@@ -10,11 +10,13 @@
         <tr>
             <th>Value</th>
             <th>Count</th>
+            <th>Equivalent</th>
         </tr>
         {% for value, count in breakdown_courses.items() %}
         <tr>
             <td>{{ value }}</td>
             <td>{{ count }}</td>
+            <td>{{ count * 9000 if value == "Engineering" else count * 3000 }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -25,11 +27,13 @@
         <tr>
             <th>Value</th>
             <th>Count</th>
+            <th>%</th>
         </tr>
         {% for value, count in breakdown_ratings.items() %}
         <tr>
             <td>{{ value }}</td>
             <td>{{ count }}</td>
+            <td>{{ 10*count/breakdown_ratings|length }}</td>
         </tr>
         {% endfor %}
     </table>

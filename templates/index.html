@@ -9,6 +9,7 @@
     <div>
         <button id="selectAllBtn">Select All</button>
         <button id="deselectAllBtn">Deselect All</button>
+        <button id="copyEmailsBtn">Copy Emails</button>
     </div>
     <table id="studentTable">
         <thead>
@@ -28,7 +29,7 @@
         <tbody>
             {% for student in students %}
             <tr>
-                <td><input type="checkbox" class="studentCheckbox"></td>
+                <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                 <td>{{ student[1] }}</td>
                 {% if student[2] and student[2] != '' %}
                     <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
@@ -52,7 +53,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
     <script>
-        // Initialize DataTables
         $(document).ready(function() {
             var table = $('#studentTable').DataTable();
 
@@ -65,6 +65,36 @@
             $('#deselectAllBtn').on('click', function() {
                 $('.studentCheckbox').prop('checked', false);
                 table.rows().deselect();
+            });
+
+            // Copy Emails button action
+            $('#copyEmailsBtn').on('click', function() {
+                var emails = [];
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+
+                    text = table.row($(this).closest('tr')).data();
+
+                    // Extract the email address from the text
+                    var email = text[2].match(/mailto:(.*?)"/)[1];
+
+                    // Output the extracted email address
+
+                    emails.push(email); // Assuming email is in the third column (index 2)
+                });
+
+                var emailsString = emails.join('\n');
+
+                // Create a temporary textarea element and set its value to the emails string
+                var textarea = $('<textarea>').val(emailsString).appendTo('body').select();
+
+                // Copy the emails string to the clipboard
+                document.execCommand('copy');
+
+                // Remove the temporary textarea element
+                textarea.remove();
+
+                // Display a confirmation message
+                alert('Emails have been copied to the clipboard.');
             });
         });
     </script>

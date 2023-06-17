@@ -46,7 +46,6 @@ def dashboard():
     students = cursor.fetchall()
 
     item_values = [student[42] for student in students]
-
     # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(item_values))
 
@@ -55,10 +54,16 @@ def dashboard():
     # Calculate the value breakdown using Counter
     breakdown_courses = dict(Counter(item_values))
 
+    total_equivalent = 0
+    for value, count in breakdown_courses.items():
+        total_equivalent = total_equivalent + (9000 * count if value == "Engineering" else count * 3000)
+
+
+
     # Close the database connection
     conn.close()
 
-    return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses)
+    return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses,total_equivalent=total_equivalent)
 
 if __name__ == '__main__':
     app.run(debug=True)

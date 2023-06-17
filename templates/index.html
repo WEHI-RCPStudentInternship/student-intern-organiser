@@ -14,6 +14,7 @@
             <th>Intake</th>
             <th>Course</th>
             <th>Status</th>
+            <th>Post Internship Rating</th>
             <th>Actions</th>
         </tr>
         {% for student in students %}
@@ -25,10 +26,12 @@
             <td>{{ student[5] }}</td>
             <td>{{ student[6] }}</td>
             <td>{{ student[7] }}</td>
+            <td>{{ student[8] }}</td>
             <td><a href="/view/{{ student[0] }}">View</a></td>
         </tr>
         {% endfor %}
     </table>
+    <a href="/dashboard">Dashboard</a>
 </body>
 </html>
 

@@ -6,9 +6,14 @@
 </head>
 <body>
     <h1>Student Index</h1>
+    <div>
+        <button id="selectAllBtn">Select All</button>
+        <button id="deselectAllBtn">Deselect All</button>
+    </div>
     <table id="studentTable">
         <thead>
             <tr>
+                <th></th> <!-- Checkbox column -->
                 <th>Name</th>
                 <th>Email</th>
                 <th>Pronunciation</th>
@@ -23,9 +28,10 @@
         <tbody>
             {% for student in students %}
             <tr>
+                <td><input type="checkbox" class="studentCheckbox"></td>
                 <td>{{ student[1] }}</td>
                 {% if student[2] and student[2] != '' %}
-                    <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a> <!-- Added mailto link --> </td>
+                    <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
                 {% else %}
                     <td></td>
                 {% endif %}
@@ -48,7 +54,18 @@
     <script>
         // Initialize DataTables
         $(document).ready(function() {
-            $('#studentTable').DataTable();
+            var table = $('#studentTable').DataTable();
+
+            // Select/Deselect All checkboxes
+            $('#selectAllBtn').on('click', function() {
+                $('.studentCheckbox').prop('checked', true);
+                table.rows().select();
+            });
+
+            $('#deselectAllBtn').on('click', function() {
+                $('.studentCheckbox').prop('checked', false);
+                table.rows().deselect();
+            });
         });
     </script>
 </body>

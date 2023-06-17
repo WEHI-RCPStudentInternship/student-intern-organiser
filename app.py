@@ -48,6 +48,7 @@ def dashboard():
     item_values = [student[42] for student in students]
     # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(item_values))
+    total_students = len(students)
 
     item_values = [student[6] for student in students]
 
@@ -63,7 +64,7 @@ def dashboard():
     # Close the database connection
     conn.close()
 
-    return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses,total_equivalent=total_equivalent)
+    return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses,total_equivalent=total_equivalent,total_students=total_students)
 
 if __name__ == '__main__':
     app.run(debug=True)

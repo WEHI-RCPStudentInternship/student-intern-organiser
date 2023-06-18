@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 import sqlite3
 
 from collections import Counter
@@ -15,10 +15,14 @@ def index():
     cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status,post_internship_summary_rating_internal FROM Students')
     students = cursor.fetchall()
 
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
     # Close the database connection
     conn.close()
 
-    return render_template('index.html', students=students)
+    return render_template('index.html', students=students,statuses=statuses)
 
 @app.route('/view/<int:intern_id>')
 def student(intern_id):
@@ -34,6 +38,48 @@ def student(intern_id):
     conn.close()
 
     return render_template('view.html', student=student)
+
+
+@app.route('/change_status', methods=['POST'])
+def change_status():
+
+    data = request.get_json()
+    student_ids = data.get('student_ids', [])
+    new_status = data.get('new_status', '')
+
+    print(student_ids)
+    print(new_status)
+
+
+    # Convert student IDs to integers
+    student_ids = [int(id) for id in student_ids]
+
+    # Call the change_student_status function
+    change_student_status(student_ids, new_status)
+
+    # Redirect back to the index page
+    return redirect('/')
+
+def change_student_status(student_ids, new_status):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    print(student_ids)
+    print(new_status) 
+
+    # Prepare the SQL query
+    query = '''
+        UPDATE Students
+        SET status = ?
+        WHERE intern_id IN ({})
+    '''.format(','.join(['?'] * len(student_ids)))
+
+    # Execute the query
+    cursor.execute(query, [new_status] + student_ids)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
 
 @app.route('/dashboard')
 def dashboard():

@@ -27,7 +27,7 @@ def index_current_intake():
 
     # Close the database connection
     conn.close()
-    title_of_page = "Current Students for this Intake Students"
+    title_of_page = "Current Recruitment for this Intake"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page)
 
 @app.route('/outstanding')

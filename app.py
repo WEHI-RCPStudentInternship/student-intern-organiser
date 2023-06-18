@@ -145,16 +145,8 @@ def change_student_status(student_ids, new_status):
     conn.commit()
     conn.close()
 
-@app.route('/dashboard')
-def dashboard():
-    # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
-    cursor = conn.cursor()
 
-    # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Students where status = "14 Finished"')
-    students = cursor.fetchall()
-
+def calculate_breakdown_of_students(students):
     item_values = [student[42] for student in students]
     # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(item_values))
@@ -170,9 +162,28 @@ def dashboard():
         total_equivalent = total_equivalent + (9000 * count if value == "Engineering" else count * 3000)
 
 
+    return [breakdown_ratings,breakdown_courses,total_equivalent,total_students]
+
+
+@app.route('/dashboard')
+def dashboard():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Students where status = "14 Finished"')
+    students = cursor.fetchall()
 
     # Close the database connection
     conn.close()
+
+    result = calculate_breakdown_of_students(students)
+
+    breakdown_ratings = result[0]
+    breakdown_courses = result[1]
+    total_equivalent = result[2]
+    total_students = result[3]
 
     return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses,total_equivalent=total_equivalent,total_students=total_students)
 

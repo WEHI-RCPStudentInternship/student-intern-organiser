@@ -59,10 +59,6 @@
         </tbody>
     </table>
     <a href="/dashboard">Dashboard</a>
-    Hello
-    {% for status in statuses %}
-        {{ status[1] }}
-    {% endfor %}
 
     <!-- Include DataTables JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -126,7 +122,6 @@
                 var selectedRows = $('.studentCheckbox:checked').each(function() {
                     text = table.row($(this).closest('tr')).data();
                     var id = text[1];
-                    alert('Changing ' + id + ' to be ' +status_name);
                     student_ids.push(id);
                 });
 

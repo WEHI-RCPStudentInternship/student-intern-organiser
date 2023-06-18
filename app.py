@@ -18,19 +18,15 @@ def index_current_intake():
     rows_to_extract = [1,2,3,4,5,6,7,8,9, 10,11,12,13]
     current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
 
+    cursor.execute('SELECT name FROM Intakes where current = "yes"')
+    intake_current = cursor.fetchall()[0][0]
+
+
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
-    query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal
-        FROM Students
-        WHERE intake = '7 - Semester 2 2023' or status IN ({})
-    '''.format(','.join(['?'] * len(current_statuses_list)))
-
-    # Execute the query with the statuses list
-    cursor.execute(query, current_statuses_list)
+    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal FROM Students WHERE intake = ?',(intake_current,))
 
     students = cursor.fetchall()
-
 
     # Close the database connection
     conn.close()

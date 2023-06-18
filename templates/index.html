@@ -4,6 +4,10 @@
     <title>{{ title_of_page }} Index</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
     <style>
+        .dataTables_length {
+            margin-top: 9px;
+            margin-left: 10px;
+        }
         body {
             font-size: 16px;
             font-weight: 300;
@@ -118,7 +122,8 @@
     <script>
         $(document).ready(function() {
             var table = $('#studentTable').DataTable({
-                "lengthMenu": [50, 100, 250, 500]  // Set the available options for number of entries
+                "lengthMenu": [50, 100, 250, 500],  // Set the available options for the number of entries
+                "dom": '<"top"ilp>rt<"bottom"lp><"clear">', // Place the information at the top
             });
 
             // Select/Deselect All checkboxes

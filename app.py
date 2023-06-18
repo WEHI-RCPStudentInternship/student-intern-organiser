@@ -88,7 +88,7 @@ def dashboard():
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Students')
+    cursor.execute('SELECT * FROM Students where status = "14 Finished"')
     students = cursor.fetchall()
 
     item_values = [student[42] for student in students]

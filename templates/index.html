@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Index</title>
+    <title>{{ title_of_page }} Index</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
 </head>
 <body>
-    <h1>Student Index</h1>
+    <h1>{{ title_of_page }} Index</h1>
     <div>
         <button id="selectAllBtn">Select All</button>
         <button id="deselectAllBtn">Deselect All</button>
@@ -59,13 +59,18 @@
         </tbody>
     </table>
     <a href="/dashboard">Dashboard</a>
+    <a href="/current">Currently Signed Students Index</a>
+    <a href="/current_intake">Current Students for this Intake Index</a>
+    <a href="/">All Students Index</a>
 
     <!-- Include DataTables JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-            var table = $('#studentTable').DataTable();
+            var table = $('#studentTable').DataTable({
+                "lengthMenu": [50, 100, 250, 500]  // Set the available options for number of entries
+            });
 
             // Select/Deselect All checkboxes
             $('#selectAllBtn').on('click', function() {

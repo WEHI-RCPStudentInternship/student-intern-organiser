@@ -140,9 +140,6 @@ def change_status():
     student_ids = data.get('student_ids', [])
     new_status = data.get('new_status', '')
 
-    print(student_ids)
-    print(new_status)
-
 
     # Convert student IDs to integers
     student_ids = [int(id) for id in student_ids]
@@ -156,9 +153,6 @@ def change_status():
 def change_student_status(student_ids, new_status):
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
-
-    print(student_ids)
-    print(new_status) 
 
     # Prepare the SQL query
     query = '''
@@ -177,9 +171,11 @@ def change_student_status(student_ids, new_status):
 
 def calculate_breakdown_of_students(students):
     item_values = [student[42] for student in students]
+    item_values = [student[42] for student in students if student[42] is not None]
+
     # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(item_values))
-    total_students = len(students)
+    total_students = len(item_values)
 
     item_values = [student[6] for student in students]
 

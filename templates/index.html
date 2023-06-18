@@ -44,9 +44,13 @@
             margin-top:20px;
             margin-bottom:20px;
         }
-
+    
         .top_links a:hover {
             background-color: #1976d2;
+        }
+        .top_links select {
+            font-size: 16px;
+            padding: 5px;
         }
     </style>
 
@@ -56,21 +60,18 @@
         <img src="/static/logo.png" alt="Logo" class="logo">
         <h1>{{ title_of_page }} Index</h1>
     </div>
-    <div>
-        <label for="statusDropdown">Status:</label>
-        <select id="statusDropdown">
-            {% for status in statuses %}
-            <option value="{{ status[0] }}">{{ status[1] }}</option>
-            {% endfor %}
-        </select>
-        <button id="changeStatusBtn">Change Status</button>
-    </div>
     <div class="top_links">
         <a href="/dashboard">Dashboard</a>
         <a href="/current">Currently Signed Students Index</a>
         <a href="/current_intake">Current Students for this Intake Index</a>
         <a href="/">All Students Index</a>
         <a href="#" id="copyEmailsBtn">Copy Emails</a>
+        <select id="statusDropdown">
+            {% for status in statuses %}
+            <option value="{{ status[0] }}">{{ status[1] }}</option>
+            {% endfor %}
+        </select>
+        <a id="changeStatusBtn" href="#">Change Status</a>
     </div>
  
     <table id="studentTable">

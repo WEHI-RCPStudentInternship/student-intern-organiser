@@ -172,7 +172,24 @@ def dashboard():
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Students where status = "14 Finished"')
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    rows_to_extract = [9, 10,11,12,13,14]
+    current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT *
+        FROM Students
+        WHERE status IN ({})
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+    # Execute the query with the statuses list
+    cursor.execute(query, current_statuses_list)
+
+    # Retrieve student data from the database
     students = cursor.fetchall()
 
     # Close the database connection

@@ -48,6 +48,17 @@
 {% endblock %}
 
 
+{% block top_links_menu %}
+
+        <a href="#" id="copyEmailsBtn">Copy Emails</a>
+        <select id="statusDropdown">
+            {% for status in statuses %}
+            <option value="{{ status[0] }}">{{ status[1] }}</option>
+            {% endfor %}
+        </select>
+        <a id="changeStatusBtn" href="#">Change Status</a>
+{% endblock %}
+
 
 {% block scripts %}
 

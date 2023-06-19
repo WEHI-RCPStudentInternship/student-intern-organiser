@@ -1,40 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-    <style>
-        body {
-            font-size: 16px;
-            font-weight: 300;
-            font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-            color: #58595b;
-            background-color: #f8f8f8;
-        }
+{% extends 'base.html' %}
 
-        .banner {
-            background-color: #f8f8f8;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-        }
+{% block title %}Dashboard{% endblock %}
 
-        .logo {
-            margin-right: 10px;
-            height: 50px;
-        }
+{% block page_title %}Dashboard{% endblock %}
 
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-        }
 
-    </style>
-</head>
-<body>
-     <div class="banner">
-        <img src="/static/logo.png" alt="Logo" class="logo">
-        <h1>Dashboard</h1>
-    </div>
+{% block content %}
 
     <table>
         <tr>
@@ -75,9 +46,7 @@
 
 
 
-    <a href="/">Return</a>
+{% endblock %}
             
 
-</body>
-</html>
 

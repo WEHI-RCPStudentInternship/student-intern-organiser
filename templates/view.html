@@ -44,8 +44,22 @@
         </tr>
         <tr>
             <td>link_to_application_doc</td>
-            <td>{{ student[8] }}</td>
+            <td>
+                {% if matching_files %}
+                    <ul>
+                        {% for file_name in matching_files %}
+
+                            <li><a href="/view_docs/{{ file_name }}">Link to {{ file_name }} File</a></li>
+
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    No matching files found.
+                {% endif %}
+
+            </td>
         </tr>
+
         <tr>
             <td>read_student_handbook</td>
             <td>{{ student[9] }}</td>

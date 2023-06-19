@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_file
 import sqlite3
+import os
 
 from collections import Counter
 
@@ -116,6 +117,12 @@ def index():
     title_of_page = "All Students"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page)
 
+# Route to serve the file from a different directory
+@app.route('/view_docs/<path:filename>')
+def view_docs(filename):
+    directory = 'student_intern_data/attachments/'  # Replace with the actual directory path
+    filepath = directory + '/' + filename
+    return send_file(filepath, as_attachment=True)
 
 @app.route('/view/<int:intern_id>')
 def student(intern_id):
@@ -130,7 +137,15 @@ def student(intern_id):
     # Close the database connection
     conn.close()
 
-    return render_template('view.html', student=student)
+    # Find matching PDF files
+    attachments_dir = 'student_intern_data/attachments'
+    matching_files = []
+    for filename in os.listdir(attachments_dir):
+        if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf'):
+            matching_files.append(filename)
+
+    # Pass matching_files to the template
+    return render_template('view.html', student=student, matching_files=matching_files)
 
 
 @app.route('/change_status', methods=['POST'])

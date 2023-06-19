@@ -6,6 +6,29 @@ from collections import Counter
 
 app = Flask(__name__)
 
+@app.route('/upload_signed_contract/<int:item_id>/<string:full_name>', methods=['GET', 'POST'])
+def upload_signed_contract(item_id, full_name):
+
+    attachments_dir = 'student_intern_data/attachments'
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            # Save the file to the attachments directory with the desired filename
+            filename = str(item_id)+"_"+full_name.replace(" ", "_").title()+"_signed_contract.pdf"
+
+            file.save(os.path.join(attachments_dir, filename))
+            # Get the referrer URL
+            referrer = request.referrer
+
+            # Redirect back to the previous page
+            return redirect(referrer)
+
+    
+    return render_template('upload_signed_contract.html', item_id=item_id, full_name=full_name)
+
+
+
+
 @app.route('/current_intake')
 def index_current_intake():
     # Connect to the SQLite database

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Signed Contract{% endblock %}
+
+{% block page_title %}Upload Signed Contract{% endblock %}
+
+
+{% block content %}
+
+    <h1>Upload Signed Contract</h1>
+    <form action="{{ url_for('upload_signed_contract', item_id=item_id, full_name=full_name) }}" method="POST" enctype="multipart/form-data">
+        <label for="file">Select File:</label>
+        <input type="file" name="file" id="file" required>
+        <br><br>
+        <input type="submit" value="Upload">
+    </form>
+
+{% endblock %}

@@ -1,84 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ title_of_page }} Index</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
-    <style>
-        .dataTables_length {
-            margin-top: 9px;
-            margin-left: 10px;
-        }
-        body {
-            font-size: 16px;
-            font-weight: 300;
-            font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-            color: #58595b;
-            background-color: #f8f8f8;
-        }
+{% extends 'base.html' %}
 
-        .banner {
-            background-color: #f8f8f8;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-        }
+{% block title %}{{ title_of_page }} Index{% endblock %}
 
-        .logo {
-            margin-right: 10px;
-            height: 50px;
-        }
+{% block page_title %}{{ title_of_page }}{% endblock %}
 
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .dataTables_wrapper {
-            width:90%;
-        }
-        /* Style the buttons in the top_links div */
-        .top_links a {
-            display: inline-block;
-            margin-right: 10px;
-            padding: 5px 10px;
-            background-color: #49A942;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            margin-top:20px;
-            margin-bottom:20px;
-        }
-    
-        .top_links a:hover {
-            background-color: #1976d2;
-        }
-        .top_links select {
-            font-size: 16px;
-            padding: 5px;
-        }
-    </style>
+{% block content %}
+    <!-- Add your content specific to the child template -->
 
-</head>
-<body>
-     <div class="banner">
-        <img src="/static/logo.png" alt="Logo" class="logo">
-        <h1>{{ title_of_page }} Index</h1>
-    </div>
-    <div class="top_links">
-        <a href="/dashboard">Dashboard</a>
-        <a href="/current">Signed Students</a>
-        <a href="/current_intake">Current Recruitment</a>
-        <a href="/outstanding">Outstanding Students</a>
-        <a href="/">All Students Index</a>
-        <a href="#" id="copyEmailsBtn">Copy Emails</a>
-        <select id="statusDropdown">
-            {% for status in statuses %}
-            <option value="{{ status[0] }}">{{ status[1] }}</option>
-            {% endfor %}
-        </select>
-        <a id="changeStatusBtn" href="#">Change Status</a>
-    </div>
- 
     <table id="studentTable">
         <thead>
             <tr>
@@ -117,9 +45,12 @@
             {% endfor %}
         </tbody>
     </table>
-    <!-- Include DataTables JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+
+
+
+{% block scripts %}
+
     <script>
         $(document).ready(function() {
             var table = $('#studentTable').DataTable({
@@ -220,6 +151,5 @@
             });
         });
     </script>
-</body>
-</html>
+{% endblock %}
 

@@ -1,10 +1,85 @@
 from flask import Flask, render_template, request, redirect, send_file
 import sqlite3
 import os
+import csv
+import zipfile
+import shutil
 
 from collections import Counter
 
 app = Flask(__name__)
+
+
+@app.route('/download_contracts')
+def download_contracts():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve students with status '09 Signed contract' from the database
+    cursor.execute('SELECT intern_id, full_name FROM Students WHERE status = ?', ('09 Signed contract',))
+    students = cursor.fetchall()
+
+
+    # Create a temporary directory to store the files
+    temp_dir = 'student_intern_data/attachments/tmp'
+
+    try:
+        os.makedirs(temp_dir)
+    except Exception:
+        pass
+
+    # Create the CSV file inside the temporary directory
+    csv_path = os.path.join(temp_dir, 'student_data.csv')
+    with open(csv_path, 'w') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(['Full Name', 'Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week'])
+
+        for student in students:
+            # Retrieve student data from the database
+            cursor.execute('SELECT full_name, mobile, email, start_date, end_date, hours_per_week FROM Students WHERE intern_id = ?', (student[0],))
+            student_data = cursor.fetchone()
+
+            # Write the student data to the CSV file
+            csv_writer.writerow(student_data)
+
+    # Create the ZIP file
+    zip_path = os.path.join(temp_dir, 'contract_files.zip')
+    with zipfile.ZipFile(zip_path, 'w') as zip_file:
+        # Add the PDF files for each student to the ZIP file
+        for student in students:
+
+            intern_id = student[0]
+
+            # Get all PDF files starting with the intern_id
+            matching_files = [filename for filename in os.listdir('student_intern_data/attachments') if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf')]
+
+            # Copy the matching PDF files to the temporary directory
+            for file in matching_files:
+                file_path = os.path.join('student_intern_data/attachments', file)
+                dest_path = os.path.join(temp_dir, file)
+                shutil.copy(file_path, dest_path)
+
+            
+    # Create a zip file of the PDF files
+    zip_path = 'student_contracts.zip'
+    with zipfile.ZipFile(zip_path, 'w') as zip_file:
+        for folder_name, _, file_names in os.walk(temp_dir):
+            for file_name in file_names:
+                file_path = os.path.join(folder_name, file_name)
+                zip_file.write(file_path, os.path.basename(file_path))
+
+    # Remove the temporary directory
+    shutil.rmtree(temp_dir)
+
+    # Close the database connection
+    conn.close()
+
+    # Serve the ZIP file for download
+    return send_file(zip_path, as_attachment=True, attachment_filename='contract_files.zip')
+
+
+
 
 @app.route('/upload_signed_contract/<int:item_id>/<string:full_name>', methods=['GET', 'POST'])
 def upload_signed_contract(item_id, full_name):

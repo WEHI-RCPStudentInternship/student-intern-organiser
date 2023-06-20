@@ -36,7 +36,7 @@
             width:90%;
         }
         /* Style the buttons in the top_links div */
-        .top_links a {
+        .second_level_top_links a, .top_links a {
             display: inline-block;
             margin-right: 10px;
             padding: 5px 10px;
@@ -49,10 +49,10 @@
             margin-bottom:20px;
         }
     
-        .top_links a:hover {
+        .second_level_top_links a:hover, .top_links a:hover {
             background-color: #1976d2;
         }
-        .top_links select {
+        .second_level_top_links select , .top_links select {
             font-size: 16px;
             padding: 5px;
         }
@@ -73,8 +73,9 @@
         <a href="/outstanding">Outstanding Students</a>
         <a href="/">All Students Index</a>
 
+     </div>
+     <div class="second_level_top_links">
         {% block top_links_menu %}{% endblock %}
-
      </div>
  
     {% block content %}{% endblock %}

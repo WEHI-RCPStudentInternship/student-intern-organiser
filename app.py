@@ -40,26 +40,27 @@ def get_projects():
     conn.close()
     return projects
 
-def get_student_by_id(item_id):
+def get_student_by_id(intern_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (item_id,))
+    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (intern_id,))
     student = cursor.fetchone()
     conn.close()
     return student
 
-def update_student(item_id, data):
+def update_student(intern_id, data):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute('UPDATE Students SET full_name = ?, pronouns = ?, status = ?, email = ?, mobile = ?, course = ?, course_major = ?, intake = ?, project = ?, start_date = ?, end_date = ?, hours_per_week = ? WHERE intern_id = ?',
-                   (data['full_name'], data['pronouns'], data['status'], data['email'], data['mobile'], data['course'], data['course_major'], data['intake'], data['project'], data['start_date'], data['end_date'], data['hours_per_week'], item_id))
+    cursor.execute('UPDATE Students SET full_name = ?, pronouns = ?, status = ?, email = ?, mobile = ?, course = ?, course_major = ?, intake = ?, project = ?, start_date = ?, end_date = ?, hours_per_week = ?, cover_letter_projects = ?, pronunciation = ? WHERE intern_id = ?',
+                   (data['full_name'], data['pronouns'], data['status'], data['email'], data['mobile'], data['course'], data['course_major'], data['intake'], data['project'], data['start_date'], data['end_date'], data['hours_per_week'], data['cover_letter_projects'],data['pronunciation'], intern_id))
     conn.commit()
     conn.close()
 
-@app.route('/edit_student/<int:item_id>', methods=['GET', 'POST'])
-def edit_student(item_id):
+@app.route('/edit_student/<int:intern_id>', methods=['GET', 'POST'])
+def edit_student(intern_id):
     if request.method == 'POST':
         # Handle form submission and update the student record in the database
+        print(request.form)
         data = {
             'full_name': request.form['full_name'],
             'pronouns': request.form['pronouns'],
@@ -72,10 +73,12 @@ def edit_student(item_id):
             'project': request.form['project'],
             'start_date': request.form['start_date'],
             'end_date': request.form['end_date'],
-            'hours_per_week': request.form['hours_per_week']
+            'hours_per_week': request.form['hours_per_week'],
+            'pronunciation': request.form['pronunciation'],
+            'cover_letter_projects': request.form['cover_letter_projects'],
         }
         
-        update_student(item_id, data)  # Update the student record in the database
+        update_student(intern_id, data)  # Update the student record in the database
         
         # Redirect to the student details page after updating
         # Get the referrer URL
@@ -83,9 +86,9 @@ def edit_student(item_id):
         return redirect(referrer)
     
     else:
-        # Retrieve the student record from the database based on the item_id
+        # Retrieve the student record from the database based on the intern_id
         # Pass the student record, statuses, intakes, and projects to the edit.html template
-        student = get_student_by_id(item_id)
+        student = get_student_by_id(intern_id)
         statuses = get_statuses()  # Retrieve the list of statuses from the database
         intakes = get_intakes()    # Retrieve the list of intakes from the database
         projects = get_projects()  # Retrieve the list of projects from the database
@@ -170,15 +173,15 @@ def download_contracts_and_applications():
 
 
 
-@app.route('/upload_signed_contract/<int:item_id>/<string:full_name>', methods=['GET', 'POST'])
-def upload_signed_contract(item_id, full_name):
+@app.route('/upload_signed_contract/<int:intern_id>/<string:full_name>', methods=['GET', 'POST'])
+def upload_signed_contract(intern_id, full_name):
 
     attachments_dir = 'student_intern_data/attachments'
     if request.method == 'POST':
         file = request.files['file']
         if file:
             # Save the file to the attachments directory with the desired filename
-            filename = str(item_id)+"_"+full_name.replace(" ", "_").title()+"_signed_contract.pdf"
+            filename = str(intern_id)+"_"+full_name.replace(" ", "_").title()+"_signed_contract.pdf"
 
             file.save(os.path.join(attachments_dir, filename))
             # Get the referrer URL
@@ -188,7 +191,7 @@ def upload_signed_contract(item_id, full_name):
             return redirect(referrer)
 
     
-    return render_template('upload_signed_contract.html', item_id=item_id, full_name=full_name)
+    return render_template('upload_signed_contract.html', intern_id=intern_id, full_name=full_name)
 
 
 

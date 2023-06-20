@@ -264,7 +264,6 @@ def change_status():
     student_ids = data.get('student_ids', [])
     new_status = data.get('new_status', '')
 
-
     # Convert student IDs to integers
     student_ids = [int(id) for id in student_ids]
 

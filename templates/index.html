@@ -131,7 +131,7 @@
 
                 var selectedRows = $('.studentCheckbox:checked').each(function() {
                     text = table.row($(this).closest('tr')).data();
-                    var id = text[1];
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
                     student_ids.push(id);
                 });
 

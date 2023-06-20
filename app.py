@@ -4,14 +4,18 @@ import os
 import csv
 import zipfile
 import shutil
+import datetime
 
 from collections import Counter
 
 app = Flask(__name__)
 
 
-@app.route('/download_contracts')
-def download_contracts():
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
+
+
+@app.route('/download_contracts_and_applications')
+def download_contracts_and_applications():
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -75,8 +79,15 @@ def download_contracts():
     # Close the database connection
     conn.close()
 
+
+    # Get today's date
+    today = datetime.date.today()
+
+    # Format the date as YYYY-mm-dd
+    formatted_date = today.strftime("%Y-%m-%d")
+
     # Serve the ZIP file for download
-    return send_file(zip_path, as_attachment=True, attachment_filename='contract_files.zip')
+    return send_file(zip_path, as_attachment=True, attachment_filename=formatted_date+'_contract_files.zip')
 
 
 

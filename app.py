@@ -125,6 +125,9 @@ def index_current_intake():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
     cursor.execute('SELECT name FROM Intakes where current = "yes"')
     intake_current = cursor.fetchall()[0][0]
 
@@ -138,13 +141,18 @@ def index_current_intake():
     # Close the database connection
     conn.close()
     title_of_page = "Current Recruitment for this Intake"
-    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 @app.route('/outstanding')
 def index_outstanding():
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
+
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -170,7 +178,7 @@ def index_outstanding():
     # Close the database connection
     conn.close()
     title_of_page = "Outstanding Students"
-    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 
 
@@ -183,6 +191,9 @@ def index_current():
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
 
     rows_to_extract = [9, 10,11,12,13]
     current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
@@ -204,7 +215,7 @@ def index_current():
     # Close the database connection
     conn.close()
     title_of_page = "Currently Signed Students"
-    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 
 @app.route('/')
@@ -217,6 +228,9 @@ def index():
     cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status,post_internship_summary_rating_internal FROM Students')
     students = cursor.fetchall()
 
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
@@ -224,7 +238,7 @@ def index():
     # Close the database connection
     conn.close()
     title_of_page = "All Students"
-    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 # Route to serve the file from a different directory
 @app.route('/view_docs/<path:filename>')
@@ -256,6 +270,22 @@ def student(intern_id):
     # Pass matching_files to the template
     return render_template('view.html', student=student, matching_files=matching_files)
 
+@app.route('/change_project', methods=['POST'])
+def change_project():
+
+    data = request.get_json()
+    student_ids = data.get('student_ids', [])
+    new_project = data.get('new_project', '')
+
+    # Convert student IDs to integers
+    student_ids = [int(id) for id in student_ids]
+
+    # Call the change_student_project function
+    change_student_project(student_ids, new_project)
+
+    # Redirect back to the index page
+    return redirect('/')
+
 
 @app.route('/change_status', methods=['POST'])
 def change_status():
@@ -286,6 +316,26 @@ def change_student_status(student_ids, new_status):
 
     # Execute the query
     cursor.execute(query, [new_status] + student_ids)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+
+
+
+def change_student_project(student_ids, new_project):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Prepare the SQL query
+    query = '''
+        UPDATE Students
+        SET project = ?
+        WHERE intern_id IN ({})
+    '''.format(','.join(['?'] * len(student_ids)))
+
+    # Execute the query
+    cursor.execute(query, [new_project] + student_ids)
 
     # Commit the changes and close the connection
     conn.commit()

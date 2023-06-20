@@ -4,6 +4,30 @@
 
 {% block page_title %}{{ title_of_page }}{% endblock %}
 
+{% block top_links_menu %}
+
+        <a href="#" id="copyEmailsBtn">Copy Emails</a>
+
+        <select id="statusDropdown">
+            {% for status in statuses %}
+            <option value="{{ status[0] }}">{{ status[1] }}</option>
+            {% endfor %}
+        </select>
+        <a id="changeStatusBtn" href="#">Change Status</a>
+
+        <select id="projectDropdown">
+            {% for project in projects %}
+            <option value="{{ project[0] }}">{{ project[1] }}</option>
+            {% endfor %}
+        </select>
+        <a id="changeProjectBtn" href="#">Change Project</a>
+
+
+
+{% endblock %}
+
+
+
 {% block content %}
     <!-- Add your content specific to the child template -->
 
@@ -45,18 +69,6 @@
             {% endfor %}
         </tbody>
     </table>
-{% endblock %}
-
-
-{% block top_links_menu %}
-
-        <a href="#" id="copyEmailsBtn">Copy Emails</a>
-        <select id="statusDropdown">
-            {% for status in statuses %}
-            <option value="{{ status[0] }}">{{ status[1] }}</option>
-            {% endfor %}
-        </select>
-        <a id="changeStatusBtn" href="#">Change Status</a>
 {% endblock %}
 
 
@@ -152,6 +164,45 @@
                   .then(response => {
                     if (response.ok) {
                       console.log('Status changed successfully');
+                    } else {
+                      console.error('An error occurred:', response.statusText);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('An error occurred:', error);
+                  });
+            });
+
+
+            // Change project button action
+            $('#changeProjectBtn').on('click', function() {
+                var project_id = $('#projectDropdown').val();
+                var student_ids = [];
+                var project_name = $('#projectDropdown option:selected').text();
+
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids,
+                    new_project: project_name
+                };
+
+                url = '/change_project';
+                // Send the POST request
+                fetch(url, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                  .then(response => {
+                    if (response.ok) {
+                      console.log('Project changed successfully');
                     } else {
                       console.error('An error occurred:', response.statusText);
                     }

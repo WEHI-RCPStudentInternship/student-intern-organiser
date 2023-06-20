@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student Details{% endblock %}
+
+{% block page_title %}Edit Student Details{% endblock %}
+
+{% block content %}
+    <form action="{{ url_for('edit_student', item_id=student[0]) }}" method="POST">
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>intern_id</td>
+                <td>{{ student[0] }}</td>
+            </tr>
+            <tr>
+                <td>full_name</td>
+                <td><input type="text" name="full_name" value="{{ student[1] }}" required></td>
+            </tr>
+            <tr>
+                <td>pronouns</td>
+                <td><input type="text" name="pronouns" value="{{ student[2] }}" required></td>
+            </tr>
+            <tr>
+                <td>status</td>
+                <td>
+                    <select name="status" required>
+                        {% for status in statuses %}
+                            {% if status == student[3] %}
+                                <option value="{{ status }}" selected>{{ status }}</option>
+                            {% else %}
+                                <option value="{{ status }}">{{ status }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>email</td>
+                <td><input type="email" name="email" value="{{ student[4] }}" required></td>
+            </tr>
+            <tr>
+                <td>mobile</td>
+                <td><input type="tel" name="mobile" value="{{ student[5] }}" required></td>
+            </tr>
+            <tr>
+                <td>course</td>
+                <td><input type="text" name="course" value="{{ student[6] }}" required></td>
+            </tr>
+            <tr>
+                <td>course_major</td>
+                <td><input type="text" name="course_major" value="{{ student[7] }}" required></td>
+            </tr>
+            <tr>
+                <td>cover_letter_projects</td>
+                <td><textarea name="cover_letter_projects" rows="3" required>{{ student[11] }}</textarea></td>
+            </tr>
+            <tr>
+                <td>pronunciation</td>
+                <td><textarea name="pronunciation" rows="3" required>{{ student[14] }}</textarea></td>
+            </tr>
+            <tr>
+                <td>project</td>
+                <td>
+                    <select name="project" required>
+                        {% for project in projects %}
+                            {% if project['name'] == student[15] %}
+                                <option value="{{ project['name'] }}" selected>{{ project['name'] }}</option>
+                            {% else %}
+                                <option value="{{ project['name'] }}">{{ project['name'] }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>start_date</td>
+                <td><input type="date" name="start_date" value="{{ student[16] }}" required></td>
+            </tr>
+            <tr>
+                <td>end_date</td>
+                <td><input type="date" name="end_date" value="{{ student[17] }}" required></td>
+            </tr>
+            <tr>
+                <td>hours_per_week</td>
+                <td><input type="number" name="hours_per_week" value="{{ student[18] }}" required></td>
+            </tr>
+            <tr>
+                <td>intake</td>
+                <td>
+                    <select name="intake" required>
+                        {% for intake in intakes %}
+                            {% if intake == student[19] %}
+                                <option value="{{ intake }}" selected>{{ intake }}</option>
+                            {% else %}
+                                <option value="{{ intake }}">{{ intake }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button type="submit">Update</button>
+    </form>
+{% endblock %}
+

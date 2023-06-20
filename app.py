@@ -13,6 +13,84 @@ app = Flask(__name__)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
+db_path = 'student_intern_data/student_intern_data.db'  # Replace with your SQLite database file path
+
+
+def get_statuses():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT name FROM Statuses')
+    statuses = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return statuses
+
+def get_intakes():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT name FROM Intakes')
+    intakes = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return intakes
+
+def get_projects():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, name FROM Projects')
+    projects = [{'id': row[0], 'name': row[1]} for row in cursor.fetchall()]
+    conn.close()
+    return projects
+
+def get_student_by_id(item_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (item_id,))
+    student = cursor.fetchone()
+    conn.close()
+    return student
+
+def update_student(item_id, data):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE Students SET full_name = ?, pronouns = ?, status = ?, email = ?, mobile = ?, course = ?, course_major = ?, intake = ?, project = ?, start_date = ?, end_date = ?, hours_per_week = ? WHERE intern_id = ?',
+                   (data['full_name'], data['pronouns'], data['status'], data['email'], data['mobile'], data['course'], data['course_major'], data['intake'], data['project'], data['start_date'], data['end_date'], data['hours_per_week'], item_id))
+    conn.commit()
+    conn.close()
+
+@app.route('/edit_student/<int:item_id>', methods=['GET', 'POST'])
+def edit_student(item_id):
+    if request.method == 'POST':
+        # Handle form submission and update the student record in the database
+        data = {
+            'full_name': request.form['full_name'],
+            'pronouns': request.form['pronouns'],
+            'status': request.form['status'],
+            'email': request.form['email'],
+            'mobile': request.form['mobile'],
+            'course': request.form['course'],
+            'course_major': request.form['course_major'],
+            'intake': request.form['intake'],
+            'project': request.form['project'],
+            'start_date': request.form['start_date'],
+            'end_date': request.form['end_date'],
+            'hours_per_week': request.form['hours_per_week']
+        }
+        
+        update_student(item_id, data)  # Update the student record in the database
+        
+        # Redirect to the student details page after updating
+        # Get the referrer URL
+        referrer = request.referrer
+        return redirect(referrer)
+    
+    else:
+        # Retrieve the student record from the database based on the item_id
+        # Pass the student record, statuses, intakes, and projects to the edit.html template
+        student = get_student_by_id(item_id)
+        statuses = get_statuses()  # Retrieve the list of statuses from the database
+        intakes = get_intakes()    # Retrieve the list of intakes from the database
+        projects = get_projects()  # Retrieve the list of projects from the database
+        
+    return render_template('edit.html', student=student, statuses=statuses, intakes=intakes, projects=projects)
 
 @app.route('/download_contracts_and_applications')
 def download_contracts_and_applications():
@@ -177,7 +255,7 @@ def index_outstanding():
 
     # Close the database connection
     conn.close()
-    title_of_page = "Outstanding Students"
+    title_of_page = "In Progress Students"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 

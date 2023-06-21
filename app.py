@@ -257,7 +257,7 @@ def index_outstanding():
 
     # Close the database connection
     conn.close()
-    title_of_page = "In Progress Students"
+    title_of_page = "Available Students"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 

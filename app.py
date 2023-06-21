@@ -129,7 +129,7 @@ def download_contracts_and_applications():
             csv_writer.writerow(student_data)
 
     # Create the ZIP file
-    zip_path = os.path.join(temp_dir, 'contract_files.zip')
+    zip_path = 'student_intern_data/attachments/contract_downloads_temp.zip'
     with zipfile.ZipFile(zip_path, 'w') as zip_file:
         # Add the PDF files for each student to the ZIP file
         for student in students:
@@ -146,8 +146,7 @@ def download_contracts_and_applications():
                 shutil.copy(file_path, dest_path)
 
             
-    # Create a zip file of the PDF files
-    zip_path = 'student_contracts.zip'
+    # Create a zip file of the other files
     with zipfile.ZipFile(zip_path, 'w') as zip_file:
         for folder_name, _, file_names in os.walk(temp_dir):
             for file_name in file_names:

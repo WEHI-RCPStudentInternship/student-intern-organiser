@@ -4,7 +4,7 @@ import os
 import csv
 import zipfile
 import shutil
-import datetime
+from datetime import datetime
 
 from collections import Counter
 
@@ -15,7 +15,53 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
 db_path = 'student_intern_data/student_intern_data.db'  # Replace with your SQLite database file path
 
+@app.route('/download_key_attributes')
+def download_key_attributes():
+    data = request.args.getlist('student_ids')
+    values = data[0].split(',')
 
+    student_ids = [int(value) for value in values] 
+
+
+ 
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT full_name, project, status, mobile, email, start_date, end_date, hours_per_week FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
+
+    students = cursor.fetchall()
+
+
+    # Create a temporary directory to store the files
+    temp_dir = 'student_intern_data/attachments/tmp'
+
+    try:
+        os.makedirs(temp_dir)
+    except Exception:
+        pass
+
+    # Get the current datetime
+    now = datetime.now()
+    formatted_datetime = now.strftime("%Y-%m-%d-%H:%M:%S")
+
+    # Create the CSV file inside the temporary directory
+    csv_path = os.path.join(temp_dir, formatted_datetime+'_student_data.csv')
+    with open(csv_path, 'w') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(['Full Name', 'Project','Status','Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week'])
+
+
+        for student in students:
+            # Retrieve student data from the database
+            # Write the student data to the CSV file
+            csv_writer.writerow(student)
+
+
+
+    return send_file(csv_path, as_attachment=True)
+
+ 
 def get_statuses():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()

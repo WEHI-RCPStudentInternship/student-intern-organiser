@@ -7,6 +7,7 @@
 {% block top_links_menu %}
 
         <a href="#" id="copyEmailsBtn">Copy Emails</a>
+        <a href="#" id="downloadKeyAttributesBtn">Download Key Attributes</a>
 
         <select id="statusDropdown">
             {% for status in statuses %}
@@ -97,6 +98,33 @@
                 var isChecked = $(this).is(':checked');
                 $('.studentCheckbox').prop('checked', isChecked);
                 table.rows().select(isChecked);
+            });
+
+
+            // Download Key attributes button action
+            $('#downloadKeyAttributesBtn').on('click', function() {
+
+                var student_ids = [];
+var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids
+                };
+
+                // Construct the query string
+                var queryString = 'student_ids=' + student_ids.join(',');
+
+                url = '/download_key_attributes';
+
+                // Append the query string to the URL
+                url += '?' + queryString;
+
+                window.location.href = url;
+ 
             });
 
 

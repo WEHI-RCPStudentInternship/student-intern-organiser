@@ -60,6 +60,12 @@ pip install flask
 flask run
 ```
 
+# Setup of the database
+
+Please use [student_intern_data_public](https://github.com/WEHI-ResearchComputing/student_intern_data_public) to setup the database to use flask run
+
+
+
 >Note: Remember to deactivate the virtual environment once you have finished using the application. Simply run the command
  ``` 
  deactivate

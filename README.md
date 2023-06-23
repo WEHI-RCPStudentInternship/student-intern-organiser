@@ -1,4 +1,4 @@
-# **student-intern-organiser**
+# student-intern-organiser
 
 This is a way for WEHI to organise the Research Software Engineer Student Internship program
 # Installation
@@ -8,7 +8,7 @@ To begin, please follow the steps below for installing Python and setting up the
 Download the latest version of Python from the official website.
 [Download Here](https://www.python.org/)
 
-# **Windows**
+# Windows
 Follow the installation instructions provided, ensuring that Python is added to the system PATH.
 ## Install virtualenv
 Open the command prompt.
@@ -34,7 +34,7 @@ Start the Flask application by running the following command:
 flask run
 ```
 
-# **MacOS/Linux**
+# MacOS/Linux
 Open Terminal
 ## install virtualenv
 ```

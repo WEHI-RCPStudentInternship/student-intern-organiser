@@ -68,4 +68,4 @@ in the terminal to deactivate the virtual environment.
 
 >We hope this documentation helps you in setting up and running the Student Intern Organiser effectively. 
 
-**If you have any further questions or issues, please don't hesitate to reach out for assistance.**
+If you have any further questions or issues, please don't hesitate to reach out for assistance.

@@ -5,25 +5,16 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-
     <table>
         <tr>
-            <th>Value</th>
-            <th>Count</th>
-            <th>Equivalent</th>
+            <th>Status</th>
+            <th>Total</th>
         </tr>
-        {% for stat in stats %}
+        {% for row in stats %}
         <tr>
-            <td>{{ stat[1] }}</td>
-            <td>{{ stat[2] }}</td>
-            <td>{{ stat[2] * 900 if stat[1] == "Engineering" else stat[2] * 300 }}</td>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
         </tr>
         {% endfor %}
-        <tr>
-            <td></td>
-            <td></td>
-            <td>{{ total_equivalent }}</td>
-        </tr>
     </table>
-
 {% endblock %}

@@ -490,23 +490,29 @@ def calculate_breakdown_of_students(students):
 
 
 @app.route('/dashboard')
+@app.route('/dashboard')
+@app.route('/dashboard')
 def dashboard():
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    # Retrieve student data from the database
-    #cursor.execute('SELECT pronouns, course, COUNT(pronouns) FROM Students WHERE status LIKE "%09%" OR status LIKE "%10%" OR status LIKE "%11%" OR status LIKE "%12%" OR status LIKE "%13%" OR status LIKE "%14%" GROUP BY pronouns, course')
-    cursor.execute('SELECT id, name,COUNT(name) FROM Statuses WHERE name LIKE "%09%" OR name LIKE "%10%" OR name LIKE "%11%" OR name LIKE "%12%" OR name LIKE "%13%" OR name LIKE "%14%" GROUP BY id;')
+    # Execute the query
+    cursor.execute('''
+        SELECT status, COUNT(*) AS count
+        FROM Students
+        WHERE status IN ('01 Received application', '02 Emailed acknowledgement', '03 Quick review', '04 Initial phone call', '05 Added to Round 2 list', '06 Interviewed by non-RCP supervisor', '07 Offered contact', '08 Accepted contract', '09 Signed contract', '10 Sent to be added to Workday', '11 Added to WEHI-wide Teams Group', '12 WEHI email created', '13 Internship started', '14 Finished', '15 Ineligible', '15 Chose another internship', '15 Did not complete', '15 Did not reply', '15 Was not chosen', '15 Withdrew', '15 Applied after close')
+        GROUP BY status;
+
+    ''')
 
     stats = cursor.fetchall()
 
     # Close the database connection
     conn.close()
 
-    total_equivalent = 9000  # Update this value with your desired total equivalent calculation
+    return render_template('dashboard.html', stats=stats)
 
-    return render_template('dashboard.html', stats=stats, total_equivalent=total_equivalent)
 if __name__ == '__main__':
     app.run(debug=True)
 

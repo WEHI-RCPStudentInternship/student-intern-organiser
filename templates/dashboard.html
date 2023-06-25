@@ -4,49 +4,17 @@
 
 {% block page_title %}Dashboard{% endblock %}
 
-
 {% block content %}
-
     <table>
         <tr>
-            <th>Value</th>
-            <th>Count</th>
-            <th>Equivalent</th>
+            <th>Status</th>
+            <th>Total</th>
         </tr>
-        {% for value, count in breakdown_courses.items() %}
+        {% for row in stats %}
         <tr>
-            <td>{{ value }}</td>
-            <td>{{ count }}</td>
-            <td>{{ count * 9000 if value == "Engineering" else count * 3000 }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-            <td></td>
-            <td></td>
-            <td>{{ total_equivalent }}</td>
-        </tr>
-    </table>
-
-
-
-    <table>
-        <tr>
-            <th>Value</th>
-            <th>Count</th>
-            <th>%</th>
-        </tr>
-        {% for value, count in breakdown_ratings.items() %}
-        <tr>
-            <td>{{ value }}</td>
-            <td>{{ count }}</td>
-            <td>{{ count/total_students*100 }}</td>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
         </tr>
         {% endfor %}
     </table>
-
-
-
 {% endblock %}
-            
-
-

@@ -495,39 +495,21 @@ def dashboard():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Statuses')
-    statuses = cursor.fetchall()
-
-    rows_to_extract = [9, 10,11,12,13,14]
-    current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
-
-    # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
-    query = '''
-        SELECT *
+    # Execute the query
+    cursor.execute('''
+        SELECT status, COUNT(*) AS count
         FROM Students
-        WHERE status IN ({})
-    '''.format(','.join(['?'] * len(current_statuses_list)))
+        WHERE status IN ('01 Received application', '02 Emailed acknowledgement', '03 Quick review', '04 Initial phone call', '05 Added to Round 2 list', '06 Interviewed by non-RCP supervisor', '07 Offered contact', '08 Accepted contract', '09 Signed contract', '10 Sent to be added to Workday', '11 Added to WEHI-wide Teams Group', '12 WEHI email created', '13 Internship started', '14 Finished', '15 Ineligible', '15 Chose another internship', '15 Did not complete', '15 Did not reply', '15 Was not chosen', '15 Withdrew', '15 Applied after close')
+        GROUP BY status;
 
-    # Execute the query with the statuses list
-    cursor.execute(query, current_statuses_list)
+    ''')
 
-    # Retrieve student data from the database
-    students = cursor.fetchall()
+    stats = cursor.fetchall()
 
     # Close the database connection
     conn.close()
 
-    result = calculate_breakdown_of_students(students)
-
-    breakdown_ratings = result[0]
-    breakdown_courses = result[1]
-    total_equivalent = result[2]
-    total_students = result[3]
-
-    return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses,total_equivalent=total_equivalent,total_students=total_students)
-
+    return render_template('dashboard.html', stats=stats)
 if __name__ == '__main__':
     app.run(debug=True)
 

@@ -4,7 +4,6 @@
 
 {% block page_title %}Dashboard{% endblock %}
 
-
 {% block content %}
 
     <table>
@@ -13,11 +12,11 @@
             <th>Count</th>
             <th>Equivalent</th>
         </tr>
-        {% for value, count in breakdown_courses.items() %}
+        {% for stat in stats %}
         <tr>
-            <td>{{ value }}</td>
-            <td>{{ count }}</td>
-            <td>{{ count * 9000 if value == "Engineering" else count * 3000 }}</td>
+            <td>{{ stat[1] }}</td>
+            <td>{{ stat[2] }}</td>
+            <td>{{ stat[2] * 900 if stat[1] == "Engineering" else stat[2] * 300 }}</td>
         </tr>
         {% endfor %}
         <tr>
@@ -27,26 +26,4 @@
         </tr>
     </table>
 
-
-
-    <table>
-        <tr>
-            <th>Value</th>
-            <th>Count</th>
-            <th>%</th>
-        </tr>
-        {% for value, count in breakdown_ratings.items() %}
-        <tr>
-            <td>{{ value }}</td>
-            <td>{{ count }}</td>
-            <td>{{ count/total_students*100 }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-
-
 {% endblock %}
-            
-
-

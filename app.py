@@ -496,38 +496,18 @@ def dashboard():
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Statuses')
-    statuses = cursor.fetchall()
+    #cursor.execute('SELECT pronouns, course, COUNT(pronouns) FROM Students WHERE status LIKE "%09%" OR status LIKE "%10%" OR status LIKE "%11%" OR status LIKE "%12%" OR status LIKE "%13%" OR status LIKE "%14%" GROUP BY pronouns, course')
+    cursor.execute('SELECT id, name,COUNT(name) FROM Statuses WHERE name LIKE "%09%" OR name LIKE "%10%" OR name LIKE "%11%" OR name LIKE "%12%" OR name LIKE "%13%" OR name LIKE "%14%" GROUP BY id;')
 
-    rows_to_extract = [9, 10,11,12,13,14]
-    current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
-
-    # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
-    query = '''
-        SELECT *
-        FROM Students
-        WHERE status IN ({})
-    '''.format(','.join(['?'] * len(current_statuses_list)))
-
-    # Execute the query with the statuses list
-    cursor.execute(query, current_statuses_list)
-
-    # Retrieve student data from the database
-    students = cursor.fetchall()
+    stats = cursor.fetchall()
 
     # Close the database connection
     conn.close()
 
-    result = calculate_breakdown_of_students(students)
+    total_equivalent = 9000  # Update this value with your desired total equivalent calculation
 
-    breakdown_ratings = result[0]
-    breakdown_courses = result[1]
-    total_equivalent = result[2]
-    total_students = result[3]
-
-    return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses,total_equivalent=total_equivalent,total_students=total_students)
-
+    return render_template('dashboard.html', stats=stats, total_equivalent=total_equivalent)
 if __name__ == '__main__':
     app.run(debug=True)
+
 

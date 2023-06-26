@@ -77,14 +77,12 @@
                 <th>Pronouns</th>
                 <th>Count</th>
                 <th>%</th>
-                <th>Statuses</th>
             </tr>
             {% for pronouns, data in pronoun_data.items() %}
             <tr>
                 <td>{{ pronouns }}</td>
                 <td>{{ data['count'] }}</td>
                 <td>{{ pronoun_percentage[pronouns] }}</td>
-                <td>{{ data['statuses'] }}</td>
             </tr>
             {% endfor %}
         </table>

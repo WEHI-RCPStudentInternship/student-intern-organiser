@@ -284,8 +284,8 @@ def index_outstanding():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    rows_to_extract = [1,2,3,4,5,6,7,8,19,21]
-    current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
+    status_of_students_current_and_past = [1,2,3,4,5,6,7,8,19,21]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current_and_past]
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
@@ -321,8 +321,8 @@ def index_current():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    rows_to_extract = [9, 10,11,12,13]
-    current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
+    status_of_students_current_and_past = [9, 10,11,12,13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current_and_past]
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
@@ -527,8 +527,8 @@ def dashboard():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    rows_to_extract = [9, 10, 11, 12, 13, 14]
-    current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
+    status_of_students_current_and_past = [9, 10, 11, 12, 13, 14]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current_and_past]
 
     # Retrieve student data from the database
     # Prepare the SQL query with placeholders for the statuses filter and pronouns

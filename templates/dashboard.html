@@ -6,47 +6,88 @@
 
 
 {% block content %}
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    th, td {
+        border: 1px solid #ccc;
+        padding: 5px;
+    }
+    
+    th {
+        background-color: #f2f2f2;
+    }
+    
+    caption {
+        font-weight: bold;
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+</style>
 
-    <table>
-        <tr>
-            <th>Value</th>
-            <th>Count</th>
-            <th>Equivalent</th>
-        </tr>
-        {% for value, count in breakdown_courses.items() %}
-        <tr>
-            <td>{{ value }}</td>
-            <td>{{ count }}</td>
-            <td>{{ count * 9000 if value == "Engineering" else count * 3000 }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-            <td></td>
-            <td></td>
-            <td>{{ total_equivalent }}</td>
-        </tr>
-    </table>
-
-
-
-    <table>
-        <tr>
-            <th>Value</th>
-            <th>Count</th>
-            <th>%</th>
-        </tr>
-        {% for value, count in breakdown_ratings.items() %}
-        <tr>
-            <td>{{ value }}</td>
-            <td>{{ count }}</td>
-            <td>{{ count/total_students*100 }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-
-
+<div style="display: flex; flex-wrap: wrap;">
+    <div style="flex: 1; margin-right: 20px;">
+        <table>
+            <caption style="color: #3173ee;">Breakdown by Value</caption>
+            <tr>
+                <th>Value</th>
+                <th>Count</th>
+                <th>Equivalent</th>
+            </tr>
+            {% for value, count in breakdown_courses.items() %}
+            <tr>
+                <td>{{ value }}</td>
+                <td>{{ count }}</td>
+                <td>{{ count * 9000 if value == "Engineering" else count * 3000 }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td>{{ total_equivalent }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div style="flex: 1; margin-right: 20px;">
+        <table>
+            <caption style="color: #3173ee;">Breakdown by Ratings</caption>
+            <tr>
+                <th>Value</th>
+                <th>Count</th>
+                <th>%</th>
+            </tr>
+            {% for value, count in breakdown_ratings.items() %}
+            <tr>
+                <td>{{ value }}</td>
+                <td>{{ count }}</td>
+                <td>{{ count/total_students*100 }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    
+    <div style="flex: 1;">
+        <table>
+            <caption style="color: #3173ee;"> Breakdown by Pronouns</caption>
+            <tr>
+                <th>Pronouns</th>
+                <th>Count</th>
+                <th>%</th>
+                <th>Statuses</th>
+            </tr>
+            {% for pronouns, data in pronoun_data.items() %}
+            <tr>
+                <td>{{ pronouns }}</td>
+                <td>{{ data['count'] }}</td>
+                <td>{{ pronoun_percentage[pronouns] }}</td>
+                <td>{{ data['statuses'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
 {% endblock %}
-            
-
-

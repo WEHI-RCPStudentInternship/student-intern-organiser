@@ -488,6 +488,34 @@ def calculate_breakdown_of_students(students):
 
     return [breakdown_ratings,breakdown_courses,total_equivalent,total_students]
 
+#pronouns breakdown 
+def calculate_breakdown_of_pronouns(students):
+    pronoun_data = {}
+    total_students = len(students)
+
+    # Count the occurrences of each pronoun and track associated statuses
+    for student in students:
+        pronouns = student[2]  # Assuming pronouns column is at index 2
+        status = student[3]  # Assuming status column is at index 3
+
+        if pronouns in pronoun_data:
+            pronoun_data[pronouns]['count'] += 1
+            pronoun_data[pronouns]['statuses'].add(status)
+        else:
+            pronoun_data[pronouns] = {
+                'count': 1,
+                'statuses': {status}
+            }
+
+    # Calculate the percentage for each pronoun
+    pronoun_percentage = {}
+    for pronouns, data in pronoun_data.items():
+        percentage = (data['count'] / total_students) * 100
+        pronoun_percentage[pronouns] = round(percentage, 2)
+        data['statuses'] = ', '.join(data['statuses'])  # Convert set of statuses to comma-separated string
+
+    return pronoun_data, pronoun_percentage, total_students
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -499,15 +527,15 @@ def dashboard():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    rows_to_extract = [9, 10,11,12,13,14]
+    rows_to_extract = [9, 10, 11, 12, 13, 14]
     current_statuses_list = [row[1] for row in statuses if row[0] in rows_to_extract]
 
     # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
+    # Prepare the SQL query with placeholders for the statuses filter and pronouns
     query = '''
         SELECT *
         FROM Students
-        WHERE status IN ({})
+        WHERE status IN ({}) AND pronouns IS NOT NULL
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
     # Execute the query with the statuses list
@@ -526,7 +554,14 @@ def dashboard():
     total_equivalent = result[2]
     total_students = result[3]
 
-    return render_template('dashboard.html', students=students,breakdown_ratings=breakdown_ratings,breakdown_courses=breakdown_courses,total_equivalent=total_equivalent,total_students=total_students)
+    pronoun_data, pronoun_percentage, total_students = calculate_breakdown_of_pronouns(students)
+
+    return render_template('dashboard.html', students=students, breakdown_ratings=breakdown_ratings,
+                        breakdown_courses=breakdown_courses, total_equivalent=total_equivalent,
+                        total_students=total_students, pronoun_data=pronoun_data,
+                        pronoun_percentage=pronoun_percentage)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

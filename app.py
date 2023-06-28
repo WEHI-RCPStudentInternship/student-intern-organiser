@@ -483,7 +483,7 @@ def calculate_breakdown_of_students(students):
 
     total_equivalent = 0
     for value, count in breakdown_courses.items():
-        total_equivalent = total_equivalent + (9000 * count if value == "Engineering" else count * 3000)
+        total_equivalent = total_equivalent + (9000 * count if value == "Engineering and IT" else count * 3000)
 
 
     return [breakdown_ratings,breakdown_courses,total_equivalent,total_students]

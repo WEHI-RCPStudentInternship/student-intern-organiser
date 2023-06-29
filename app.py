@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_file
+from flask import Flask, render_template, request, redirect, send_file, url_for
 import sqlite3
 import os
 import csv
@@ -14,6 +14,75 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
 db_path = 'student_intern_data/student_intern_data.db'  # Replace with your SQLite database file path
+
+
+# Feedback Route 
+@app.route('/submit_feedback', methods=['POST'])
+def submit_feedback():
+    # Retrieve the feedback data from the request form
+    student_id = request.form.get('intern_id')
+    adaptability = request.form.get('adaptability')
+    learn_technical = request.form.get('learn_technical')
+    learn_conceptual = request.form.get('learn_conceptual')
+    collaborative = request.form.get('collaborative')
+    ambiguity = request.form.get('ambiguity')
+    complexity = request.form.get('complexity')
+    summary_rating_external = request.form.get('summary_rating_external')
+
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Update the feedback data in the Students table
+    cursor.execute('''
+        UPDATE Students
+        SET post_internship_adaptability = ?,
+            post_internship_learn_technical = ?,
+            post_internship_learn_conceptual = ?,
+            post_internship_collaborative = ?,
+            post_internship_ambiguity = ?,
+            post_internship_complexity = ?,
+            post_internship_summary_rating_external = ?
+        WHERE intern_id = ?
+    ''', (adaptability, learn_technical, learn_conceptual, collaborative, ambiguity, complexity, summary_rating_external, student_id))
+
+    # Commit the changes and close the database connection
+    conn.commit()
+    conn.close()
+
+    # Redirect to the student's details page
+    return redirect(url_for('feedback_table', intern_id=student_id))
+
+@app.route('/feedback/<int:intern_id>', methods=['GET'])
+def feedback(intern_id):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve the student's details from the database
+    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (intern_id,))
+    student = cursor.fetchone()
+
+    # Close the database connection
+    conn.close()
+
+    return render_template('feedback.html', student=student)
+
+@app.route('/feedback_table/<int:intern_id>', methods=['GET'])
+def feedback_table(intern_id):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve the feedback data from the Students table
+    cursor.execute('SELECT * FROM Students')
+    students = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    return render_template('feedback_table.html', students=students)
+
 
 @app.route('/download_key_attributes')
 def download_key_attributes():

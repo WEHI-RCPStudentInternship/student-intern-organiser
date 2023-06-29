@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Give Feedback{% endblock %}
+
+{% block page_title %}Give Feedback{% endblock %}
+
+{% block content %}
+    <style>
+        form {
+            width: 400px;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        tr {
+            height: 40px;
+        }
+
+        td:first-child {
+            width: 150px;
+        }
+
+        textarea {
+            width: 350px;
+            height: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+    <form action="/submit_feedback" method="POST">
+        <input type="hidden" name="intern_id" value="{{ student[0] }}">
+        <table>
+            <tr>
+                <td>Full Name:</td>
+                <td>{{ student[1] }}</td>
+            </tr>
+            <tr>
+                <td>Pronouns:</td>
+                <td>{{ student[2] }}</td>
+            </tr>
+        </table>
+        <label for="adaptability">Adaptability:</label>
+        <textarea name="adaptability" id="adaptability"></textarea>
+
+        <label for="learn_technical">Quickly learn technical concepts:</label>
+        <textarea name="learn_technical" id="learn_technical"></textarea>
+
+        <label for="learn_conceptual">Quickly learn domain concepts:</label>
+        <textarea name="learn_conceptual" id="learn_conceptual"></textarea>
+
+        <label for="collaborative">Collaborative by default:</label>
+        <textarea name="collaborative" id="collaborative"></textarea>
+
+        <label for="ambiguity">Tolerance for ambiguity:</label>
+        <textarea name="ambiguity" id="ambiguity"></textarea>
+
+        <label for="complexity">Tolerance for complexity:</label>
+        <textarea name="complexity" id="complexity"></textarea>
+
+        <label for="summary_rating_external">My Reaction</label>
+        <textarea name="my_reaction" id="my_reaction"></textarea>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

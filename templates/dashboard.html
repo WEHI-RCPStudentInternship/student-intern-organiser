@@ -64,7 +64,7 @@
             <tr>
                 <td>{{ value }}</td>
                 <td>{{ count }}</td>
-                <td>{{ count/total_students*100 }}</td>
+                <td>{{ (count/breakdown_statuses['14 Finished']*100)|round(2) }}</td>
             </tr>
             {% endfor %}
         </table>

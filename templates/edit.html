@@ -59,7 +59,20 @@
             </tr>
             <tr>
                 <td>post_internship_summary_rating_internal</td>
-                <td><input type="text" name="post_internship_summary_rating_internal" value="{{ student[42] }}" required></td>
+                <td>
+                    <select name="post_internship_summary_rating_internal" required>
+                    {% set ratings = ['Impressive','Decent','N/A'] %}
+                    {% for rating in ratings %}
+                        {% if rating == student[42] %}
+                            <option value="{{ rating }}" selected>{{ rating }}</option>
+                        {% else %}
+                            <option value="{{ rating }}">{{ rating }}</option>
+                        {% endif %}
+                    {% endfor %}
+
+                    </select>
+                </td>
+
             </tr>
              <tr>
                 <td>pronunciation</td>

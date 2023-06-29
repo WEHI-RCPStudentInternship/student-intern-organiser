@@ -37,17 +37,31 @@
                 <th>Count</th>
                 <th>Equivalent</th>
             </tr>
+
+            {% set ns = namespace() %}
+            {% set ns.total_equiv = 0 %}
             {% for value, count in breakdown_courses.items() %}
             <tr>
                 <td>{{ value }}</td>
                 <td>{{ count }}</td>
-                <td>{{ count * 9000 if value == "Engineering and IT" else count * 3000 }}</td>
+                
+                {% if value == "Engineering and IT"%}
+                    {% set ns.total_equiv = ns.total_equiv + (count * 9000)  %}
+                    <td>{{ count * 9000 }} {{ total_equiv }}</td>
+                {% elif value == "Science Full Year" %}
+                    {% set ns.total_equiv = ns.total_equiv + (count * 6000)  %}
+                    <td>{{ count * 6000 }} {{ total_equiv }} </td>
+                {% else %}
+                    {% set ns.total_equiv = ns.total_equiv + (count * 3000)  %}
+                    <td>{{ count * 3000 }}</td>
+                {% endif %}
+
             </tr>
             {% endfor %}
             <tr>
                 <td></td>
                 <td></td>
-                <td>{{ total_equivalent }}</td>
+                <td>{{ ns.total_equiv }}</td>
             </tr>
         </table>
     </div>

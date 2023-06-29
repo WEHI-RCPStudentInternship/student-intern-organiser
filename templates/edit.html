@@ -61,7 +61,7 @@
                 <td>post_internship_summary_rating_internal</td>
                 <td>
                     <select name="post_internship_summary_rating_internal" required>
-                    {% set ratings = ['Impressive','Decent','N/A'] %}
+                    {% set ratings = ['N/A','Impressive','Decent'] %}
                     {% for rating in ratings %}
                         {% if rating == student[42] %}
                             <option value="{{ rating }}" selected>{{ rating }}</option>

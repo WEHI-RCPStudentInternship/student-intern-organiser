@@ -470,11 +470,12 @@ def change_student_project(student_ids, new_project):
 
 
 def calculate_breakdown_of_students(students):
-    ratings = [student[42] for student in students if student[42] is not None]
+    ratings = [student[42] for student in students if student[42] is not None and student[42] != 'N/A']
 
     # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(ratings))
     total_students = len(ratings)
+
 
     courses = [student[6] for student in students]
 
@@ -486,12 +487,7 @@ def calculate_breakdown_of_students(students):
     breakdown_statuses = dict(Counter(statuses))
     print(breakdown_statuses)
 
-    total_equivalent = 0
-    for value, count in breakdown_courses.items():
-        total_equivalent = total_equivalent + (9000 * count if value == "Engineering and IT" else count * 3000)
-
-
-    return [breakdown_ratings,breakdown_courses,total_equivalent,total_students,breakdown_statuses]
+    return [breakdown_ratings,breakdown_courses,total_students,breakdown_statuses]
 
 #pronouns breakdown 
 def calculate_breakdown_of_pronouns(students):
@@ -556,14 +552,13 @@ def dashboard():
 
     breakdown_ratings = result[0]
     breakdown_courses = result[1]
-    total_equivalent = result[2]
-    total_students = result[3]
-    breakdown_statuses = result[4]
+    total_students = result[2]
+    breakdown_statuses = result[3]
 
     pronoun_data, pronoun_percentage, total_students = calculate_breakdown_of_pronouns(students)
 
     return render_template('dashboard.html', students=students, breakdown_ratings=breakdown_ratings,
-                        breakdown_courses=breakdown_courses, total_equivalent=total_equivalent,
+                        breakdown_courses=breakdown_courses, 
                         total_students=total_students, pronoun_data=pronoun_data,
                         pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses)
 

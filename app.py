@@ -15,6 +15,24 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
 db_path = 'student_intern_data/student_intern_data.db'  # Replace with your SQLite database file path
 
+@app.route('/allocate_student_project/')
+def allocate_student_project():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+    
+    # Fetch the projects from the Projects table
+    cursor.execute('SELECT id, name FROM Projects')
+    projects = cursor.fetchall()
+    
+    # Fetch the students from the Students table
+    cursor.execute('SELECT intern_id, full_name FROM Students')
+    students = cursor.fetchall()
+    
+    # Close the database connection
+    cursor.close()
+    conn.close()
+    return render_template('Allocate_students_project.html', projects=projects, students=students)
 
 # Feedback Route 
 @app.route('/submit_feedback', methods=['POST'])

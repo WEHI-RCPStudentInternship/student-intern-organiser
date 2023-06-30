@@ -27,7 +27,7 @@ def submit_feedback():
     collaborative = request.form.get('collaborative')
     ambiguity = request.form.get('ambiguity')
     complexity = request.form.get('complexity')
-    summary_rating_external = request.form.get('summary_rating_external')
+    my_reaction = request.form.get('my_reaction')
 
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
@@ -44,7 +44,7 @@ def submit_feedback():
             post_internship_complexity = ?,
             post_internship_summary_rating_external = ?
         WHERE intern_id = ?
-    ''', (adaptability, learn_technical, learn_conceptual, collaborative, ambiguity, complexity, summary_rating_external, student_id))
+    ''', (adaptability, learn_technical, learn_conceptual, collaborative, ambiguity, complexity, my_reaction, student_id))
 
     # Commit the changes and close the database connection
     conn.commit()

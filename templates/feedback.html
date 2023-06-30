@@ -7,8 +7,10 @@
 {% block content %}
     <style>
         form {
-            width: 400px;
+            width: 200px;
             margin: 0 auto;
+            margin-left: 100px;
+            margin-right: 100px;
         }
 
         table {
@@ -22,14 +24,6 @@
 
         td:first-child {
             width: 150px;
-        }
-
-        textarea {
-            width: 350px;
-            height: 80px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
 
         label {
@@ -63,27 +57,65 @@
                 <td>{{ student[2] }}</td>
             </tr>
         </table>
+
         <label for="adaptability">Adaptability:</label>
-        <textarea name="adaptability" id="adaptability"></textarea>
+        <select name="adaptability" id="adaptability" required>
+            <option disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is reasonably adaptable, as {{ student[2] }} could change the direction of the project with some prompting when {{ student[2] }} was given new information.">{{ student[1] }} is reasonably adaptable, as {{ student[2] }} could change the direction of the project with some prompting when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        </select>
 
         <label for="learn_technical">Quickly learn technical concepts:</label>
-        <textarea name="learn_technical" id="learn_technical"></textarea>
+        <select name="learn_technical" id="learn_technical">
+            <option disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        </select>
 
         <label for="learn_conceptual">Quickly learn domain concepts:</label>
-        <textarea name="learn_conceptual" id="learn_conceptual"></textarea>
+        <select name="learn_conceptual" id="learn_conceptual">
+            <option disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        </select>
 
         <label for="collaborative">Collaborative by default:</label>
-        <textarea name="collaborative" id="collaborative"></textarea>
+        <select name="collaborative" id="collaborative">
+            <option disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        </select>
 
         <label for="ambiguity">Tolerance for ambiguity:</label>
-        <textarea name="ambiguity" id="ambiguity"></textarea>
+        <select name="ambiguity" id="ambiguity">
+            <option disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        </select>
 
         <label for="complexity">Tolerance for complexity:</label>
-        <textarea name="complexity" id="complexity"></textarea>
+        <select name="complexity" id="complexity">
+            <option disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        </select>
 
-        <label for="summary_rating_external">My Reaction</label>
-        <textarea name="my_reaction" id="my_reaction"></textarea>
+        <label for="my_reaction">My Reaction:</label>
+        <select name="my_reaction" id="my_reaction">
+            <option disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        </select>
+
         <br>
         <button type="submit">Submit</button>
     </form>
+
 {% endblock %}

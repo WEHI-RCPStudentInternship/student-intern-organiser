@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Give Feedback{% endblock %}
+{% block title %}Generic Post Internship Evaluation Per Student{% endblock %}
 
-{% block page_title %}Give Feedback{% endblock %}
+{% block page_title %}Generic Post Internship Evaluation Per Student{% endblock %}
 
 {% block content %}
     <style>
         form {
-            width: 200px;
+            width: 600px;
             margin: 0 auto;
             margin-left: 100px;
             margin-right: 100px;
@@ -15,20 +15,35 @@
 
         table {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         tr {
-            height: 40px;
+            height: 20px;
         }
 
         td:first-child {
-            width: 150px;
+            width: 100px;
         }
 
         label {
-            display: block;
+            display: inline-block;
+            width: 500px;
             margin-bottom: 5px;
+        }
+        .r_overall {
+            display: inline-block;
+            margin-bottom: 5px;
+            width: 100%;
+            max-width: 100%;
+        }
+        select {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         button[type="submit"] {
@@ -59,63 +74,109 @@
         </table>
 
         <label for="adaptability">Adaptability:</label>
-        <select name="adaptability" id="adaptability" required>
-            <option disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        <select name="adaptability" id="adaptability" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily <br> when {{ student[2] }} was given new information.</option>
             <option value="{{ student[1] }} is reasonably adaptable, as {{ student[2] }} could change the direction of the project with some prompting when {{ student[2] }} was given new information.">{{ student[1] }} is reasonably adaptable, as {{ student[2] }} could change the direction of the project with some prompting when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+            <option value="{{ student[1] }}  could benefit from being more adaptable, as {{ student[2] }} needed help to change the direction of the project when {{ student[2] }} was given new information.">{{ student[1] }}  could benefit from being more adaptable, as {{ student[2] }} needed help to change the direction of the project when {{ student[1] }} was given new information.</option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} adaptability."> I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} adaptability. </option>
         </select>
 
         <label for="learn_technical">Quickly learn technical concepts:</label>
-        <select name="learn_technical" id="learn_technical">
-            <option disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        <select name="learn_technical" id="learn_technical" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} learns technical concepts very quickly, as {{ student[2] }} could understand high level technical concepts and research how to implement them. ">{{ student[1] }} learns technical concepts very quickly, as {{ student[2] }} could understand high level technical concepts and research how to implement them. </option>
+            <option value="{{ student[1] }} learns technical concepts in a reasonable time, as {{ student[2] }} could understand high level technical concepts and research how to implement them with some prompting. ">{{ student[1] }} learns technical concepts in a reasonable time, as {{ student[2] }} could understand high level technical concepts and research how to implement them with some prompting. </option>
+            <option value="{{ student[1] }} could benefit from learning how to learn technical concepts more quickly, as {{ student[2] }} needed help to understand high level technical concepts and research how to implement them. ">{{ student[1] }} could benefit from learning how to learn technical concepts more quickly, as {{ student[2] }} needed help to understand high level technical concepts and research how to implement them. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to learn technical concepts quickly. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to learn technical concepts quickly. </option>
+
         </select>
 
         <label for="learn_conceptual">Quickly learn domain concepts:</label>
-        <select name="learn_conceptual" id="learn_conceptual">
-            <option disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        <select name="learn_conceptual" id="learn_conceptual" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} learns domain concepts very quickly, as {{ student[2] }} used those concepts when communicating regularly, and used them to guide {{ student[2] }} when looking at low-level technical problems. ">{{ student[1] }} learns domain concepts very quickly, as {{ student[2] }} used those concepts when communicating regularly, and used them to guide {{ student[2] }} when looking at low-level technical problems. </option>
+            <option value="{{ student[1] }} learns domain concepts in a reasonable time, as {{ student[2] }} used those concepts when communicating from time-to-time, and, with prompting, used them to guide {{ student[2] }} when looking at low-level technical problems. ">{{ student[1] }} learns domain concepts in a reasonable time, as {{ student[2] }} used those concepts when communicating from time-to-time, and, with prompting, used them to guide {{ student[2] }} when looking at low-level technical problems. </option>
+            <option value="{{ student[1] }} could benefit from learning domain concepts and using them to {{ student[2] }} advantage, as {{ student[2] }} needed help to use these concepts when communicating, and needed help to use them to guide {{ student[2] }} when looking at low-level technical problems. ">{{ student[1] }} could benefit from learning domain concepts and using them to {{ student[2] }} advantage, as {{ student[2] }} needed help to use these concepts when communicating, and needed help to use them to guide {{ student[2] }} when looking at low-level technical problems. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to learn domain concepts quickly. ">I do not have enough information about {{ student[2] }} to provide feedback on {{ student[2] }} ability to learn domain concepts quickly. </option>
         </select>
 
         <label for="collaborative">Collaborative by default:</label>
-        <select name="collaborative" id="collaborative">
-            <option disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        <select name="collaborative" id="collaborative" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} is highly collaborative as {{ student[2] }} worked well with other students. ">{{ student[1] }} is highly collaborative as {{ student[2] }} worked well with other students. </option>
+            <option value="{{ student[1] }} is collaborative as {{ student[2] }} worked well with other students when prompted. ">{{ student[1] }} is collaborative as {{ student[2] }} worked well with other students when prompted. </option>
+            <option value="{{ student[1] }} might benefit from being more collaborative. ">{{ student[1] }} might benefit from being more collaborative. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to be collaborative. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to be collaborative. </option>
         </select>
 
         <label for="ambiguity">Tolerance for ambiguity:</label>
-        <select name="ambiguity" id="ambiguity">
-            <option disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        <select name="ambiguity" id="ambiguity" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} has a high tolerance for ambiguity, as {{ student[2] }} handled the lack of clarity of the project and was comfortable in helping to clarify what needed doing. ">{{ student[1] }} has a high tolerance for ambiguity, as {{ student[2] }} handled the lack of clarity of the project and was comfortable in helping to clarify what needed doing. </option>
+            <option value="{{ student[1] }} has a reasonable tolerance for ambiguity, as {{ student[2] }} handled the lack of clarity of the project with some support and was comfortable in helping to clarify what needed doing with prompting. ">{{ student[1] }} has a reasonable tolerance for ambiguity, as {{ student[2] }} handled the lack of clarity of the project with some support and was comfortable in helping to clarify what needed doing with prompting. </option>
+            <option value="{{ student[1] }} could benefit from increasing their tolerance for ambiguity, as {{ student[2] }} needed help to clarify what needed doing on a regular basis. ">{{ student[1] }} could benefit from increasing their tolerance for ambiguity, as {{ student[2] }} needed help to clarify what needed doing on a regular basis. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to tolerate ambiguity. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to tolerate ambiguity. </option>
         </select>
 
         <label for="complexity">Tolerance for complexity:</label>
-        <select name="complexity" id="complexity">
-            <option disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        <select name="complexity" id="complexity" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} has a high tolerance for complexity, as {{ student[2] }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ student[2] }} may come across in {{ student[2] }} career. ">{{ student[1] }} has a high tolerance for complexity, as {{ student[2] }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ student[2] }} may come across in {{ student[2] }} career. </option>
+            <option value="{{ student[1] }} has a reasonable tolerance for complexity, as {{ student[2] }} handled the complexity of the project with some support and was comfortable in working at that level with prompting. ">{{ student[1] }} has a reasonable tolerance for complexity, as {{ student[2] }} handled the complexity of the project with some support and was comfortable in working at that level with prompting. </option>
+            <option value="{{ student[1] }} could benefit from increasing their tolerance for complexity, as {{ student[2] }} needed help to deal with the complexity on a regular basis. ">{{ student[1] }} could benefit from increasing their tolerance for complexity, as {{ student[2] }} needed help to deal with the complexity on a regular basis. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to tolerate complexity. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to tolerate complexity. </option>
         </select>
-
+        <br>
         <label for="my_reaction">My Reaction:</label>
-        <select name="my_reaction" id="my_reaction">
-            <option disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.">{{ student[1] }} is highly adaptable, as {{ student[2] }} could change the direction of the project easily when {{ student[2] }} was given new information.</option>
+        <select name="my_reaction" id="my_reaction" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select your Feedback</option>
+            <option value="{{ student[1] }} was extremely impressive and I would highly recommend {{ student[2] }} and I would hire {{ student[2] }} if possible. It is my opinion that {{ student[2] }} could be placed in an elite team and quickly contribute and continue to improve. ">{{ student[1] }} was extremely impressive and I would highly recommend {{ student[2] }} and I would hire {{ student[2] }} if possible. It is my opinion that {{ student[2] }} could be placed in an elite team and quickly contribute and continue to improve. </option>
+            <option value="{{ student[1] }} shows excellent potential and {{ student[2] }} would work best in a team environment with a focus on independence. ">{{ student[1] }} shows excellent potential and {{ student[2] }} would work best in a team environment with a focus on independence. </option>
+            <option value="{{ student[1] }} shows potential and {{ student[2] }} would work best in a strong team environment with a focus on development. ">{{ student[1] }} shows potential and {{ student[2] }} would work best in a strong team environment with a focus on development. </option>
         </select>
+        <label for="review_overall">Review Overall:</label>
+        <div class="r_overall" id="review_overall"></div>
 
         <br>
         <button type="submit">Submit</button>
     </form>
 
+    <script>
+        // Function to update the "Review Overall" section
+        function updateReviewOverall() {
+            // Get the selected values from all dropdowns
+            var adaptability = document.getElementById("adaptability").value;
+            var learnTechnical = document.getElementById("learn_technical").value;
+            var learnConceptual = document.getElementById("learn_conceptual").value;
+            var collaborative = document.getElementById("collaborative").value;
+            var ambiguity = document.getElementById("ambiguity").value;
+            var complexity = document.getElementById("complexity").value;
+            var myReaction = document.getElementById("my_reaction").value;
+    
+            // Concatenate the selected values
+            var reviewOverall = adaptability + " " +
+                learnTechnical + " " +
+                learnConceptual + " " +
+                collaborative + " " +
+                ambiguity + " " +
+                complexity + "<br>" + 
+                myReaction;
+    
+            // Update the "Review Overall" section
+            document.getElementById("review_overall").innerHTML = reviewOverall;
+        }
+    
+        // Attach the updateReviewOverall function to the change event of all dropdowns
+        document.getElementById("adaptability").addEventListener("change", updateReviewOverall);
+        document.getElementById("learn_technical").addEventListener("change", updateReviewOverall);
+        document.getElementById("learn_conceptual").addEventListener("change", updateReviewOverall);
+        document.getElementById("collaborative").addEventListener("change", updateReviewOverall);
+        document.getElementById("ambiguity").addEventListener("change", updateReviewOverall);
+        document.getElementById("complexity").addEventListener("change", updateReviewOverall);
+        document.getElementById("my_reaction").addEventListener("change", updateReviewOverall);
+    
+        // Initial update of the "Review Overall" section
+        updateReviewOverall();
+    </script>
 {% endblock %}

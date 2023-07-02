@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}Generic Pre Internship Evaluation Per Student{% endblock %}
+
+{% block page_title %}Generic Pre Internship Evaluation Per Student{% endblock %}
+
+{% block content %}
+    <style>
+        form {
+            width: 600px;
+            margin: 0 auto;
+            margin-left: 100px;
+            margin-right: 100px;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        tr {
+            height: 20px;
+        }
+
+        td:first-child {
+            width: 100px;
+        }
+
+        label {
+            display: inline-block;
+            width: 500px;
+            margin-bottom: 5px;
+        }
+        .r_overall {
+            display: inline-block;
+            margin-bottom: 5px;
+            width: 100%;
+            max-width: 100%;
+        }
+        select {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #454ba0;
+        }
+    </style>
+
+    <form action="/submit_student_evaluation" method="POST">
+        <input type="hidden" name="intern_id" value="{{ student[0] }}">
+        <table>
+            <tr>
+                <td>Full Name:</td>
+                <td>{{ student[1] }}</td>
+            </tr>
+            <tr>
+                <td>Pronouns:</td>
+                <td>{{ student[2] }}</td>
+            </tr>
+        </table>
+
+        <label for="Overall_Internal"> Overall Internal </label>
+        <select name="Overall_Internal" id="Overall_Internal" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="01 - F Exciting Technical Skills - Recommend sign up even without a project. "> 01 - F Exciting Technical Skills - Recommend sign up even without a project.</option>
+            <option value="02 - F Translator - Recommend sign up even without a project. "> 02 - F Translator - Recommend sign up even without a project.</option>
+            <option value="03 - F Technical Skills - Recommend sign up for a specific project. "> 03 - F Technical Skills - Recommend sign up for a specific project.</option>
+            <option value="04 - FF ETS - Recommend sign up even without a project. "> 04 - FF ETS - Recommend sign up even without a project.</option>
+            <option value="05 - FF Translator - Recommend sign up even without a project. "> 05 - FF Translator - Recommend sign up even without a project.</option>
+            <option value="06 - FF TS - Recommend sign up for a specific project. "> 06 - FF TS - Recommend sign up for a specific project.</option>
+            <option value="07 - ETS - Recommend sign up for a specific project. "> 07 - ETS - Recommend sign up for a specific project.</option>            
+            <option value="08 - TS - Recommend no sign up except under specific circumstances. "> 08 - TS - Recommend no sign up except under specific circumstances.</option>            
+        </select>
+
+        <label for="Overall_External">Overall External:</label>
+        <select name="Overall_External" id="Overall_External" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }} has a high probability to be a good fit for a brand new or complex internship project, individually or in a team, with minimal supervision. ">{{ student[1] }} has a high probability to be a good fit for a brand new or complex internship project, individually or in a team, with minimal supervision. </option>
+            <option value="{{ student[1] }} has a medium probability to be a good fit for a complex internship project, within a team of students. ">{{ student[1] }} has a medium probability to be a good fit for a complex internship project, within a team of students. </option>
+            <option value="{{ student[1] }} has a medium probability to be a good fit for a simple internship with strong technical supervision. ">{{ student[1] }} has a medium probability to be a good fit for a simple internship with strong technical supervision. </option>
+            <option value="{{ student[1] }} has a high probability to be a good fit for a highly technical internship project, with strong technical supervision. ">{{ student[1] }} has a high probability to be a good fit for a highly technical internship project, with strong technical supervision. </option>
+
+        </select>
+
+        <label for="learn_quickly_technical">Quickly learn technical concepts:</label>
+        <select name="learn_quickly_technical" id="learn_quickly_technical" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }} seems to have a high probability of being able to learn technical concepts quickly. ">{{ student[1] }} seems to have a high probability of being able to learn technical concepts quickly. </option>
+            <option value="{{ student[1] }} seems to have a medium probability of being able to learn technical concepts quickly. ">{{ student[1] }} seems to have a medium probability of being able to learn technical concepts quickly. </option>
+            <option value="{{ student[1] }} seems to have a low probability of being able to learn technical concepts quickly. ">{{ student[1] }} seems to have a low probability of being able to learn technical concepts quickly. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to learn technical concepts quickly. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to learn technical concepts quickly. </option>
+        </select>
+
+        <label for="learn_domain_concepts">Quickly learn domain concepts:</label>
+        <select name="learn_domain_concepts" id="learn_domain_concepts" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }} seems to have a high probability of being able to learn domain concepts quickly. ">{{ student[1] }} seems to have a high probability of being able to learn domain concepts quickly. </option>
+            <option value="{{ student[1] }} seems to have a medium probability of being able to learn domain concepts quickly. ">{{ student[1] }} seems to have a medium probability of being able to learn domain concepts quickly. </option>
+            <option value="{{ student[1] }} seems to have a low probability of being able to learn domain concepts quickly. ">{{ student[1] }} seems to have a low probability of being able to learn domain concepts quickly. </option>
+            <option value="{{ student[1] }}I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to learn domain concepts quickly. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} ability to learn domain concepts quickly. </option>
+        </select>
+
+        <label for="Enthusiastic">Enthusiastic </label>
+        <select name="Enthusiastic" id="Enthusiastic" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }} is clearly enthusiastic in person and has shown this with their activities. ">{{ student[1] }} is clearly enthusiastic in person and has shown this with their activities. </option>
+            <option value="{{ student[1] }} is enthusiastic in person. ">{{ student[1] }} is enthusiastic in person. </option>
+            <option value="{{ student[1] }} is enthusiastic as shown with their activities. ">{{ student[1] }} is enthusiastic as shown with their activities. </option>
+            <option value=" I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} enthusiasm.">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} enthusiasm. </option>
+        </select>
+
+        <label for="Experience"> Experience:</label>
+        <select name="Experience" id="Experience" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }} has experience in a professional work environment. ">{{ student[1] }} has experience in a professional work environment. </option>
+            <option value="{{ student[1] }} has experience in a research environment. ">{{ student[1] }} has experience in a research environment. </option>
+            <option value="{{ student[1] }} has experience in a internship environment. ">{{ student[1] }} has experience in a internship environment. </option>
+            <option value="{{ student[1] }} has experience in a volunteer environment. ">{{ student[1] }} has experience in a volunteer environment. </option>
+            <option value="{{ student[1] }} has no prior experience in a volunteer, professional, or research environment. ">{{ student[1] }} has no prior experience in a volunteer, professional, or research environment. </option>
+        </select>
+
+        <label for="Communication">Communication</label>
+        <select name="Communication" id="Communication" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }} communicated well in the written application and in the phone interview. ">{{ student[1] }} communicated well in the written application and in the phone interview. </option>
+            <option value="{{ student[1] }} communicated well in the written application but not as well in the phone interview. ">{{ student[1] }} communicated well in the written application but not as well in the phone interview. </option>
+            <option value="{{ student[1] }} communicated well in the phone interview but not as well in the written application. ">{{ student[1] }} communicated well in the phone interview but not as well in the written application. </option>
+            <option value="{{ student[1] }} communicated well in the written application but did not get a phone interview. ">{{ student[1] }} communicated well in the written application but did not get a phone interview. </option>
+            <option value="{{ student[1] }} communicated well in the written application but have not yet done a phone interview. ">{{ student[1] }} communicated well in the written application but have not yet done a phone interview. </option>
+            <option value="{{ student[1] }} did not communicate that well in the written application and have not yet done a phone interview. ">{{ student[1] }} did not communicate that well in the written application and have not yet done a phone interview. </option>
+            <option value="{{ student[1] }} did not communicate that well in the written application but did well with the phone interview.">{{ student[1] }} did not communicate that well in the written application but did well with the phone interview. </option>
+        </select>
+        <br>
+        <label for="Adaptability"> Adaptability </label>
+        <select name="Adaptability" id="Adaptability" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }} seems highly adaptable, based on the information I have. ">{{ student[1] }} seems highly adaptable, based on the information I have. </option>
+            <option value="{{ student[1] }} seems reasonably adaptable, based on the information I have. ">{{ student[1] }} seems reasonably adaptable, based on the information I have. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} adaptability. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ student[2] }} adaptability. </option>
+        </select>
+
+        <label for="summary_tech_skills">Summary of Technical Skills:</label>
+        <select name="summary_tech_skills" id="summary_tech_skills" required>
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="Python">Python</option>
+            <option value="Flask">Flask</option>
+            <option value="SQL">SQL</option>
+            <option value="Matlab">Matlab</option>
+            <option value="C++">C++</option>
+            <option value="Java">Java</option>
+        </select>
+        
+        
+
+        <label for="summary_experience"> summary experience </label>
+        <select name="summary_experience" id="summary_experience" required oninvalid="this.setCustomValidity('Please Evaluate the Student.')" oninput="this.setCustomValidity('')">
+            <option value="" disabled selected>Select to Evaluate</option>
+            <option value="{{ student[1] }}Did an intern at Microsoft and has had a full time job previously at Google. Really interested about her experience with AI in imaging. ">{{ student[1] }} Did an intern at Microsoft and has had a full time job previously at Google. Really interested about her experience with AI in imaging.</option>
+            <option value="{{ student[1] }}  have beenworking in opensource ">{{ student[1] }} have beenworking in opensource </option>
+        </select>
+        <div class="rev_overal">
+            <label for="review_overall">Review Overall:</label>
+            <div class="r_overall" id="review_overall"></div>
+            <p>Selected Skills: <span id="selected_skills"></span></p>
+        </div>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // Function to update the "Review Overall" section
+        function updateReviewOverall() {
+            // Get the selected values from all dropdowns
+            var Overall_External = document.getElementById("Overall_External").value;
+            var learn_quickly_technical = document.getElementById("learn_quickly_technical").value;
+            var learn_domain_concepts = document.getElementById("learn_domain_concepts").value;
+            var Enthusiastic = document.getElementById("Enthusiastic").value;
+            var Experience = document.getElementById("Experience").value;
+            var Communication = document.getElementById("Communication").value;
+            var Adaptability = document.getElementById("Adaptability").value;
+            var Overall_Internal = document.getElementById("Overall_Internal").value;
+            var summary_tech_skills = document.getElementById("summary_tech_skills").value;
+            var summary_experience = document.getElementById("summary_experience").value;
+
+            // Concatenate the selected values
+            var reviewOverall = Overall_Internal + "<br>" + "<br>" +
+                Overall_External + " " +
+                learn_quickly_technical + " " +
+                learn_domain_concepts + " " +
+                Enthusiastic + " " +
+                Experience + " " +
+                Communication + "<br>" + 
+                Adaptability + " " +
+                summary_experience;
+                
+    
+            // Update the "Review Overall" section
+            document.getElementById("review_overall").innerHTML = reviewOverall;
+        }
+    
+        // Attach the updateReviewOverall function to the change event of all dropdowns
+        document.getElementById("Overall_External").addEventListener("change", updateReviewOverall);
+        document.getElementById("learn_quickly_technical").addEventListener("change", updateReviewOverall);
+        document.getElementById("learn_domain_concepts").addEventListener("change", updateReviewOverall);
+        document.getElementById("Enthusiastic").addEventListener("change", updateReviewOverall);
+        document.getElementById("Experience").addEventListener("change", updateReviewOverall);
+        document.getElementById("Communication").addEventListener("change", updateReviewOverall);
+        document.getElementById("Adaptability").addEventListener("change", updateReviewOverall);
+        document.getElementById("Overall_Internal").addEventListener("change", updateReviewOverall);
+        document.getElementById("summary_tech_skills").addEventListener("change", updateReviewOverall);
+        document.getElementById("summary_experience").addEventListener("change", updateReviewOverall);
+    
+        // Initial update of the "Review Overall" section
+        updateReviewOverall();
+    </script>
+            <script>
+                const selectElement = document.getElementById('summary_tech_skills');
+                const selectedSkillsElement = document.getElementById('selected_skills');
+                const selectedSkills = [];
+            
+                selectElement.addEventListener('change', function(event) {
+                    const selectedOption = event.target.value;
+            
+                    if (selectedSkills.includes(selectedOption)) {
+                        // Remove selected option if it already exists in the array
+                        const index = selectedSkills.indexOf(selectedOption);
+                        selectedSkills.splice(index, 1);
+                    } else {
+                        // Add selected option to the array
+                        selectedSkills.push(selectedOption);
+                    }
+            
+                    selectedSkillsElement.textContent = selectedSkills.join(', ');
+                });
+            </script>
+{% endblock %}

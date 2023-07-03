@@ -139,7 +139,8 @@
         <div class="r_overall" id="review_overall"></div>
 
         <br>
-        <button type="submit">Submit</button>
+        <button type="submit">Submit</button> <button type="button" class="btn btn-primary" id="saveButton">Save Progress</button>
+
     </form>
 
     <script>
@@ -179,4 +180,44 @@
         // Initial update of the "Review Overall" section
         updateReviewOverall();
     </script>
+    <script>
+        // Function to save the form data to localStorage
+        function saveProgress() {
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            const serializedData = JSON.stringify(Object.fromEntries(formData));
+    
+            localStorage.setItem('reviewProgress', serializedData);
+            alert('Progress saved successfully!');
+        }
+    
+        // Function to load saved progress from localStorage and populate the form
+        function resumeReview() {
+            const savedData = localStorage.getItem('reviewProgress');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                const form = document.querySelector('form');
+                
+                for (const key in formData) {
+                    if (formData.hasOwnProperty(key)) {
+                        const inputElement = form.elements.namedItem(key);
+                        if (inputElement) {
+                            if (inputElement.type === 'select-one') {
+                                inputElement.value = formData[key];
+                            }
+                            // Add handling for other input types as needed (text, radio, etc.).
+                        }
+                    }
+                }
+                alert('Resuming review from where you left off.');
+            } else {
+                alert('No progress found to resume.');
+            }
+        }
+    
+        // Attach event listeners to the Save button and load saved progress on page load
+        document.getElementById('saveButton').addEventListener('click', saveProgress);
+        window.addEventListener('DOMContentLoaded', resumeReview);
+    </script>
+    
 {% endblock %}

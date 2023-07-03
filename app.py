@@ -66,7 +66,19 @@ def feedback(intern_id):
     # Close the database connection
     conn.close()
 
-    return render_template('feedback.html', student=student)
+    # Retrieve the pronoun from the database
+    pronoun = student[2]
+
+    # Split the pronoun into multiple parts using the '/' delimiter 
+    #he/him/his or she/her or they/them/their
+    pronoun_parts = pronoun.split('/')
+
+    # Assign pronoun1, pronoun2, and pronoun3 based on the pronoun_parts
+    pronoun1 = pronoun_parts[0].strip()
+    pronoun2 = pronoun_parts[1].strip() if len(pronoun_parts) > 1 else ""
+    pronoun3 = pronoun_parts[2].strip() if len(pronoun_parts) > 2 else ""
+
+    return render_template('feedback.html', student=student, pronoun1=pronoun1, pronoun2=pronoun2, pronoun3=pronoun3)
 
 @app.route('/feedback_table/<int:intern_id>', methods=['GET'])
 def feedback_table(intern_id):

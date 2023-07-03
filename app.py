@@ -28,7 +28,7 @@ def download_key_attributes():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT full_name, project, status, mobile, email, start_date, end_date, hours_per_week FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
+    cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
 
     students = cursor.fetchall()
 
@@ -49,7 +49,7 @@ def download_key_attributes():
     csv_path = os.path.join(temp_dir, formatted_datetime+'_student_data.csv')
     with open(csv_path, 'w') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(['Full Name', 'Project','Status','Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week'])
+        csv_writer.writerow(['Full Name', 'Pronunciation','Project','Status','Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week'])
 
 
         for student in students:

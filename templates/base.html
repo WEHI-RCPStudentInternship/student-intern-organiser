@@ -3,6 +3,10 @@
 <head>
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dragula/dist/dragula.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/dragula/dist/dragula.min.js"></script>
+
     <style>
         .dataTables_length {
             margin-top: 9px;

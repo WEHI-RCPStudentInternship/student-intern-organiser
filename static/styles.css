@@ -1,0 +1,23 @@
+.flex-container {
+    display: flex;
+  }
+  
+  .unassigned-column {
+    flex: 0 0 150px;
+    background-color: #f1eded;
+    padding: 10px;
+  }
+  
+  .column-header {
+    font-weight: bold;
+    color: rgb(79, 107, 231);
+    margin-bottom: 10px;
+  }
+  
+  .project-column {
+    flex: 1;
+    background-color: lightgray;
+    padding: 10px;
+    margin-left: 10px;
+  }
+  

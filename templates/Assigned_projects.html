@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Assigned Projects{% endblock %}
+{% block page_title %}Assigned Projects{% endblock %}
+
+{% block content %}
+<table>
+  <thead>
+    <tr>
+      <th>Unassigned</th>
+      {% for project in projects %}
+        <th>{{ project[1] }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for student in students %}
+      <tr>
+        {% if student[2] == "Unassigned" %}
+          <td>{{ student[1] }}</td>
+        {% else %}
+          {% for project in projects %}
+            {% if project[1] == student[2] %}
+              <td>{{ student[1] }}</td>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -16,7 +16,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 db_path = 'student_intern_data/student_intern_data.db'  # Replace with your SQLite database file path
 
 
-# Feedback Route 
+# Submit Feedback Route 
 @app.route('/submit_feedback', methods=['POST'])
 def submit_feedback():
     # Retrieve the feedback data from the request form
@@ -52,7 +52,7 @@ def submit_feedback():
 
     # Redirect to the student's details page
     return redirect(url_for('feedback_table', intern_id=student_id))
-
+# feedback 
 @app.route('/feedback/<int:intern_id>', methods=['GET'])
 def feedback(intern_id):
     # Connect to the SQLite database
@@ -65,19 +65,21 @@ def feedback(intern_id):
 
     # Close the database connection
     conn.close()
-
     # Retrieve the pronoun from the database
     pronoun = student[2]
-
-    # Split the pronoun into multiple parts using the '/' delimiter 
-    #he/him or she/her or they/them
+    # Split the pronoun into multiple parts using the '/' delimiter
     pronoun_parts = pronoun.split('/')
 
     # Assign pronoun1, pronoun2 based on the pronoun_parts
     pronoun1 = pronoun_parts[0].strip()
     pronoun2 = pronoun_parts[1].strip() if len(pronoun_parts) > 1 else ""
 
-    return render_template('feedback.html', student=student, pronoun1=pronoun1, pronoun2=pronoun2)
+    return render_template(
+        'feedback.html',
+        student=student,
+        pronoun1=pronoun1,
+        pronoun2=pronoun2
+    )
 
 @app.route('/feedback_table/<int:intern_id>', methods=['GET'])
 def feedback_table(intern_id):

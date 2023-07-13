@@ -74,27 +74,39 @@
         </table>
 
         <label for="adaptability">Adaptability:</label>
-        <select name="adaptability" id="adaptability" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
-            <option value="" disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} is highly adaptable, as {{ pronoun1 }} could change the direction of the project easily when {{ pronoun1 }} was given new information.">{{ student[1] }} is highly adaptable, as {{ pronoun1 }} could change the direction of the project easily <br> when {{ pronoun1 }} was given new information.</option>
-            <option value="{{ student[1] }} is reasonably adaptable, as {{ pronoun1 }} could change the direction of the project with some prompting when {{ pronoun1 }} was given new information.">{{ student[1] }} is reasonably adaptable, as {{ pronoun1 }} could change the direction of the project with some prompting when {{ pronoun1 }} was given new information.</option>
-            <option value="{{ student[1] }}  could benefit from being more adaptable, as {{ pronoun1 }} needed help to change the direction of the project when {{ pronoun1 }} was given new information.">{{ student[1] }}  could benefit from being more adaptable, as {{ pronoun1 }} needed help to change the direction of the project when {{ student[1] }} was given new information.</option>
-            <option value="I do not have enough information about {{ student[1] }} to provide feedback on their adaptability."> I do not have enough information about {{ student[1] }} to provide feedback on their adaptability. </option>
+        <select name="adaptability" id="adaptability">
+            {% if student[36] %}
+                <option value="{{ student[36] }}" selected>{{ student[36] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Feedback</option>
+            {% endif %}
+            <option value="{{ student[1] }} is highly adaptable, as {{ pronoun1 }} could change the direction of the project easily when {{ pronoun1 }} was given new information." {% if adaptability == student[36] %}selected{% endif %}>{{ student[1] }} is highly adaptable, as {{ pronoun1 }} could change the direction of the project easily <br> when {{ pronoun1 }} was given new information.</option>
+            <option value="{{ student[1] }} is reasonably adaptable, as {{ pronoun1 }} could change the direction of the project with some prompting when {{ pronoun1 }} was given new information." {% if adaptability == student[36] %}selected{% endif %}>{{ student[1] }} is reasonably adaptable, as {{ pronoun1 }} could change the direction of the project with some prompting <br> when {{ pronoun1 }} was given new information.</option>
+            <option value="{{ student[1] }} could benefit from being more adaptable, as {{ pronoun1 }} needed help to change the direction of the project when {{ pronoun1 }} was given new information." {% if adaptability == student[36] %}selected{% endif %}>{{ student[1] }} could benefit from being more adaptable, as {{ pronoun1 }} needed help to change the direction of the project <br> when {{ pronoun1 }} was given new information.</option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on their adaptability." {% if adaptability == student[36] %}selected{% endif %}>I do not have enough information about {{ student[1] }} to provide feedback on their adaptability.</option>
         </select>
 
-        <label for="learn_technical">Quickly learn technical concepts:</label>
-        <select name="learn_technical" id="learn_technical" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
-            <option value="" disabled selected>Select your Feedback</option>
-            <option value="{{ student[1] }} learns technical concepts very quickly, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them. ">{{ student[1] }} learns technical concepts very quickly, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them. </option>
-            <option value="{{ student[1] }} learns technical concepts in a reasonable time, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them with some prompting. ">{{ student[1] }} learns technical concepts in a reasonable time, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them with some prompting. </option>
-            <option value="{{ student[1] }} could benefit from learning how to learn technical concepts more quickly, as {{ pronoun1 }} needed help to understand high level technical concepts and research how to implement them. ">{{ student[1] }} could benefit from learning how to learn technical concepts more quickly, as {{ pronoun1 }} needed help to understand high level technical concepts and research how to implement them. </option>
-            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun1 }} ability to learn technical concepts quickly. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun1 }} ability to learn technical concepts quickly. </option>
 
+        <label for="learn_technical">Quickly learn technical concepts:</label>
+        <select name="learn_technical" id="learn_technical">
+            {% if student[37] %}
+            <option value="{{ student[37] }}"selected>{{ student[37] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Feedback</option>
+            {% endif %}
+            <option value="{{ student[1] }} learns technical concepts very quickly, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them."{% if learn_technical == student[37] %}selected{% endif %}>{{ student[1] }} learns technical concepts very quickly, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them. </option>
+            <option value="{{ student[1] }} learns technical concepts in a reasonable time, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them with some prompting."{% if learn_technical == student[37] %}selected{% endif %}>{{ student[1] }} learns technical concepts in a reasonable time, as {{ pronoun1 }} could understand high level technical concepts and research how to implement them with some prompting. </option>
+            <option value="{{ student[1] }} could benefit from learning how to learn technical concepts more quickly, as {{ pronoun1 }} needed help to understand high level technical concepts and research how to implement them." {% if learn_technical == student[37] %}selected{% endif %}>{{ student[1] }} could benefit from learning how to learn technical concepts more quickly, as {{ pronoun1 }} needed help to understand high level technical concepts and research how to implement them. </option>
+            <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun1 }} ability to learn technical concepts quickly." {% if learn_technical == student[37] %}selected{% endif %}>I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun1 }} ability to learn technical concepts quickly.</option>
         </select>
 
         <label for="learn_conceptual">Quickly learn domain concepts:</label>
-        <select name="learn_conceptual" id="learn_conceptual" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
-            <option value="" disabled selected>Select your Feedback</option>
+        <select name="learn_conceptual" id="learn_conceptual">
+            {% if student[38] %}
+            <option value="{{ student[38] }}"selected>{{ student[38] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Feedback</option>
+            {% endif %}
             <option value="{{ student[1] }} learns domain concepts very quickly, as {{ pronoun1 }} used those concepts when communicating regularly, and used them to guide {{ pronoun2 }} when looking at low-level technical problems. ">{{ student[1] }} learns domain concepts very quickly, as {{ pronoun1 }} used those concepts when communicating regularly, and used them to guide {{ pronoun2 }} when looking at low-level technical problems. </option>
             <option value="{{ student[1] }} learns domain concepts in a reasonable time, as {{ pronoun1 }} used those concepts when communicating from time-to-time, and, with prompting, used them to guide {{ pronoun2 }} when looking at low-level technical problems. ">{{ student[1] }} learns domain concepts in a reasonable time, as {{ pronoun1 }} used those concepts when communicating from time-to-time, and, with prompting, used them to guide {{ pronoun2 }} when looking at low-level technical problems. </option>
             <option value="{{ student[1] }} could benefit from learning domain concepts and using them to {{ pronoun1 }} advantage, as {{ pronoun1 }} needed help to use these concepts when communicating, and needed help to use them to guide {{ pronoun2 }} when looking at low-level technical problems. ">{{ student[1] }} could benefit from learning domain concepts and using them to {{ pronoun1 }} advantage, as {{ pronoun1 }} needed help to use these concepts when communicating, and needed help to use them to guide {{ pronoun2 }} when looking at low-level technical problems. </option>
@@ -102,17 +114,24 @@
         </select>
 
         <label for="collaborative">Collaborative by default:</label>
-        <select name="collaborative" id="collaborative" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
-            <option value="" disabled selected>Select your Feedback</option>
+        <select name="collaborative" id="collaborative">
+            {% if student[39] %}
+            <option value="{{ student[39] }}"selected>{{ student[39] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Feedback</option>
+            {% endif %}            
             <option value="{{ student[1] }} is highly collaborative as {{ pronoun1 }} worked well with other students. ">{{ student[1] }} is highly collaborative as {{ pronoun1 }} worked well with other students. </option>
             <option value="{{ student[1] }} is collaborative as {{ pronoun1 }} worked well with other students when prompted. ">{{ student[1] }} is collaborative as {{ pronoun1 }} worked well with other students when prompted. </option>
             <option value="{{ student[1] }} might benefit from being more collaborative. ">{{ student[1] }} might benefit from being more collaborative. </option>
             <option value="I do not have enough information about {{ student[1] }} to provide feedback on their ability to be collaborative. ">I do not have enough information about {{ student[1] }} to provide feedback on their ability to be collaborative. </option>
         </select>
-
         <label for="ambiguity">Tolerance for ambiguity:</label>
-        <select name="ambiguity" id="ambiguity" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
-            <option value="" disabled selected>Select your Feedback</option>
+        <select name="ambiguity" id="ambiguity">
+            {% if student[40] %}
+            <option value="{{ student[40] }}"selected>{{ student[40] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Feedback</option>
+            {% endif %}            
             <option value="{{ student[1] }} has a high tolerance for ambiguity, as {{ pronoun1 }} handled the lack of clarity of the project and was comfortable in helping to clarify what needed doing. ">{{ student[1] }} has a high tolerance for ambiguity, as {{ pronoun1 }} handled the lack of clarity of the project and was comfortable in helping to clarify what needed doing. </option>
             <option value="{{ student[1] }} has a reasonable tolerance for ambiguity, as {{ pronoun1 }} handled the lack of clarity of the project with some support and was comfortable in helping to clarify what needed doing with prompting. ">{{ student[1] }} has a reasonable tolerance for ambiguity, as {{ pronoun1 }} handled the lack of clarity of the project with some support and was comfortable in helping to clarify what needed doing with prompting. </option>
             <option value="{{ student[1] }} could benefit from increasing their tolerance for ambiguity, as {{ pronoun1 }} needed help to clarify what needed doing on a regular basis. ">{{ student[1] }} could benefit from increasing their tolerance for ambiguity, as {{ pronoun1 }} needed help to clarify what needed doing on a regular basis. </option>
@@ -120,8 +139,12 @@
         </select>
 
         <label for="complexity">Tolerance for complexity:</label>
-        <select name="complexity" id="complexity" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
-            <option value="" disabled selected>Select your Feedback</option>
+        <select name="complexity" id="complexity">
+            {% if student[41] %}
+            <option value="{{ student[41] }}"selected>{{ student[41] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Feedback</option>
+            {% endif %}                        
             <option value="{{ student[1] }} has a high tolerance for complexity, as {{ pronoun1 }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ pronoun1 }} may come across in {{ pronoun2 }} career. ">{{ student[1] }} has a high tolerance for complexity, as {{ pronoun1 }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ pronoun1 }} may come across in {{ pronoun2 }} career. </option>
             <option value="{{ student[1] }} has a reasonable tolerance for complexity, as {{ pronoun1 }} handled the complexity of the project with some support and was comfortable in working at that level with prompting. ">{{ student[1] }} has a reasonable tolerance for complexity, as {{ pronoun1 }} handled the complexity of the project with some support and was comfortable in working at that level with prompting. </option>
             <option value="{{ student[1] }} could benefit from increasing their tolerance for complexity, as {{ pronoun1 }} needed help to deal with the complexity on a regular basis. ">{{ student[1] }} could benefit from increasing their tolerance for complexity, as {{ pronoun1 }} needed help to deal with the complexity on a regular basis. </option>
@@ -129,8 +152,12 @@
         </select>
         <br>
         <label for="my_reaction">My Reaction:</label>
-        <select name="my_reaction" id="my_reaction" required oninvalid="this.setCustomValidity('Please Give your feedback.')" oninput="this.setCustomValidity('')">
-            <option value="" disabled selected>Select your Feedback</option>
+        <select name="my_reaction" id="my_reaction">
+            {% if student[43] %}
+            <option value="{{ student[43] }}"selected>{{ student[43] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Feedback</option>
+            {% endif %}                        
             <option value="{{ student[1] }} was extremely impressive and I would highly recommend {{ pronoun2 }} and I would hire {{ pronoun2 }} if possible. It is my opinion that {{ pronoun1 }} could be placed in an elite team and quickly contribute and continue to improve. ">{{ student[1] }} was extremely impressive and I would highly recommend {{ pronoun2 }} and I would hire {{ pronoun2 }} if possible. It is my opinion that {{ pronoun1 }} could be placed in an elite team and quickly contribute and continue to improve. </option>
             <option value="{{ student[1] }} shows excellent potential and {{ pronoun1 }} would work best in a team environment with a focus on independence. ">{{ student[1] }} shows excellent potential and {{ pronoun1 }} would work best in a team environment with a focus on independence. </option>
             <option value="{{ student[1] }} shows potential and {{ pronoun1 }} would work best in a strong team environment with a focus on development. ">{{ student[1] }} shows potential and {{ pronoun1 }} would work best in a strong team environment with a focus on development. </option>
@@ -139,7 +166,7 @@
         <div class="r_overall" id="review_overall"></div>
 
         <br>
-        <button type="submit">Submit</button> <button type="button" class="btn btn-primary" id="saveButton">Save Progress</button>
+        <button type="submit">Submit</button> 
 
     </form>
 
@@ -180,44 +207,4 @@
         // Initial update of the "Review Overall" section
         updateReviewOverall();
     </script>
-    <script>
-        // Function to save the form data to localStorage
-        function saveProgress() {
-            const form = document.querySelector('form');
-            const formData = new FormData(form);
-            const serializedData = JSON.stringify(Object.fromEntries(formData));
-    
-            localStorage.setItem('reviewProgress', serializedData);
-            alert('Progress saved successfully!');
-        }
-    
-        // Function to load saved progress from localStorage and populate the form
-        function resumeReview() {
-            const savedData = localStorage.getItem('reviewProgress');
-            if (savedData) {
-                const formData = JSON.parse(savedData);
-                const form = document.querySelector('form');
-                
-                for (const key in formData) {
-                    if (formData.hasOwnProperty(key)) {
-                        const inputElement = form.elements.namedItem(key);
-                        if (inputElement) {
-                            if (inputElement.type === 'select-one') {
-                                inputElement.value = formData[key];
-                            }
-                            // Add handling for other input types as needed (text, radio, etc.).
-                        }
-                    }
-                }
-                alert('Resuming review from where you left off.');
-            } else {
-                alert('No progress found to resume.');
-            }
-        }
-    
-        // Attach event listeners to the Save button and load saved progress on page load
-        document.getElementById('saveButton').addEventListener('click', saveProgress);
-        window.addEventListener('DOMContentLoaded', resumeReview);
-    </script>
-    
 {% endblock %}

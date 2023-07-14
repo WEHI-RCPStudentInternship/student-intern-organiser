@@ -1,5 +1,7 @@
 venv/
 *.swp
+.DS_Store
 student_intern_data/
 .env/
 __pycache__/
+student_intern_data-old/

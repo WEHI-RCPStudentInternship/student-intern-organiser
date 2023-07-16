@@ -15,7 +15,91 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
 db_path = 'student_intern_data/student_intern_data.db'  # Replace with your SQLite database file path
 
+#  Generic Pre Internship Evaluation Per Student
+@app.route('/submit_student_evaluation', methods=['POST'])
+def submit_student_evaluation():
+    # Retrieve  data from the form
+    student_id = request.form.get('intern_id')
+    Overall_External = request.form.get('Overall_External')
+    Overall_Internal = request.form.get('Overall_Internal')
+    learn_quickly_technical = request.form.get('learn_quickly_technical')
+    learn_domain_concepts = request.form.get('learn_domain_concepts')
+    Enthusiastic = request.form.get('Enthusiastic')
+    Experience = request.form.get('Experience')
+    Communication = request.form.get('Communication')
+    Adaptability = request.form.get('Adaptability')
+    summary_tech_skills = request.form.get('summary_tech_skills')
+    summary_experience = request.form.get('summary_experience')
 
+
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Update Students Evaluation data in the Students table
+    cursor.execute('''
+        UPDATE Students
+        SET pre_internship_summary_recommendation_external = ?,
+            pre_internship_summary_recommendation_internal = ?,
+            pre_internship_technical_rating = ?,
+            pre_internship_learning_quickly = ?,
+            pre_internship_enthusiasm = ?,
+            pre_internship_experience = ?,
+            pre_internship_communication = ?,
+            pre_internship_adaptable = ?,
+            summary_tech_skills = ?,
+            summary_experience = ?
+
+        WHERE intern_id = ?
+    ''', (Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, summary_experience, student_id))
+
+    # Commit the changes and close the database connection
+    conn.commit()
+    conn.close()
+
+    # Redirect to the student's evaluation  page in standardized vocabulary
+    return redirect(url_for('student_evaluation', intern_id=student_id))
+
+@app.route('/pre_int_st_evaluation/<int:intern_id>', methods=['GET'])
+def pre_int_st_evaluation(intern_id):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve the student's details from the database
+    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (intern_id,))
+    student = cursor.fetchone()
+
+    # Close the database connection
+    conn.close()
+    pronoun = student[2]
+
+    # Split the pronoun into multiple parts using the '/' delimiter 
+    #he/him/his or she/her or they/them/their
+    pronoun_parts = pronoun.split('/')
+
+    # Assign pronoun1, pronoun2, and pronoun3 based on the pronoun_parts
+    pronoun1 = pronoun_parts[0].strip()
+    pronoun2 = pronoun_parts[1].strip() if len(pronoun_parts) > 1 else ""
+
+    return render_template('pre_int_st_evaluation.html', student=student, pronoun1=pronoun1, pronoun2=pronoun2)
+
+@app.route('/student_evaluation/<int:intern_id>', methods=['GET'])
+def student_evaluation(intern_id):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve the feedback data from the Students table
+    cursor.execute('SELECT * FROM Students')
+    st_eval = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    return render_template('student_evaluation.html', st_eval=st_eval)
+
+#  Generic Post Internship Evaluation Per Student
 # Submit Feedback Route 
 @app.route('/submit_feedback', methods=['POST'])
 def submit_feedback():

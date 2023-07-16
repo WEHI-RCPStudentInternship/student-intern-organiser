@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Generic Pre Internship Evaluation Per Student{% endblock %}
+
+{% block page_title %}Generic Pre Internship Evaluation Per Student {% endblock %}
+
+{% block content %}
+<style>
+    /* styles.css */
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    }
+
+    th, td {
+    border: 1px solid rgb(20, 129, 192);
+    padding: 8px;
+    text-align: left;
+    }
+
+    th {
+    background-color: #f2f2f2;
+    }
+
+    tr:hover {
+    background-color: #f5f5f5;
+    }
+
+</style>
+    <table>
+        <tr>
+            <th>Student ID</th>
+            <th>Overall_External</th>
+            <th>Overall_Internal</th>
+            <th>Quickly learn technical concepts</th>
+            <th>Quickly learn domain concepts</th>
+            <th>Enthusiastic</th>
+            <th>Experience</th>
+            <th>Communication</th>
+            <th>Adaptability</th>
+            <th>summary_tech_skills</th>
+            <th>summary_experience</th>
+
+        </tr>
+        {% for student in st_eval %}
+        <tr>
+            <td>{{ student[0] }}</td>
+            <td>{{ student[25] }}</td>
+            <td>{{ student[26] }}</td>
+            <td>{{ student[27] }}</td>
+            <td>{{ student[29] }}</td>
+            <td>{{ student[30] }}</td>
+            <td>{{ student[31] }}</td>
+            <td>{{ student[32] }}</td>
+            <td>{{ student[33] }}</td>
+            <td>{{ student[22] }}</td>
+            <td>{{ student[23] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

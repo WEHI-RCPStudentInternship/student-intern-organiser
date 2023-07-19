@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_file, url_for
+from flask import Flask, render_template, request, redirect, send_file, url_for,jsonify
 import sqlite3
 import os
 import csv
@@ -10,10 +10,77 @@ from collections import Counter
 
 app = Flask(__name__)
 
-
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
-db_path = 'student_intern_data/student_intern_data.db'  # Replace with your SQLite database file path
+ # Replace with your SQLite database file path
+db_path = 'student_intern_data/student_intern_data.db' 
+
+# Allocating students projects
+@app.route('/assigned_projects/', methods=['GET', 'PUT'])
+def assigned_projects():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+    try:
+        if request.method == 'GET':
+            # Fetch the projects from the Projects table
+            cursor.execute('SELECT id, name FROM Projects ORDER BY id DESC')
+            projects = cursor.fetchall()
+
+            # Fetch the students from the Students table
+            cursor.execute('SELECT intern_id, full_name, project FROM Students')
+            students = cursor.fetchall()
+
+            # Close the database connection
+            cursor.close()
+            conn.close()
+
+            return render_template('Assigned_projects.html', projects=projects, students=students)
+        elif request.method == 'PUT':
+            # Handle the AJAX request for updating the student's project assignment
+            data = request.get_json()
+            intern_id = data['internId']
+            new_project_id = data['projectId']
+
+            # Update the student's project assignment in the database
+            cursor.execute('UPDATE Students SET project = ? WHERE intern_id = ?', (new_project_id, intern_id))
+            conn.commit()
+
+            # Close the database connection
+            cursor.close()
+            conn.close()
+
+            return jsonify({'status': 'success', 'message': 'Project assignment updated successfully'})
+
+    except Exception as e:
+        # Handle any errors
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# Route to handle the AJAX request for updating the student's project assignment
+@app.route('/update_project_assignment', methods=['PUT'])
+def update_project_assignment():
+    try:
+        data = request.get_json()
+        intern_id = data['internId']
+        new_project_id = data['projectId']
+
+        # Connect to the SQLite database
+        conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+        cursor = conn.cursor()
+
+        # Update the student's project assignment in the database
+        cursor.execute('UPDATE Students SET project = ? WHERE intern_id = ?', (new_project_id, intern_id))
+        conn.commit()
+
+        # Close the database connection
+        cursor.close()
+        conn.close()
+
+        return jsonify({'status': 'success', 'message': 'Project assignment updated successfully'})
+
+    except Exception as e:
+        # Handle any errors
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 #  Generic Pre Internship Evaluation Per Student
 @app.route('/submit_student_evaluation', methods=['POST'])

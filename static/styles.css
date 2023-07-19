@@ -1,0 +1,33 @@
+/**
+Kanban boards styles
+**/
+
+.kanban-container {
+  display: flex;
+  width: fit-content;
+}
+
+.kanban-column {
+  flex: 1;
+  background-color: lightgray;
+  padding: 10px;
+  margin: 0 5px; /* Adjust the margin to provide spacing between columns */
+  display: flex;
+  flex-direction: column;
+}
+
+.column-header {
+  font-weight: bold;
+  color: rgb(79, 107, 231);
+  margin-bottom: 10px;
+  font-size: 16px; /* Adjust the font size for column headers */
+}
+
+.kanban-card {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-size: 14px; /* Adjust the font size for card content */
+}

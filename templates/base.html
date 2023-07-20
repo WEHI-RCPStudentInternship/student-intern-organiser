@@ -3,6 +3,9 @@
 <head>
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
+    <!-- css link -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
     <style>
         .dataTables_length {
             margin-top: 9px;
@@ -56,7 +59,7 @@
             font-size: 16px;
             padding: 5px;
         }
-/* Add your custom styles here */
+    /* Add your custom styles here */
     </style>
     {% block styles %}{% endblock %}
 </head>

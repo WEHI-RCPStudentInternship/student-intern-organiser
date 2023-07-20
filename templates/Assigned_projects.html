@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %} Project Students Allocation {% endblock %}
+{% block page_title %}Projects Students Allocation{% endblock %}
+
+{% block content %}
+
+<div class="kanban-container">
+  {% for project in projects %}
+    <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h3 class="column-header">{{ project[1] }}</h3>
+      {% for student in students %}
+        {% if project[1] == student[2] %}
+          <div class="kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
+            {{ student[1] }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Drag and Drop Functionnality -->
+
+<script>
+
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+  function drag(event) {
+    event.dataTransfer.setData("text", event.target.dataset.studentId);
+  }
+
+  function drop(event) {
+    event.preventDefault();
+    const studentId = event.dataTransfer.getData("text");
+    const projectId = event.target.closest('.kanban-column').dataset.projectId;
+
+    console.log('Student ID:', studentId);
+    console.log('Project ID:', projectId);
+
+    // Find the student element and target column
+    const studentElement = document.querySelector(`[data-student-id="${studentId}"]`);
+    const targetColumn = event.target.closest('.kanban-column');
+
+    // printing in the console for testing if i was catching data  while debugging
+    console.log('Student Element:', studentElement);
+    console.log('Target Column:', targetColumn);
+
+    if (studentElement && targetColumn) {
+      // Move the student to the target column
+      targetColumn.appendChild(studentElement);
+
+      // Send AJAX request to update the student's project assignment in the database
+      fetch('/update_project_assignment', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ internId: studentId, projectId: projectId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          console.log('Project assignment updated successfully.');
+        } else {
+          console.log('Failed to update project assignment.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the project assignment.');
+      });
+    } else {
+      console.log('Student or target column not found.');
+    }
+  }
+
+  function addDragListeners() {
+    const unassignedStudents = document.querySelectorAll('.unassigned .kanban-card');
+    unassignedStudents.forEach(student => {
+      student.addEventListener('dragstart', drag);
+    });
+
+    const projectColumns = document.querySelectorAll('.project-column');
+    projectColumns.forEach(column => {
+      column.addEventListener('dragover', allowDrop);
+      column.addEventListener('drop', drop);
+    });
+  }
+
+  // Initial call to add drag listeners when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    addDragListeners();
+  });
+</script>
+
+{% endblock %}

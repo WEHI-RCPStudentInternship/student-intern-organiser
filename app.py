@@ -24,17 +24,21 @@ def assigned_projects():
     try:
         if request.method == 'GET':
             # Fetch the projects from the Projects table
-            cursor.execute('SELECT id, name FROM Projects ORDER BY id DESC')
+            cursor.execute('SELECT id, name FROM Projects ORDER BY id = ? DESC, id DESC', (22,))
             projects = cursor.fetchall()
 
+            cursor.execute('SELECT name FROM Intakes where current = "yes"')
+            intake_current = cursor.fetchall()[0][0]
+
             # Fetch the students from the Students table
-            cursor.execute('SELECT intern_id, full_name, project FROM Students')
+            cursor.execute('SELECT intern_id, full_name, project FROM Students WHERE intake = ?',(intake_current,))
             students = cursor.fetchall()
 
             # Close the database connection
             cursor.close()
             conn.close()
 
+            title_of_page = "Project Allocation"
             return render_template('Assigned_projects.html', projects=projects, students=students)
         elif request.method == 'PUT':
             # Handle the AJAX request for updating the student's project assignment

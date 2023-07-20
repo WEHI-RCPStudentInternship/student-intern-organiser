@@ -38,7 +38,6 @@ def assigned_projects():
             cursor.close()
             conn.close()
 
-            title_of_page = "Project Allocation"
             return render_template('Assigned_projects.html', projects=projects, students=students)
         elif request.method == 'PUT':
             # Handle the AJAX request for updating the student's project assignment

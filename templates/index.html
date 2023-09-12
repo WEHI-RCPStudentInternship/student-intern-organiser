@@ -42,6 +42,7 @@
                 <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column -->
                 <th>ID</th>
                 <th>Name</th>
+                <th>Pronouns</th>
                 <th>Email</th>
                 <th>Pronunciation</th>
                 <th>Project</th>
@@ -59,6 +60,7 @@
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                 <td><a href="/view/{{ student[0] }}">{{ student[0] }}</a></td>
                 <td>{{ student[1] }}</td>
+                <td>{{ student[10] }}</td>
                 {% if student[2] and student[2] != '' %}
                     <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
                 {% else %}

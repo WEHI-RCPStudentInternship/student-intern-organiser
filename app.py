@@ -498,7 +498,7 @@ def index_current_intake():
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
-    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pre_internship_summary_recommendation_internal FROM Students WHERE intake = ?',(intake_current,))
+    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pre_internship_summary_recommendation_internal, pronouns FROM Students WHERE intake = ?',(intake_current,))
 
     students = cursor.fetchall()
 

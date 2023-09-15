@@ -128,7 +128,7 @@ def submit_student_evaluation():
     conn.close()
 
     # Redirect to the student's evaluation  page in standardized vocabulary
-    return redirect(url_for('student_evaluation', intern_id=student_id))
+    return redirect(url_for('pre_int_st_evaluation', intern_id=student_id))
 
 @app.route('/pre_int_st_evaluation/<int:intern_id>', methods=['GET'])
 def pre_int_st_evaluation(intern_id):

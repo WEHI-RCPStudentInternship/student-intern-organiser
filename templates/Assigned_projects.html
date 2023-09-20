@@ -12,7 +12,7 @@
       {% for student in students %}
         {% if project[1] == student[2] %}
           <div class="kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-            {{ student[1] }}
+            {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }}
           </div>
         {% endif %}
       {% endfor %}

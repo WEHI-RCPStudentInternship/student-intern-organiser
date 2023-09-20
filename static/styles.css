@@ -8,7 +8,7 @@ Kanban boards styles
 }
 
 .kanban-column {
-  flex: 0 0 100px; /* Set a fixed width for each project column */
+  flex: 0 0 150px; /* Set a fixed width for each project column */
   background-color: lightgray;
   padding: 5px;
   padding-top: 5px;

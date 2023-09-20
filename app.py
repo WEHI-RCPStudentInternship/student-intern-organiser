@@ -31,7 +31,7 @@ def assigned_projects():
             intake_current = cursor.fetchall()[0][0]
 
             # Fetch the students from the Students table
-            cursor.execute('SELECT intern_id, full_name, project FROM Students WHERE intake = ?',(intake_current,))
+            cursor.execute('SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects FROM Students WHERE intake = ?',(intake_current,))
             students = cursor.fetchall()
 
             # Close the database connection

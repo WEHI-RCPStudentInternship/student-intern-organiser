@@ -90,6 +90,9 @@ def update_project_assignment():
 def submit_student_evaluation():
     # Retrieve  data from the form
     student_id = request.form.get('intern_id')
+    status = request.form.get('status')
+    pronunciation = request.form.get('pronunciation')
+    cover_letter_projects = request.form.get('cover_letter_projects')
     Overall_External = request.form.get('Overall_External')
     Overall_Internal = request.form.get('Overall_Internal')
     learn_quickly_technical = request.form.get('learn_quickly_technical')
@@ -109,7 +112,11 @@ def submit_student_evaluation():
     # Update Students Evaluation data in the Students table
     cursor.execute('''
         UPDATE Students
-        SET pre_internship_summary_recommendation_external = ?,
+
+        SET status = ?,
+            pronunciation = ?,
+            cover_letter_projects = ?,
+            pre_internship_summary_recommendation_external = ?,
             pre_internship_summary_recommendation_internal = ?,
             pre_internship_technical_rating = ?,
             pre_internship_learning_quickly = ?,
@@ -121,7 +128,7 @@ def submit_student_evaluation():
             summary_experience = ?
 
         WHERE intern_id = ?
-    ''', (Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, summary_experience, student_id))
+    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, summary_experience, student_id))
 
     # Commit the changes and close the database connection
     conn.commit()
@@ -152,7 +159,9 @@ def pre_int_st_evaluation(intern_id):
     pronoun1 = pronoun_parts[0].strip()
     pronoun2 = pronoun_parts[1].strip() if len(pronoun_parts) > 1 else ""
 
-    return render_template('pre_int_st_evaluation.html', student=student, pronoun1=pronoun1, pronoun2=pronoun2)
+    statuses = get_statuses()  # Retrieve the list of statuses from the database
+
+    return render_template('pre_int_st_evaluation.html', student=student, pronoun1=pronoun1, pronoun2=pronoun2,statuses=statuses)
 
 @app.route('/student_evaluation/<int:intern_id>', methods=['GET'])
 def student_evaluation(intern_id):

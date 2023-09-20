@@ -159,9 +159,18 @@ def pre_int_st_evaluation(intern_id):
     pronoun1 = pronoun_parts[0].strip()
     pronoun2 = pronoun_parts[1].strip() if len(pronoun_parts) > 1 else ""
 
+
+    # Find matching PDF files
+    attachments_dir = 'student_intern_data/attachments'
+    matching_files = []
+    for filename in os.listdir(attachments_dir):
+        if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf'):
+            matching_files.append(filename)
+
+
     statuses = get_statuses()  # Retrieve the list of statuses from the database
 
-    return render_template('pre_int_st_evaluation.html', student=student, pronoun1=pronoun1, pronoun2=pronoun2,statuses=statuses)
+    return render_template('pre_int_st_evaluation.html', student=student, pronoun1=pronoun1, pronoun2=pronoun2,statuses=statuses, matching_files=matching_files)
 
 @app.route('/student_evaluation/<int:intern_id>', methods=['GET'])
 def student_evaluation(intern_id):

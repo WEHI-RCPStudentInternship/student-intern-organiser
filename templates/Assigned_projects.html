@@ -10,10 +10,12 @@
     <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
       <h3 class="column-header">{{ project[1] }}</h3>
       {% for student in students %}
-        {% if project[1] == student[2] %}
-          <div class="kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-            {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }}
-          </div>
+        {% if project[1] == student[2]  %}
+            {% if student[4] not in("15 Ineligible","15 Chose another internship")   %}
+              <div class="kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
+                {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }}
+              </div>
+            {% endif %}
         {% endif %}
       {% endfor %}
     </div>

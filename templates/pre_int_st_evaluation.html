@@ -40,6 +40,11 @@
             width: 100%;
             max-width: 100%;
         }
+        input {
+            margin-top:20px;
+            float:left;
+            width: 74%;
+        }
         select {
             margin-top:20px;
             float:left;
@@ -88,11 +93,46 @@
                 <td>Pronouns:</td>
                 <td>{{ student[2] }}</td>
             </tr>
-             <tr>
+            <tr>
                 <td>View student</td>
                 <td><a href="/view/{{ student[0] }}">Link to view student</a></td>
             </tr>
+            <tr>
+                <td>Edit student</td>
+                <td><a href="/edit_student/{{ student[0] }}">Link to edit student</a></td>
+            </tr>
+            <tr>
+                <td>link_to_application_doc</td>
+                <td>
+                    {% if matching_files %}
+                        <ul>
+                            {% for file_name in matching_files %}
+
+                                <li><a href="/view_docs/{{ file_name }}">Link to {{ file_name }} File</a></li>
+
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        No matching files found.
+                    {% endif %}
+
+                </td>
+            </tr>
+
+
         </table>
+
+
+        <label for="status">Status</label>
+        <select name="status" id="status">
+            <option value="" selected disabled>Select the updated status</option>
+        </select>
+
+        <label for="pronunciation">Pronunciation</label>
+        <input name="pronunciation" value="{{ student[14] }}"/>
+
+        <label for="cover_letter_interest">Project Interest</label>
+        <textarea name="cover_letter_interest" id="summary_tech_skills" rows="3">{{ student[11] }}</textarea>
 
         <label for="Overall_Internal"> Overall Internal </label>
         <select name="Overall_Internal" id="Overall_Internal">

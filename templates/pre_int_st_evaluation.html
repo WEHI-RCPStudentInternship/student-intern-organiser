@@ -7,7 +7,7 @@
 {% block content %}
     <style>
         form {
-            width: 600px;
+            width: 800px;
             margin: 0 auto;
             margin-left: 100px;
             margin-right: 100px;
@@ -27,9 +27,12 @@
         }
 
         label {
+            margin-top:20px;
             display: inline-block;
-            width: 500px;
+            width: 25%;
             margin-bottom: 5px;
+            float:left;
+            clear:both;
         }
         .r_overall {
             display: inline-block;
@@ -38,15 +41,18 @@
             max-width: 100%;
         }
         select {
-            width: 100%;
-            max-width: 100%;
+            margin-top:20px;
+            float:left;
+            width: 75%;
             box-sizing: border-box;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
         textarea{
-            width: 100%;
+            margin-top:20px;
+            float:left;
+            width: 74%;
         }
 
         button[type="submit"] {
@@ -119,7 +125,7 @@
 
         </select>
 
-        <label for="learn_quickly_technical">Quickly learn technical concepts:</label>
+        <label for="learn_quickly_technical">Quickly learn tech concepts:</label>
         <select name="learn_quickly_technical" id="learn_quickly_technical">
             {% if student[27] %}
                 <option value="{{ student[27] }}"selected>{{ student[27] }}</option>
@@ -132,7 +138,7 @@
             <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} ability to learn technical concepts quickly. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} ability to learn technical concepts quickly. </option>
         </select>
 
-        <label for="learn_domain_concepts">Quickly learn domain concepts:</label>
+        <label for="learn_domain_concepts">Quickly learn domain:</label>
         <select name="learn_domain_concepts" id="learn_domain_concepts">
             {% if student[29] %}
                 <option value="{{ student[29] }}"selected>{{ student[29] }}</option>

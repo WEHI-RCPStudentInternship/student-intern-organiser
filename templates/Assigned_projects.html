@@ -13,7 +13,7 @@
         {% if project[1] == student[2]  %}
             {% if student[4] not in("15 Ineligible","15 Chose another internship")   %}
               <div class="kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-                {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }}
+                {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a href="/view/{{ student[0] }}">View</a>
               </div>
             {% endif %}
         {% endif %}

@@ -463,13 +463,13 @@ def download_contracts_and_applications():
 
 
     # Get today's date
-    today = datetime.date.today()
+    today = datetime.now()
 
     # Format the date as YYYY-mm-dd
     formatted_date = today.strftime("%Y-%m-%d")
 
     # Serve the ZIP file for download
-    return send_file(zip_path, as_attachment=True, attachment_filename=formatted_date+'_contract_files.zip')
+    return send_file(zip_path, as_attachment=True, download_name=formatted_date+'_contract_files.zip')
 
 
 

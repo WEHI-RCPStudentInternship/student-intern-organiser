@@ -4,6 +4,15 @@
 
 {% block page_title %}Generic Pre Internship Evaluation Per Student{% endblock %}
 
+{% block top_links_menu %}
+
+        <a href="/view/{{ student[0] }}" id="viewBtn">View Student</a>
+        <a href="/edit_student/{{ student[0] }}" id="editBtn">Edit Student</a>
+        <a href="https://wehieduau.sharepoint.com/:w:/r/sites/rcp/Shared%20Documents/Student%20internships/RDM%230235%20Email%20templates%20for%20Student%20Internship%20Programme.docx?d=wb7b5709838c24f229cb1c5e79f6119c2&csf=1&web=1&e=DcOcRO" >RDM#0235 Email templates for Students</a>
+
+{% endblock %}
+
+
 {% block content %}
     <style>
         form {
@@ -92,14 +101,6 @@
              <tr>
                 <td>Pronouns:</td>
                 <td>{{ student[2] }}</td>
-            </tr>
-            <tr>
-                <td>View student</td>
-                <td><a href="/view/{{ student[0] }}">Link to view student</a></td>
-            </tr>
-            <tr>
-                <td>Edit student</td>
-                <td><a href="/edit_student/{{ student[0] }}">Link to edit student</a></td>
             </tr>
             <tr>
                 <td>link_to_application_doc</td>

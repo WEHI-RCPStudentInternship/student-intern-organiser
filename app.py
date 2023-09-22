@@ -27,7 +27,7 @@ def assigned_projects():
             cursor.execute('SELECT id, name FROM Projects ORDER BY id = ? DESC, id DESC', (22,))
             projects = cursor.fetchall()
 
-            cursor.execute('SELECT name FROM Intakes where current = "yes"')
+            cursor.execute('SELECT name FROM Intakes where status  = "new"')
             intake_current = cursor.fetchall()[0][0]
 
             # Fetch the students from the Students table
@@ -497,8 +497,9 @@ def upload_signed_contract(intern_id, full_name):
 
 
 
-@app.route('/current_intake')
-def index_current_intake():
+#This is actually the new intake
+@app.route('/new_intake')
+def index_new_intake():
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -510,7 +511,7 @@ def index_current_intake():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    cursor.execute('SELECT name FROM Intakes where current = "yes"')
+    cursor.execute('SELECT name FROM Intakes where status = "new"')
     intake_current = cursor.fetchall()[0][0]
 
 
@@ -535,6 +536,9 @@ def index_outstanding():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -548,11 +552,12 @@ def index_outstanding():
     query = '''
         SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal
         FROM Students
-        WHERE status IN ({})
+        WHERE intake = ? AND status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
+
     # Execute the query with the statuses list
-    cursor.execute(query, current_statuses_list)
+    cursor.execute(query, [intake_current] + current_statuses_list)
 
     students = cursor.fetchall()
 
@@ -577,8 +582,8 @@ def index_current():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    status_of_students_current_and_past = [9, 10,11,12,13]
-    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current_and_past]
+    status_of_students_current = [13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter

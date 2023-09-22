@@ -23,8 +23,8 @@
         </select>
         <a id="changeProjectBtn" href="#">Change Project</a>
 
-        <!-- Check if the current page is '/current_intake', then display the button -->
-        {% if request.path == '/current_intake' %}
+        <!-- Check if the current page is '/new_intake', then display the button -->
+        {% if request.path == '/new_intake' %}
         <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>
         {% endif %}
 

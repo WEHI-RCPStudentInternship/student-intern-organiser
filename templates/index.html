@@ -23,6 +23,13 @@
         </select>
         <a id="changeProjectBtn" href="#">Change Project</a>
 
+        <select id="post_internship_rating">
+            <option value="Decent">Decent</option>
+            <option value="Impressive">Impressive</option>
+        </select>
+        <a id="change_post_internship_rating" href="#">Change Rating</a>
+
+
         <!-- Check if the current page is '/new_intake', then display the button -->
         {% if request.path == '/new_intake' %}
         <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>
@@ -209,7 +216,6 @@ var selectedRows = $('.studentCheckbox:checked').each(function() {
                   });
             });
 
-
             // Change project button action
             $('#changeProjectBtn').on('click', function() {
                 var project_id = $('#projectDropdown').val();
@@ -247,6 +253,46 @@ var selectedRows = $('.studentCheckbox:checked').each(function() {
                     console.error('An error occurred:', error);
                   });
             });
+
+
+            // Change post_internship_rating button action
+            $('#change_post_internship_rating').on('click', function() {
+                var post_internship_rating = $('#post_internship_rating').val();
+                var student_ids = [];
+
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids,
+                    new_post_internship_rating: post_internship_rating
+                };
+
+                url = '/change_post_internship_rating';
+                // Send the POST request
+                fetch(url, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                  .then(response => {
+                    if (response.ok) {
+                      console.log('Ratings changed successfully');
+                    } else {
+                      console.error('An error occurred:', response.statusText);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('An error occurred:', error);
+                  });
+            });
+
+
         });
     </script>
 {% endblock %}

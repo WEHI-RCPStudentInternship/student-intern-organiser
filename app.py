@@ -496,34 +496,83 @@ def upload_signed_contract(intern_id, full_name):
 
 
 
+@app.route('/new_intake_unavailable')
+def index_new_intake_unavailable():
 
-#This is actually the new intake
-@app.route('/new_intake')
-def index_new_intake():
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
+
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
+    status_of_students_to_filter = [15,16,17,18,19,20,21]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal
+        FROM Students
+        WHERE intake = ? AND status IN ({})
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+    # Close the database connection conn.close()
+    title_of_page = "New Intake Unavailable"
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+
+
+@app.route('/new_intake')
+def index_new_intake():
+
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    cursor.execute('SELECT name FROM Intakes where status = "new"')
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
     intake_current = cursor.fetchall()[0][0]
 
 
     # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
-    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pre_internship_summary_recommendation_internal, pronouns FROM Students WHERE intake = ?',(intake_current,))
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
 
+    status_of_students_to_filter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19.20,21]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal
+        FROM Students
+        WHERE intake = ? AND status IN ({})
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
     students = cursor.fetchall()
 
-    # Close the database connection
-    conn.close()
-    title_of_page = "Current Recruitment for this Intake"
+    # Close the database connection conn.close()
+    title_of_page = "New Intake All"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 @app.route('/outstanding')
@@ -544,8 +593,8 @@ def index_outstanding():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    status_of_students_current_and_past = [1,2,3,4,5,6,7,8,19,21]
-    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current_and_past]
+    status_of_students_to_filter = [1,2,3,4,5,6,7,8]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
@@ -558,13 +607,12 @@ def index_outstanding():
 
     # Execute the query with the statuses list
     cursor.execute(query, [intake_current] + current_statuses_list)
-
     students = cursor.fetchall()
 
 
     # Close the database connection
     conn.close()
-    title_of_page = "Available Students"
+    title_of_page = "New Intake WIP"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 

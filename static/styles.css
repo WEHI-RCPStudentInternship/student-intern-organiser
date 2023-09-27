@@ -16,6 +16,16 @@ Kanban boards styles
   flex-direction: column;
 }
 
+.accepted {
+    background-color: green !important;
+    color: white ! important;
+}
+
+.accepted a {
+    color: white ! important;
+
+}
+
 .column-header {
   font-weight: bold;
   color: rgb(79, 107, 231);

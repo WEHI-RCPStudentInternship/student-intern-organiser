@@ -31,9 +31,29 @@ def assigned_projects():
             cursor.execute('SELECT name FROM Intakes where status  = "new"')
             intake_current = cursor.fetchall()[0][0]
 
-            # Fetch the students from the Students table
             cursor.execute('SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects FROM Students WHERE intake = ?',(intake_current,))
             students = cursor.fetchall()
+
+            cursor.execute('SELECT * FROM Statuses')
+            statuses = cursor.fetchall()
+
+            status_of_students_to_filter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+            current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+            # Retrieve student data from the database
+            # Prepare the SQL query with a placeholder for the statuses filter
+            query = '''
+                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects
+                FROM Students
+                WHERE intake = ? AND status IN ({})
+            '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+            # Execute the query with the statuses list
+            cursor.execute(query, [intake_current] + current_statuses_list)
+            students = cursor.fetchall()
+
+
 
             # Close the database connection
             cursor.close()

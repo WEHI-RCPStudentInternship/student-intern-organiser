@@ -24,8 +24,9 @@ def assigned_projects():
     try:
         if request.method == 'GET':
             # Fetch the projects from the Projects table
-            cursor.execute('SELECT id, name FROM Projects ORDER BY id = ? DESC, id DESC', (22,))
+            cursor.execute('SELECT id, name FROM Projects ORDER BY status ASC, name ASC' )
             projects = cursor.fetchall()
+            print(projects)
 
             cursor.execute('SELECT name FROM Intakes where status  = "new"')
             intake_current = cursor.fetchall()[0][0]

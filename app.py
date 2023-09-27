@@ -911,6 +911,7 @@ def dashboard():
 
     # Retrieve student data from the database
     students = cursor.fetchall()
+    total_students_current_and_past = len(students)
 
     # Close the database connection
     conn.close()
@@ -927,7 +928,7 @@ def dashboard():
     return render_template('dashboard.html', students=students, breakdown_ratings=breakdown_ratings,
                         breakdown_courses=breakdown_courses, 
                         total_students=total_students, pronoun_data=pronoun_data,
-                        pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses)
+                        pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses,total_students_current_and_past = total_students_current_and_past)
 
 
 

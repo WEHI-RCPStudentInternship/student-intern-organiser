@@ -24,7 +24,7 @@
         <a id="changeProjectBtn" href="#">Change Project</a>
 
         <select id="post_internship_rating">
-            <option value="Decent">N/A</option>
+            <option value="N/A">N/A</option>
             <option value="Decent">Decent</option>
             <option value="Impressive">Impressive</option>
         </select>
@@ -68,7 +68,7 @@
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                 <td><a href="/view/{{ student[0] }}">{{ student[0] }}</a></td>
                 <td>{{ student[1] }}</td>
-                <td>{{ student[10] }}</td>
+                <td>{{ student[9] }}</td>
                 {% if student[2] and student[2] != '' %}
                     <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
                 {% else %}
@@ -79,7 +79,7 @@
                 <td>{{ student[5] }}</td>
                 <td>{{ student[6] }}</td>
                 <td>{{ student[7] }}</td>
-                <td>{{ student[9] }}</td>
+                <td>{{ student[10] }}</td>
                 <td>{{ student[8] }}</td>
                 <td><a href="/view/{{ student[0] }}">View</a>&nbsp;<a href="/edit_student/{{ student[0] }}">Edit</a></td>
             </tr>

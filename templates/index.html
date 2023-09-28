@@ -154,7 +154,7 @@ var selectedRows = $('.studentCheckbox:checked').each(function() {
                     // Extract the email address from the text
                     try {
                         // Code that may throw an error or exception
-                        var email = text[3].match(/mailto:(.*?)"/)[1];
+                        var email = text[4].match(/mailto:(.*?)"/)[1];
                         // Output the extracted email address
                         emails.push(email); // Assuming email is in the third column (index 2)
                     } catch (error) {
@@ -166,17 +166,14 @@ var selectedRows = $('.studentCheckbox:checked').each(function() {
 
                 var emailsString = emails.join('\n');
 
-                // Create a temporary textarea element and set its value to the emails string
-                var textarea = $('<textarea>').val(emailsString).appendTo('body').select();
+                navigator.clipboard.writeText(emailsString).then(function() {
+                    alert('Copied to clipboard!');
+                }).catch(function() {
+                    alert('Unable to copy to clipboard!');
+                });
 
-                // Copy the emails string to the clipboard
-                document.execCommand('copy');
 
-                // Remove the temporary textarea element
-                textarea.remove();
 
-                // Display a confirmation message
-                alert('Emails have been copied to the clipboard.');
             });
 
             // Change Status button action

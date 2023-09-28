@@ -16,6 +16,10 @@
               <div class="accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
                 {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a href="/view/{{ student[0] }}">View</a>
               </div>
+            {% elif student[4] in ("07 Offered contact")  %}
+              <div class="offered kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
+                {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a href="/view/{{ student[0] }}">View</a>
+              </div>
             {% else %}
               <div class="not-accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
                 {{ student[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a href="/view/{{ student[0] }}">View</a>

@@ -21,7 +21,13 @@ Kanban boards styles
     color: white ! important;
 }
 
-.accepted a {
+.offered {
+    background-color: orange !important;
+    color: white ! important;
+}
+
+
+.accepted a, .offered a {
     color: white ! important;
 
 }

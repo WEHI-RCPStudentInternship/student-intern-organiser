@@ -9,10 +9,26 @@
         <a href="/view/{{ student[0] }}" id="viewBtn">View Student</a>
         <a href="/edit_student/{{ student[0] }}" id="editBtn">Edit Student</a>
         <a href="https://wehieduau.sharepoint.com/:w:/r/sites/rcp/Shared%20Documents/Student%20internships/RDM%230235%20Email%20templates%20for%20Student%20Internship%20Programme.docx?d=wb7b5709838c24f229cb1c5e79f6119c2&csf=1&web=1&e=DcOcRO" >RDM#0235 Email templates for Students</a>
+        <a href="mailto:{{ student[4] }}?subject=Offer of a WEHI RCP Internship&body=Hi {{ student[1] }}, %0D%0A%0D%0ACongratulations! %0D%0A%0D%0A We would like to offer you an Internship at WEHI with the PROJECT project. %0D%0A%0D%0A If you would like to accept this offer by replying to this email, we will then forward the email to the placement team at the University of Melbourne to start organising a contract. %0D%0A%0D%0A If you would like to decline this offer, please reply to this email if you would not like to be considered for other internships at WEHI.  ">Offer a project</a>
+        <a href="#" id="copyCoordinatorText">Copy Email Text Coordinator</a>
+{% endblock %}
+
+{% block jQuery_scripts %}
+    // Copy Emails button action
+    $('#copyCoordinatorText').on('click', function() {
+        var text_for_email = $('#coordinator_email_text').html();
+
+        navigator.clipboard.writeText(text_for_email).then(function() {
+            alert('Copied email text to clipboard!');
+        }).catch(function() {
+            alert('Unable to copy to clipboard!');
+        });
+    });
+
 
 {% endblock %}
 
-
+        
 {% block content %}
     <style>
         form {
@@ -290,6 +306,7 @@
     </form>
 
     <script>
+
         // Function to update the "Review Overall" section
         function updateReviewOverall() {
             // Get the selected values from all dropdowns
@@ -336,5 +353,15 @@
         // Initial update of the "Review Overall" section
         updateReviewOverall();
     </script>
-            
+    <div style="display:none" id="coordinator_email_text">
+Hi All, 
+
+Good news – {{ student[1] }} has decided to join WEHI on an internship with the {{ student[15] }} project! 
+
+Could you please let them know what to do next? 
+
+Details of duties are available via the student projects page at https://wehi-researchcomputing.github.io/students. 
+
+Details of the intake dates are available at https://wehi-researchcomputing.github.io/intake_dates.
+</div>
 {% endblock %}

@@ -15,6 +15,10 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
  # Replace with your SQLite database file path
 db_path = 'student_intern_data/student_intern_data.db' 
 
+@app.route('/links/', methods=['GET'])
+def links():
+    return render_template('links.html')
+
 # Allocating students projects
 @app.route('/assigned_projects/', methods=['GET', 'PUT'])
 def assigned_projects():

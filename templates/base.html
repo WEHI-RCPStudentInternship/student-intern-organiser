@@ -69,13 +69,14 @@
         <h1>{% block page_title %}{% endblock %} Index</h1>
     </div>
     <div class="top_links">
+        <a href="/">All Students Index</a>
         <a href="/dashboard">Dashboard</a>
         <a href="/download_contracts_and_applications">Download contracts</a>
         <a href="/current">Current Intake</a>
         <a href="/outstanding">New Intake WIP</a>
         <a href="/new_intake">New Intake All</a>
-        <a href="/">All Students Index</a>
         <a href="/share_students">Share Student Applications</a>
+        <a href="/links">Links</a>
 
      </div>
      <div class="second_level_top_links">
@@ -90,6 +91,7 @@
     <script>
         $(document).ready(function() {
             // Add your JavaScript code here
+            {% block jQuery_scripts %}    {% endblock %}
         });
     </script>
     {% block scripts %}{% endblock %}

@@ -418,6 +418,99 @@ def edit_student(intern_id):
         
     return render_template('edit.html', student=student, statuses=statuses, intakes=intakes, projects=projects)
 
+@app.route('/share_students')
+def share_students():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    status_of_students_to_filter = [5,6]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, mobile, intake, course, course_major , cover_letter_projects, pronunciation, summary_tech_skills, summary_experience, pre_internship_summary_recommendation_external, pre_internship_technical_rating || ' ' ||  pre_internship_learning_quickly || ' ' || pre_internship_enthusiasm || ' ' || pre_internship_experience || ' ' || pre_internship_communication || ' ' || pre_internship_adaptable AS student_details, github_username
+
+        FROM Students
+        WHERE intake = ? AND status IN ({})
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+    # Create a temporary directory to store the files
+    temp_dir = 'student_intern_data/attachments/tmp'
+
+    try:
+        os.makedirs(temp_dir)
+    except Exception:
+        pass
+
+    # Create the CSV file inside the temporary directory
+    csv_path = os.path.join(temp_dir, 'share_student_data.csv')
+    print(csv_path)
+    with open(csv_path, 'w') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(['ID', 'Full Name', 'Email','Phone', 'Intake', 'Faculty', 'Course', 'Interested in Projects','Pronunciation','Tech Skills','Experience','Summary of Student','Details of Student','github username'])
+
+        for student in students:
+
+            # Write the student data to the CSV file
+            csv_writer.writerow(student)
+
+    # Create the ZIP file
+    zip_path = 'student_intern_data/attachments/share_student_applications_temp.zip'
+    with zipfile.ZipFile(zip_path, 'w') as zip_file:
+        # Add the PDF files for each student to the ZIP file
+        for student in students:
+
+            intern_id = student[0]
+
+            # Get all PDF files starting with the intern_id
+            matching_files = [filename for filename in os.listdir('student_intern_data/attachments') if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf')]
+
+            # Copy the matching PDF files to the temporary directory
+            for file in matching_files:
+                file_path = os.path.join('student_intern_data/attachments', file)
+                dest_path = os.path.join(temp_dir, file)
+                shutil.copy(file_path, dest_path)
+
+            
+    # Create a zip file of the other files
+    with zipfile.ZipFile(zip_path, 'w') as zip_file:
+        for folder_name, _, file_names in os.walk(temp_dir):
+            for file_name in file_names:
+                file_path = os.path.join(folder_name, file_name)
+                zip_file.write(file_path, os.path.basename(file_path))
+
+    # Remove the temporary directory
+    shutil.rmtree(temp_dir)
+
+    # Close the database connection
+    conn.close()
+
+
+    # Get today's date
+    today = datetime.now()
+
+    # Format the date as YYYY-mm-dd
+    formatted_date = today.strftime("%Y-%m-%d")
+
+    # Serve the ZIP file for download
+    return send_file(zip_path, as_attachment=True, download_name=formatted_date+'_student_applications.zip')
+
+
 @app.route('/download_contracts_and_applications')
 def download_contracts_and_applications():
     # Connect to the SQLite database

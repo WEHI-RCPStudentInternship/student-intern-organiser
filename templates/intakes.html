@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Intakes Index{% endblock %}
+
+{% block page_title %}Intakes{% endblock %}
+
+{% block top_links_menu %}
+    <!-- Your top links menu goes here if needed -->
+        <a href="#" >Add Intake</a>
+{% endblock %}
+
+{% block content %}
+    <h1>Intakes Table</h1>
+    <table id="intakesTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for intake in intakes %}
+            <tr>
+                <td>{{ intake[0] }}</td>
+                <td>{{ intake[1] }}</td>
+                <td>{{ intake[2] }}</td>
+                <td><a href="/edit_intake/{{ intake[0] }}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Your JavaScript code for DataTables or other functionality goes here
+        $(document).ready(function() {
+            var table = $('#intakesTable').DataTable({
+                "lengthMenu": [10, 25, 50, 100], // Customize the number of entries per page
+                // Other DataTables options and initialization code can go here
+            });
+        });
+    </script>
+{% endblock %}
+

@@ -358,6 +358,15 @@ def get_intakes():
     conn.close()
     return intakes
 
+def get_all_intakes():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Intakes')
+    intakes = [row for row in cursor.fetchall()]
+    conn.close()
+    return intakes
+
+
 def get_projects():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -1072,6 +1081,42 @@ def dashboard(dashboard_type):
                         total_students=total_students, pronoun_data=pronoun_data,
                         pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses,total_students_current_and_past = total_students_current_and_past)
 
+
+@app.route('/intakes')
+def intakes_index():
+    intakes = get_all_intakes()
+    print(intakes)
+    return render_template('intakes.html', intakes=intakes)
+
+
+
+@app.route('/edit_intake/<int:intake_id>', methods=['GET', 'POST'])
+def edit_intake(intake_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        # Handle form submission and update the intake record in your database
+        new_name = request.form.get('name')
+        new_status = request.form.get('status')
+
+        # Perform the database update logic here
+        # Update the intake record with the new_name and new_status
+        cursor = conn.cursor()
+
+        # Update the intake record in the database
+        cursor.execute('UPDATE Intakes SET name = ?, status = ? WHERE id = ?', (new_name, new_status, intake_id))
+        conn.commit()
+
+
+
+    # If it's a GET request, render the edit_intake.html template
+    cursor.execute('SELECT * FROM Intakes where id = ?', (intake_id,))
+    intake_data = cursor.fetchone()
+    conn.close()
+ 
+
+    return render_template('edit_intake.html', intake=intake_data)
 
 
 if __name__ == '__main__':

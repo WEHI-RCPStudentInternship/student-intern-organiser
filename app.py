@@ -998,6 +998,8 @@ def dashboard(dashboard_type):
         status_of_students_current_and_past = [14]
     if dashboard_type == "current":
         status_of_students_current_and_past = [13]
+    if dashboard_type == "new_signed_and_offered":
+        status_of_students_current_and_past = [7,8,9,10,11,12]
     if dashboard_type == "new_signed_and_accepted":
         status_of_students_current_and_past = [8,9,10,11,12]
     if dashboard_type == "new_signed":

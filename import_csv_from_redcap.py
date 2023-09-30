@@ -25,6 +25,12 @@ def extract_pdf_files(zip_file_path, students_inserted, output_directory):
                 shutil.move(extracted_path, destination_path)
 
 
+    # clean up output_directory
+    try:
+        shutil.rmtree(output_directory)
+    except:
+        print('Error deleting directory')
+
 
 
 
@@ -44,7 +50,7 @@ def read_csv_file(file_path,zip_file_path):
         header = next(reader) 
 
         # Provide the path to the zip file and the output directory
-        output_directory = '.'
+        output_directory = 'student_intern_data/import/temp.'
 
         students_inserted = {}
 
@@ -86,7 +92,6 @@ def read_csv_file(file_path,zip_file_path):
 
         # Call the function to extract the PDF files
         extract_pdf_files(zip_file_path, students_inserted, output_directory)
-
 
 def insert_student_data(conn, data):
     cursor = conn.cursor()

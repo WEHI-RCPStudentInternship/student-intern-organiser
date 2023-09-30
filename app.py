@@ -594,18 +594,20 @@ def download_contracts_and_applications():
 @app.route('/import_redcap', methods=['GET', 'POST'])
 def import_redcap():
 
-    import_dir = 'student_intern_data/import'
+    today = datetime.now()
+
+    import_dir = 'student_intern_data/import/archive'
     if request.method == 'POST':
         print(request.files)
         csv_file = request.files['csv_file']
         if csv_file:
-            filename = 'goodbye.csv'
+            filename = csv_file.filename 
             csv_file_path = os.path.join(import_dir, filename)
             csv_file.save(csv_file_path)
 
         zip_file = request.files['zip_file']
         if zip_file:
-            filename = 'hello.zip'
+            filename = zip_file.filename 
             zip_file_path = os.path.join(import_dir, filename)
             zip_file.save(zip_file_path)
 

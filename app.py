@@ -593,24 +593,26 @@ def download_contracts_and_applications():
 @app.route('/import_redcap', methods=['GET', 'POST'])
 def import_redcap():
 
-    attachments_dir = 'student_intern_data/attachments'
+    import_dir = 'student_intern_data/import'
     if request.method == 'POST':
         print(request.files)
         csv_file = request.files['csv_file']
         if csv_file:
-            # Save the file to the attachments directory with the desired filename
-            filename = str(intern_id)+"_"+full_name.replace(" ", "_").title()+"_signed_contract.pdf"
+            filename = 'goodbye.csv'
 
-            file.save(os.path.join(attachments_dir, filename))
-            # Get the referrer URL
-            referrer = request.referrer
+            csv_file.save(os.path.join(import_dir, filename))
 
-            # Redirect back to the previous page
-            return redirect(referrer)
         zip_file = request.files['zip_file']
         if zip_file:
-            filename = 'hello'
-    
+            filename = 'hello.zip'
+            zip_file.save(os.path.join(import_dir, filename))
+
+        # Get the referrer URL
+        referrer = request.referrer
+
+        # Redirect back to the previous page
+        return redirect(referrer)
+ 
     return render_template('import_redcap.html')
 
 

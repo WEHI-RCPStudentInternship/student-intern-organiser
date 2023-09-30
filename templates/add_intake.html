@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Intake{% endblock %}
+
+{% block page_title %}Add Intake{% endblock %}
+
+{% block top_links_menu %}
+    <!-- Your top links menu goes here if needed -->
+{% endblock %}
+
+{% block content %}
+    <h1>Add Intake</h1>
+    <form method="POST" action="/add_intake"> <!-- Update the action to point to the appropriate route -->
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select class="form-control" id="status" name="status" required>
+                <option value="finished">Finished</option>
+                <option value="current">Current</option>
+                <option value="new">New</option>
+                <option value="future">Future</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Intake</button> <!-- Update the button text -->
+    </form>
+{% endblock %}
+

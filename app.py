@@ -1118,6 +1118,28 @@ def edit_intake(intake_id):
 
     return render_template('edit_intake.html', intake=intake_data)
 
+@app.route('/add_intake', methods=['GET', 'POST'])
+def add_intake():
+    if request.method == 'POST':
+        new_name = request.form.get('name')
+        new_status = request.form.get('status')
+
+        # Connect to the database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Insert the new intake record into the database
+        cursor.execute('INSERT INTO Intakes (name, status) VALUES (?, ?)', (new_name, new_status))
+        conn.commit()
+
+        # Close the database connection
+        conn.close()
+
+        return redirect(url_for('intakes_index'))
+
+    # If it's a GET request, render the add_intake.html template
+    return render_template('add_intake.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

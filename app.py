@@ -992,12 +992,15 @@ def dashboard(dashboard_type):
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
-
+    if dashboard_type == "new_all":
+        status_of_students_current_and_past = [1,2,3,4,5,6,7,8,9,10,11,12]
     if dashboard_type == "finished":
         status_of_students_current_and_past = [14]
     if dashboard_type == "current":
         status_of_students_current_and_past = [13]
-    if dashboard_type == "new":
+    if dashboard_type == "new_signed_and_accepted":
+        status_of_students_current_and_past = [8,9,10,11,12]
+    if dashboard_type == "new_signed":
         status_of_students_current_and_past = [9,10,11,12]
     if dashboard_type == "all":
         status_of_students_current_and_past = [9, 10, 11, 12, 13, 14]

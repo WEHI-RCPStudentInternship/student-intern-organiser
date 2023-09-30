@@ -934,7 +934,7 @@ def change_student_project(student_ids, new_project):
 
 
 def calculate_breakdown_of_students(students):
-    ratings = [student[42] for student in students if student[42] is not None and student[42] != 'N/A']
+    ratings = [student[42] for student in students if student[42] is not None ]
 
     # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(ratings))
@@ -982,8 +982,9 @@ def calculate_breakdown_of_pronouns(students):
     return pronoun_data, pronoun_percentage, total_students
 
 
-@app.route('/dashboard')
-def dashboard():
+@app.route('/dashboard/<string:dashboard_type>',methods=['GET'])
+def dashboard(dashboard_type):
+    print(dashboard_type)
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -992,7 +993,14 @@ def dashboard():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    status_of_students_current_and_past = [9, 10, 11, 12, 13, 14]
+    if dashboard_type == "finished":
+        status_of_students_current_and_past = [14]
+    if dashboard_type == "current":
+        status_of_students_current_and_past = [13]
+    if dashboard_type == "new":
+        status_of_students_current_and_past = [9,10,11,12]
+    if dashboard_type == "all":
+        status_of_students_current_and_past = [9, 10, 11, 12, 13, 14]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current_and_past]
 
     # Retrieve student data from the database

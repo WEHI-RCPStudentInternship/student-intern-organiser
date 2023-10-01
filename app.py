@@ -366,6 +366,15 @@ def get_all_intakes():
     conn.close()
     return intakes
 
+def get_all_projects():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM projects')
+    projects = [row for row in cursor.fetchall()]
+    conn.close()
+    return projects
+
+
 
 def get_projects():
     conn = sqlite3.connect(db_path)
@@ -1139,6 +1148,62 @@ def add_intake():
 
     # If it's a GET request, render the add_intake.html template
     return render_template('add_intake.html')
+
+
+@app.route('/projects')
+def projects_index():
+    projects = get_all_projects()
+    return render_template('projects.html', projects=projects)
+
+@app.route('/add_project', methods=['GET', 'POST'])
+def add_project():
+    if request.method == 'POST':
+        new_name = request.form.get('name')
+        new_status = request.form.get('status')
+
+        # Connect to the database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Insert the new project record into the database
+        cursor.execute('INSERT INTO projects (name, status) VALUES (?, ?)', (new_name, new_status))
+        conn.commit()
+
+        # Close the database connection
+        conn.close()
+
+        return redirect(url_for('projects_index'))
+
+    # If it's a GET request, render the add_project.html template
+    return render_template('add_project.html')
+
+@app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
+def edit_project(project_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        # Handle form submission and update the project record in your database
+        new_name = request.form.get('name')
+        new_status = request.form.get('status')
+
+        # Perform the database update logic here
+        # Update the project record with the new_name and new_status
+        cursor = conn.cursor()
+
+        # Update the project record in the database
+        cursor.execute('UPDATE projects SET name = ?, status = ? WHERE id = ?', (new_name, new_status, project_id))
+        conn.commit()
+
+
+
+    cursor.execute('SELECT * FROM projects where id = ?', (project_id,))
+    project_data = cursor.fetchone()
+    conn.close()
+ 
+
+    return render_template('edit_project.html', project=project_data)
+
 
 
 if __name__ == '__main__':

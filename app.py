@@ -50,7 +50,7 @@ def assigned_projects():
             query = '''
                 SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects
                 FROM Students
-                WHERE intake = ? AND status IN ({})
+                WHERE intake = ? AND status IN ({}) ORDER BY status desc
             '''.format(','.join(['?'] * len(current_statuses_list)))
 
 

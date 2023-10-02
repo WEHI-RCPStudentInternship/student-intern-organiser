@@ -455,7 +455,7 @@ def share_students():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    status_of_students_to_filter = [5,6]
+    status_of_students_to_filter = [3,4,5,6] # from quick review to Interviewed by non-RCP supervisor
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
     # Retrieve student data from the database
@@ -984,7 +984,7 @@ def change_student_project(student_ids, new_project):
 
 
 def calculate_breakdown_of_students(students):
-    ratings = [student[42] for student in students if student[42] is not None ]
+    ratings = [student[42] for student in students]
 
     # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(ratings))

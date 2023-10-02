@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Project{% endblock %}
+
+{% block page_title %}Edit Project{% endblock %}
+
+{% block top_links_menu %}
+    <!-- Your top links menu goes here if needed -->
+{% endblock %}
+
+{% block content %}
+    <h1>Edit Project</h1>
+    <form method="POST" action="/edit_project/{{ project[0] }}"> <!-- Update the action to point to the appropriate route -->
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ project[1] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select class="form-control" id="status" name="status" required>
+                <option value="0" {% if project[2] == 0 %}selected{% endif %}>0 - for unassigned</option>
+                <option value="1" {% if project[2] == 1 %}selected{% endif %}>1</option>
+                <option value="2" {% if project[2] == 2 %}selected{% endif %}>2</option>
+                <option value="3" {% if project[2] == 3 %}selected{% endif %}>3</option>
+                <option value="4" {% if project[2] == 4 %}selected{% endif %}>4</option>
+                <option value="5" {% if project[2] == 5 %}selected{% endif %}>5 - archived</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Project</button> <!-- Update the button text -->
+    </form>
+{% endblock %}
+

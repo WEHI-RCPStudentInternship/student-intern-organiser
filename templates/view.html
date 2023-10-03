@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Student Details{% endblock %}
+{% block title %}{{ student[1] }} Details{% endblock %}
 
-{% block page_title %}Student Details{% endblock %}
+{% block page_title %}{{ student[1] }} Student Details{% endblock %}
 {% block top_links_menu %}
 
         <a href="/edit_student/{{ student[0] }}" id="editBtn">Edit Student</a>

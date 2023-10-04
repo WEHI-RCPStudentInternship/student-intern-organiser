@@ -129,6 +129,7 @@ def submit_student_evaluation():
     Adaptability = request.form.get('Adaptability')
     summary_tech_skills = request.form.get('summary_tech_skills')
     summary_experience = request.form.get('summary_experience')
+    extra_notes = request.form.get('extra_notes')
 
 
     # Connect to the SQLite database
@@ -151,10 +152,11 @@ def submit_student_evaluation():
             pre_internship_communication = ?,
             pre_internship_adaptable = ?,
             summary_tech_skills = ?,
+            extra_notes = ?,
             summary_experience = ?
 
         WHERE intern_id = ?
-    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, summary_experience, student_id))
+    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, student_id))
 
     # Commit the changes and close the database connection
     conn.commit()

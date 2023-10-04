@@ -769,7 +769,7 @@ def index_outstanding():
     query = '''
         SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal
         FROM Students
-        WHERE intake = ? AND status IN ({})
+        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 

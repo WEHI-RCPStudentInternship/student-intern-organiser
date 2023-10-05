@@ -57,7 +57,6 @@ def assigned_projects():
             # Execute the query with the statuses list
             cursor.execute(query, [intake_current] + current_statuses_list)
             students = cursor.fetchall()
-            print(students)
 
 
             # Close the database connection

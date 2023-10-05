@@ -496,8 +496,6 @@ def share_students(project_id):
 
 
     students = cursor.fetchall()
-    print(students)
-    print(intake_current)
 
     # Create a temporary directory to store the files
     temp_dir = 'student_intern_data/attachments/tmp'
@@ -558,7 +556,10 @@ def share_students(project_id):
     formatted_date = today.strftime("%Y-%m-%d")
 
     # Serve the ZIP file for download
-    return send_file(zip_path, as_attachment=True, download_name=formatted_date+'_student_applications.zip')
+    if project_id == 0:
+        return send_file(zip_path, as_attachment=True, download_name=formatted_date+'_student_applications.zip')
+    else:
+        return send_file(zip_path, as_attachment=True, download_name=formatted_date+'_student_applications_'+project+'.zip')
 
 
 @app.route('/download_contracts_and_applications')

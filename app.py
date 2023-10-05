@@ -443,8 +443,8 @@ def edit_student(intern_id):
         
     return render_template('edit.html', student=student, statuses=statuses, intakes=intakes, projects=projects)
 
-@app.route('/share_students')
-def share_students():
+@app.route('/share_students/<int:project_id>')
+def share_students(project_id):
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -452,27 +452,52 @@ def share_students():
     cursor.execute('SELECT name FROM Intakes where status  = "new"')
     intake_current = cursor.fetchall()[0][0]
 
-
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    status_of_students_to_filter = [3,4,5,6] # from quick review to Interviewed by non-RCP supervisor
-    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
-    # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
-    query = '''
-        SELECT intern_id, full_name, email, mobile, intake, course, course_major , cover_letter_projects, pronunciation, summary_tech_skills, summary_experience, pre_internship_summary_recommendation_external, pre_internship_technical_rating || ' ' ||  pre_internship_learning_quickly || ' ' || pre_internship_enthusiasm || ' ' || pre_internship_experience || ' ' || pre_internship_communication || ' ' || pre_internship_adaptable AS student_details, github_username
+    if project_id == 0:
+        status_of_students_to_filter = [3,4,5,6] # from quick review to Interviewed by non-RCP supervisor
+        current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
-        FROM Students
-        WHERE intake = ? AND status IN ({})
-    '''.format(','.join(['?'] * len(current_statuses_list)))
+        # Retrieve student data from the database
+        # Prepare the SQL query with a placeholder for the statuses filter
+        query = '''
+            SELECT intern_id, full_name, email, mobile, intake, course, course_major , cover_letter_projects, pronunciation, summary_tech_skills, summary_experience, pre_internship_summary_recommendation_external, pre_internship_technical_rating || ' ' ||  pre_internship_learning_quickly || ' ' || pre_internship_enthusiasm || ' ' || pre_internship_experience || ' ' || pre_internship_communication || ' ' || pre_internship_adaptable AS student_details, github_username
+
+            FROM Students
+            WHERE intake = ? AND status IN ({})
+        '''.format(','.join(['?'] * len(current_statuses_list)))
+
+        # Execute the query with the statuses list
+        cursor.execute(query, [intake_current] + current_statuses_list )
+
+    else:
+        status_of_students_to_filter = [8,9,10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
+        current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+        cursor.execute('SELECT * FROM Projects where id = ?',(project_id,))
+        project = cursor.fetchall()[0][1]
+        print(project)
+
+        query = '''
+            SELECT intern_id, full_name, email, mobile, intake, course, course_major, cover_letter_projects, pronunciation, 
+            summary_tech_skills, summary_experience, pre_internship_summary_recommendation_external, 
+            pre_internship_technical_rating || ' ' || pre_internship_learning_quickly || ' ' || pre_internship_enthusiasm || 
+            ' ' || pre_internship_experience || ' ' || pre_internship_communication || ' ' || pre_internship_adaptable AS student_details, 
+            github_username
+            FROM Students
+            WHERE intake = ? AND project = ? AND status IN ({})
+        '''.format(','.join(['?'] * len(current_statuses_list)))
+
+        # Execute the query with the statuses list, intake, and project as parameters
+        cursor.execute(query, [intake_current, project] + current_statuses_list)
 
 
-    # Execute the query with the statuses list
-    cursor.execute(query, [intake_current] + current_statuses_list)
     students = cursor.fetchall()
+    print(students)
+    print(intake_current)
 
     # Create a temporary directory to store the files
     temp_dir = 'student_intern_data/attachments/tmp'

@@ -48,16 +48,16 @@ def assigned_projects():
             # Retrieve student data from the database
             # Prepare the SQL query with a placeholder for the statuses filter
             query = '''
-                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects
+                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects,pre_internship_summary_recommendation_internal
                 FROM Students
-                WHERE intake = ? AND status IN ({}) ORDER BY status desc
+                WHERE intake = ? AND status IN ({}) ORDER BY status desc, pre_internship_summary_recommendation_internal asc
             '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
             # Execute the query with the statuses list
             cursor.execute(query, [intake_current] + current_statuses_list)
             students = cursor.fetchall()
-
+            print(students)
 
 
             # Close the database connection

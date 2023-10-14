@@ -750,7 +750,7 @@ def index_new_intake():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    status_of_students_to_filter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19.20,21]
+    status_of_students_to_filter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
     # Retrieve student data from the database

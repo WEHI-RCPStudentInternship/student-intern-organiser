@@ -50,10 +50,12 @@
 
             {% set ns = namespace() %}
             {% set ns.total_equiv = 0 %}
+            {% set ns.total_count = 0 %}
             {% for value, count in breakdown_courses.items() %}
             <tr>
                 <td>{{ value }}</td>
                 <td>{{ count }}</td>
+                {% set ns.total_count = ns.total_count + count  %}
                 
                 {% if value == "Engineering and IT"%}
                     {% set ns.total_equiv = ns.total_equiv + (count * 9000)  %}
@@ -65,12 +67,11 @@
                     {% set ns.total_equiv = ns.total_equiv + (count * 3000)  %}
                     <td>{{ count * 3000 }}</td>
                 {% endif %}
-
             </tr>
             {% endfor %}
             <tr>
                 <td></td>
-                <td></td>
+                <td>{{ ns.total_count }}</td>
                 <td>{{ ns.total_equiv }}</td>
             </tr>
         </table>

@@ -4,7 +4,7 @@ import os
 import csv
 import zipfile
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 import import_csv_from_redcap
 
 from collections import Counter
@@ -48,12 +48,27 @@ def email_intake(intake_id):
     students = cursor.fetchall()
     print(students)
 
+    intake_science_start_date = intake[3]
+    intake_engit_start_date = intake[4]
+
+    print(intake_science_start_date)
+
+    science_start_date_object = datetime.strptime(intake_science_start_date, '%Y-%m-%d').date()
+    engit_start_date_object = datetime.strptime(intake_engit_start_date, '%Y-%m-%d').date()
+
+
+    
+
     table_rows = [
-            { "week_number": "1 week before", "science": "06-11-2023", "engit": "13-11-2023"},
-            { "week_number": "First week", "science": "13-11-2023", "engit": "20-11-2023"}
+            { "week_number": "0 - 1 week before", "science": science_start_date_object - timedelta(days=7), "engit": engit_start_date_object - timedelta(days=7)},
+            { "week_number": "1 - First week", "science": science_start_date_object, "engit": engit_start_date_object},
+            { "week_number": "2 - Second week", "science": science_start_date_object + timedelta(days=7), "engit": engit_start_date_object + timedelta(days=7)},
+            { "week_number": "3 - Fourth week", "science": science_start_date_object + timedelta(days=21), "engit": engit_start_date_object + timedelta(days=21)},
+            { "week_number": "4 - Tenth week", "science": science_start_date_object + timedelta(days=63), "engit": engit_start_date_object + timedelta(days=63)},
+            { "week_number": "5 - End of internship", "science": science_start_date_object + timedelta(days=91), "engit": engit_start_date_object + timedelta(days=91)}
            ]
 
-
+    
 
 
     return render_template('email_intake.html', intake=intake, students=students, table_rows= table_rows)

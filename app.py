@@ -46,18 +46,23 @@ def email_intake(intake_id):
     # Execute the query with the statuses list
     cursor.execute(query, [intake_name] + current_statuses_list )
     students = cursor.fetchall()
-    print(students)
+    student_emails = {'science':[],'engit':[]}
+    for student in students:
+        email = student[2]
+        course = student[3]
+        if course == 'Science':
+            student_emails['science'].append(email)
+        if course == 'Engineering and IT':
+            student_emails['engit'].append(email)
 
-    intake_science_start_date = intake[3]
-    intake_engit_start_date = intake[4]
 
-    print(intake_science_start_date)
+
+    science_student_emails = ",".join(x for x in student_emails['science']) 
+    engit_student_emails = ",".join(x for x in student_emails['engit']) 
 
     science_start_date_object = datetime.strptime(intake_science_start_date, '%Y-%m-%d').date()
     engit_start_date_object = datetime.strptime(intake_engit_start_date, '%Y-%m-%d').date()
 
-
-    
 
     table_rows = [
             { "week_number": "0 - 1 week before", "science": science_start_date_object - timedelta(days=7), "engit": engit_start_date_object - timedelta(days=7)},
@@ -68,10 +73,8 @@ def email_intake(intake_id):
             { "week_number": "5 - End of internship", "science": science_start_date_object + timedelta(days=91), "engit": engit_start_date_object + timedelta(days=91)}
            ]
 
-    
 
-
-    return render_template('email_intake.html', intake=intake, students=students, table_rows= table_rows)
+    return render_template('email_intake.html', intake=intake, science_student_emails=science_student_emails, engit_student_emails=engit_student_emails, table_rows= table_rows)
 
 @app.route('/links/', methods=['GET'])
 def links():

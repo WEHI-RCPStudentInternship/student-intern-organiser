@@ -16,6 +16,38 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
  # Replace with your SQLite database file path
 db_path = 'student_intern_data/student_intern_data.db' 
 
+@app.route('/email_intake/<int:intake_id>', methods=['GET'])
+def email_intake(intake_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Intakes WHERE id = ?',(intake_id,))
+    intake_name = cursor.fetchall()[0][1]
+    print(intake_name)
+
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+
+    status_of_students_to_filter = [10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+            SELECT intern_id, full_name, email, course, start_date, end_date
+            FROM Students
+            WHERE intake = ? AND status IN ({})
+        '''.format(','.join(['?'] * len(current_statuses_list)))
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_name] + current_statuses_list )
+    students = cursor.fetchall()
+    print(students)
+
+    return render_template('email_intake.html', intake_name=intake_name, students=students)
+
 @app.route('/links/', methods=['GET'])
 def links():
     return render_template('links.html')

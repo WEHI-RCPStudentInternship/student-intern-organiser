@@ -21,9 +21,11 @@ def email_intake(intake_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Intakes WHERE id = ?',(intake_id,))
-    intake_name = cursor.fetchall()[0][1]
-    print(intake_name)
+    intake = cursor.fetchall()[0]
 
+    intake_name = intake[1]
+    intake_science_start_date = intake[3]
+    intake_engit_start_date = intake[4]
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -36,7 +38,7 @@ def email_intake(intake_id):
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-            SELECT intern_id, full_name, email, course, start_date, end_date
+            SELECT intern_id, full_name, email, course
             FROM Students
             WHERE intake = ? AND status IN ({})
         '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -46,7 +48,7 @@ def email_intake(intake_id):
     students = cursor.fetchall()
     print(students)
 
-    return render_template('email_intake.html', intake_name=intake_name, students=students)
+    return render_template('email_intake.html', intake=intake, students=students)
 
 @app.route('/links/', methods=['GET'])
 def links():

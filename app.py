@@ -48,7 +48,15 @@ def email_intake(intake_id):
     students = cursor.fetchall()
     print(students)
 
-    return render_template('email_intake.html', intake=intake, students=students)
+    table_rows = [
+            { "week_number": "1 week before", "science": "06-11-2023", "engit": "13-11-2023"},
+            { "week_number": "First week", "science": "13-11-2023", "engit": "20-11-2023"}
+           ]
+
+
+
+
+    return render_template('email_intake.html', intake=intake, students=students, table_rows= table_rows)
 
 @app.route('/links/', methods=['GET'])
 def links():

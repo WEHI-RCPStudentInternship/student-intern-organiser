@@ -878,7 +878,7 @@ def index_current():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    status_of_students_current = [13]
+    status_of_students_current = [10,11,12,13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
 
     # Retrieve student data from the database

@@ -6,7 +6,8 @@
 
 {% block top_links_menu %}
 
-        <a href="#" id="copyEmailsBtn">Copy Emails</a>
+        <a href="#" id="copyEmailsBtn">Copy Personal Emails</a>
+        <a href="#" id="copyWehiEmailsBtn">Copy WEHI Emails</a>
         <a href="#" id="downloadKeyAttributesBtn">Download Key Attributes</a>
 
         <select id="statusDropdown">
@@ -51,7 +52,8 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Pronouns</th>
-                <th>Email</th>
+                <th>Personal Email</th>
+                <th>WEHI Email</th>
                 <th>Pronunciation</th>
                 <th>Project</th>
                 <th>Intake</th>
@@ -73,6 +75,11 @@
                     <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
                 {% else %}
                     <td></td>
+                {% endif %}
+                {% if student[11] and student[11] != '' %}
+                    <td><a href="mailto:{{ student[11] }}">{{ student[11] }}</a></td>
+                {% else %}
+                    <td>No WEHI Email</td>
                 {% endif %}
                 <td>{{ student[3] }}</td>
                 <td>{{ student[4] }}</td>
@@ -121,7 +128,7 @@
             $('#downloadKeyAttributesBtn').on('click', function() {
 
                 var student_ids = [];
-var selectedRows = $('.studentCheckbox:checked').each(function() {
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
                     text = table.row($(this).closest('tr')).data();
                     var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
                     student_ids.push(id);
@@ -167,6 +174,39 @@ var selectedRows = $('.studentCheckbox:checked').each(function() {
                 var emailsString = emails.join('\n');
 
                 navigator.clipboard.writeText(emailsString).then(function() {
+                    alert('Copied to clipboard!');
+                }).catch(function() {
+                    alert('Unable to copy to clipboard!');
+                });
+
+
+
+            });
+
+            $('#copyWehiEmailsBtn').on('click', function() {
+                var wehi_emails = [];
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+
+                    text = table.row($(this).closest('tr')).data();
+
+                    // Extract the email address from the text
+                    try {
+                        // Code that may throw an error or exception
+                        if (text[5] != '') {
+                          var wehi_email = text[5].match(/mailto:(.*?)"/)[1];
+                          // Output the extracted email address
+                          wehi_emails.push(wehi_email); // Assuming email is in the third column (index 2)
+                        }
+                    } catch (error) {
+                        // Code to handle the error or exception
+                        console.error('An error occurred:', error);
+                    }
+
+                });
+
+                var wehi_emailsString = wehi_emails.join('\n');
+
+                navigator.clipboard.writeText(wehi_emailsString).then(function() {
                     alert('Copied to clipboard!');
                 }).catch(function() {
                     alert('Unable to copy to clipboard!');

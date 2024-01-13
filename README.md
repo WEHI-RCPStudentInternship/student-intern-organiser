@@ -57,7 +57,7 @@ pip install flask
 
 ## Run the Flask application
 ```
-flask run
+flask --app app.py --debug run
 ```
 
 # Setup of the database

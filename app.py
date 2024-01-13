@@ -770,7 +770,7 @@ def index_new_intake_unavailable():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, wehi_email
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, wehi_email, mobile
         FROM Students
         WHERE intake = ? AND status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -809,7 +809,7 @@ def index_new_intake():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE intake = ? AND status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -847,7 +847,7 @@ def index_outstanding():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE intake = ? AND status IN ({}) ORDER BY status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -884,7 +884,7 @@ def index_current():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -908,7 +908,7 @@ def index():
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email FROM Students')
+    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile FROM Students')
     students = cursor.fetchall()
 
     cursor.execute('SELECT * FROM Projects')

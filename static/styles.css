@@ -18,29 +18,23 @@ Kanban boards styles
 
 .accepted {
     background-color: green !important;
-    color: white !important;
+    color: white ! important;
 }
-
-.partially-accepted {
-    background-color: #70A3CC !important;
-    color: white !important;
-}
-
 
 .offered {
     background-color: orange !important;
-    color: white !important;
+    color: white ! important;
 }
 
 .interesting {
-    background-color: #00008b !important;
-    color: white !important;
+    background-color: #ECB71E !important;
+    color: white ! important;
 }
 
 
 
 .accepted a, .offered a, .interesting a {
-    color: white !important;
+    color: white ! important;
 
 }
 

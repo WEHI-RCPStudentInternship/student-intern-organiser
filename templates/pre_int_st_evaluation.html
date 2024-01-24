@@ -175,37 +175,6 @@ If you would like to decline this offer, please reply to this email if you would
         <label for="extra_notes">Extra Notes</label>
         <textarea name="extra_notes" id="extra_notes" rows="3">{{ student[45] }}</textarea>
 
-        <label for="Overall_Internal"> Overall Internal </label>
-        <select name="Overall_Internal" id="Overall_Internal">
-            {% if student[26] %}
-                <option value="{{ student[26] }}"selected>{{ student[26] }}</option>
-            {% else %}
-                <option value="" selected disabled>Select your Evaluation</option>
-            {% endif %}
-            <option value="01 - F Exciting Technical Skills - Recommend sign up even without a project. "> 01 - F Exciting Technical Skills - Recommend sign up even without a project.</option>
-            <option value="02 - F Translator - Recommend sign up even without a project. "> 02 - F Translator - Recommend sign up even without a project.</option>
-            <option value="03 - F Technical Skills - Recommend sign up for a specific project. "> 03 - F Technical Skills - Recommend sign up for a specific project.</option>
-            <option value="04 - FF ETS - Recommend sign up even without a project. "> 04 - FF ETS - Recommend sign up even without a project.</option>
-            <option value="05 - FF Translator - Recommend sign up even without a project. "> 05 - FF Translator - Recommend sign up even without a project.</option>
-            <option value="06 - FF TS - Recommend sign up for a specific project. "> 06 - FF TS - Recommend sign up for a specific project.</option>
-            <option value="07 - ETS - Recommend sign up for a specific project. "> 07 - ETS - Recommend sign up for a specific project.</option>
-            <option value="08 - TS - Recommend no sign up except under specific circumstances. "> 08 - TS - Recommend no sign up except under specific circumstances.</option>
-        </select>
-
-        <label for="Overall_External">Overall External:</label>
-        <select name="Overall_External" id="Overall_External">
-            {% if student[25] %}
-                <option value="{{ student[25] }}"selected>{{ student[25] }}</option>
-            {% else %}
-                <option value="" selected disabled>Select your Evaluation</option>
-            {% endif %}
-            <option value="{{ student[1] }} has a high probability to be a good fit for a brand new or complex internship project, individually or in a team, with minimal supervision. ">{{ student[1] }} has a high probability to be a good fit for a brand new or complex internship project, individually or in a team, with minimal supervision. </option>
-            <option value="{{ student[1] }} has a medium probability to be a good fit for a complex internship project, within a team of students. ">{{ student[1] }} has a medium probability to be a good fit for a complex internship project, within a team of students. </option>
-            <option value="{{ student[1] }} has a medium probability to be a good fit for a simple internship with strong technical supervision. ">{{ student[1] }} has a medium probability to be a good fit for a simple internship with strong technical supervision. </option>
-            <option value="{{ student[1] }} has a high probability to be a good fit for a highly technical internship project, with strong technical supervision. ">{{ student[1] }} has a high probability to be a good fit for a highly technical internship project, with strong technical supervision. </option>
-
-        </select>
-
         <label for="learn_quickly_technical">Quickly learn tech concepts:</label>
         <select name="learn_quickly_technical" id="learn_quickly_technical">
             {% if student[27] %}
@@ -300,6 +269,37 @@ If you would like to decline this offer, please reply to this email if you would
         {% else %}
             <textarea name="summary_experience" id="summary_experience" rows="5" placeholder="write your Evaluation"></textarea>
         {% endif %}
+
+        <label for="Overall_Internal"> Overall Internal </label>
+        <select name="Overall_Internal" id="Overall_Internal">
+            {% if student[26] %}
+                <option value="{{ student[26] }}"selected>{{ student[26] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Evaluation</option>
+            {% endif %}
+            <option value="01 - F Exciting Technical Skills - Recommend sign up even without a project. "> 01 - F Exciting Technical Skills - Recommend sign up even without a project.</option>
+            <option value="02 - F Translator - Recommend sign up even without a project. "> 02 - F Translator - Recommend sign up even without a project.</option>
+            <option value="03 - F Technical Skills - Recommend sign up for a specific project. "> 03 - F Technical Skills - Recommend sign up for a specific project.</option>
+            <option value="04 - FF ETS - Recommend sign up even without a project. "> 04 - FF ETS - Recommend sign up even without a project.</option>
+            <option value="05 - FF Translator - Recommend sign up even without a project. "> 05 - FF Translator - Recommend sign up even without a project.</option>
+            <option value="06 - FF TS - Recommend sign up for a specific project. "> 06 - FF TS - Recommend sign up for a specific project.</option>
+            <option value="07 - ETS - Recommend sign up for a specific project. "> 07 - ETS - Recommend sign up for a specific project.</option>
+            <option value="08 - TS - Recommend no sign up except under specific circumstances. "> 08 - TS - Recommend no sign up except under specific circumstances.</option>
+        </select>
+
+        <label for="Overall_External">Overall External:</label>
+        <select name="Overall_External" id="Overall_External">
+            {% if student[25] %}
+                <option value="{{ student[25] }}"selected>{{ student[25] }}</option>
+            {% else %}
+                <option value="" selected disabled>Select your Evaluation</option>
+            {% endif %}
+            <option value="{{ student[1] }} has a high probability to be a good fit for a brand new or complex internship project, individually or in a team, with minimal supervision. ">{{ student[1] }} has a high probability to be a good fit for a brand new or complex internship project, individually or in a team, with minimal supervision. </option>
+            <option value="{{ student[1] }} has a medium probability to be a good fit for a complex internship project, within a team of students. ">{{ student[1] }} has a medium probability to be a good fit for a complex internship project, within a team of students. </option>
+            <option value="{{ student[1] }} has a medium probability to be a good fit for a simple internship with strong technical supervision. ">{{ student[1] }} has a medium probability to be a good fit for a simple internship with strong technical supervision. </option>
+            <option value="{{ student[1] }} has a high probability to be a good fit for a highly technical internship project, with strong technical supervision. ">{{ student[1] }} has a high probability to be a good fit for a highly technical internship project, with strong technical supervision. </option>
+
+        </select>
 
         <div class="rev_overal">
             <label for="review_overall">Review Overall:</label>

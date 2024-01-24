@@ -95,7 +95,7 @@ def assigned_projects():
             cursor.execute('SELECT * FROM Statuses')
             statuses = cursor.fetchall()
 
-            status_of_students_to_filter = [4,5,6,7,8,9,10,11,12,13,14]
+            status_of_students_to_filter = [3,4,5,6,7,8,9,10,11,12,13,14]
             current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
             # Retrieve student data from the database

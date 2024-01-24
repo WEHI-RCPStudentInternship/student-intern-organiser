@@ -37,12 +37,7 @@
         <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>
         {% endif %}
         {% if request.path == '/outstanding' %}
-        <!--
-        <a target="_blank" href="mailto:?subject=Acknowledgement of your application to the WEHI student internship program&body=Hi All,%0D%0A%0D%0AThank you for applying for the WEHI Student Internship program.%0D%0A%0D%0A
-I will be calling you by mobile phone over the next week to get a better understanding of projects that fit your interests and career aspirations. Please let me know if you need to make other arrangements as I can be flexible.%0D%0A%0D%0A
-You can see a list of projects as well as other details on the WEHI Student Internship page, where you can click on the project to go to a project page.%0D%0A%0D%0AEach project page has a rough description of the role outline, but the key information is the 'Further Reading' section that may be available for that project.%0D%0A%0D%0A
-Please also be acquainted with the program handbook.%0D%0A%0D%0ADetails of duties are available via the student projects page at https://wehi-researchcomputing.github.io/students.%0D%0A%0D%0ADetails of the intake dates are available at https://wehi-researchcomputing.github.io/intake_dates.%0D%0A%0D%0AA FAQ is also available at https://wehi-researchcomputing.github.io/faq">Copy Email Acknowledgement</a>
-        -->
+
         <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>
         {% endif %}
 {% endblock %}
@@ -76,7 +71,7 @@ Please also be acquainted with the program handbook.%0D%0A%0D%0ADetails of dutie
             {% for student in students %}
             <tr>
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
-                <td><a href="/view/{{ student[0] }}">{{ student[0] }}</a></td>
+                <td><a href="/pre_int_st_evaluation/{{ student[0] }}">{{ student[0] }}</a></td>
                 <td>{{ student[1] }}</td>
                 <td>{{ student[9] }}</td>
                 {% if student[2] and student[2] != '' %}

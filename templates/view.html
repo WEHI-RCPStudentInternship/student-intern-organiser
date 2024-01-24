@@ -18,18 +18,27 @@
     table {
         width: 50%;
         border: #ddd;
+        padding-top:20px;
+        padding-bottom: 20px;
     }
-    
+
     th, td {
         padding: 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
-    
+
     th {
         background-color: #f2f2f2;
     }
 </style>
+
+        <h2>Upload Signed Contract</h2>
+        <form action="{{ url_for('upload_signed_contract', intern_id=student[0], full_name=student[1]) }}" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".pdf" required>
+            <button type="submit">Upload</button>
+        </form>
+
         <table>
         <tr>
             <th>Attribute</th>
@@ -231,11 +240,7 @@
         </tr>
     </table>
 
-    <h2>Upload Signed Contract</h2>
-    <form action="{{ url_for('upload_signed_contract', intern_id=student[0], full_name=student[1]) }}" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".pdf" required>
-        <button type="submit">Upload</button>
-    </form>
+
 
 
 {% endblock %}

@@ -29,9 +29,17 @@ Run the following command to activate the virtual environment:
 .\.env\Scripts\activate
 ```
 ## Run the application
-Start the Flask application by running the following command:
+This line will refresh the server every time a new save is made
+```
+flask --app app.py --debug run
+```
+Regular line to run flask
 ```
 flask run
+```
+If you want to run flask on a different port
+```
+flask run -h localhost -p 5001
 ```
 
 # MacOS/Linux
@@ -56,8 +64,17 @@ pip install flask
 >Make sure the virtual environment is activated.
 
 ## Run the Flask application
+This line will refresh the server every time a new save is made
+```
+flask --app app.py --debug run
+```
+Regular line to run flask
 ```
 flask run
+```
+If you want to run flask on a different port
+```
+flask run -h localhost -p 5001
 ```
 
 # Setup of the database

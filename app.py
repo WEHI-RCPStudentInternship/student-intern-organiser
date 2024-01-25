@@ -95,7 +95,7 @@ def assigned_projects():
             cursor.execute('SELECT * FROM Statuses')
             statuses = cursor.fetchall()
 
-            status_of_students_to_filter = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+            status_of_students_to_filter = [3,4,5,6,7,8,9,10,11,12,13,14]
             current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
             # Retrieve student data from the database
@@ -111,11 +111,11 @@ def assigned_projects():
             cursor.execute(query, [intake_current] + current_statuses_list)
             students = cursor.fetchall()
 
+            print(students)
 
             # Close the database connection
             cursor.close()
             conn.close()
-
             return render_template('Assigned_projects.html', projects=projects, students=students)
         elif request.method == 'PUT':
             # Handle the AJAX request for updating the student's project assignment

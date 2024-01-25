@@ -31,16 +31,17 @@
         </select>
         <a id="change_post_internship_rating" href="#">Change Rating</a>
 
+        {% if request.path == '/outstanding' or request.path == '/new_intake' %}
+
+        <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>
+        <a href="#" id="sendEmailToMyselfBtn">Send email to myself</a>
+        {% endif %}
 
         <!-- Check if the current page is '/new_intake', then display the button -->
         {% if request.path == '/new_intake' %}
         <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>
         {% endif %}
-        {% if request.path == '/outstanding' %}
 
-        <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>
-        <a href="#" id="sendEmailToMyselfBtn">Send email to myself</a>
-        {% endif %}
 {% endblock %}
 
 
@@ -352,8 +353,9 @@
 
                 if (emails.length > 0) {
                     var emailString = emails.join(',');
-                    var mailtoLink = "mailto:?subject=Acknowledgement of your application to the WEHI student internship program&body=Hi All,%0D%0A%0D%0AThank you for applying for the WEHI Student Internship program.%0D%0A%0D%0AI will be calling you by mobile phone over the next week to get a better understanding of projects that fit your interests and career aspirations. Please let me know if you need to make other arrangements as I can be flexible.%0D%0A%0D%0AYou can see a list of projects as well as other details on the WEHI Student Internship page, where you can click on the project to go to a project page.%0D%0A%0D%0AEach project page has a rough description of the role outline, but the key information is the 'Further Reading' section that may be available for that project.%0D%0A%0D%0APlease also be acquainted with the program handbook.%0D%0A%0D%0ADetails of duties are available via the student projects page at https://wehi-researchcomputing.github.io/students.%0D%0A%0D%0ADetails of the intake dates are available at https://wehi-researchcomputing.github.io/intake_dates.%0D%0A%0D%0AA FAQ is also available at https://wehi-researchcomputing.github.io/faq" + "&to=" + emailString;
-                    window.location.href = mailtoLink;
+                    var mailtoLink = "mailto:?subject=Acknowledgement of your application to the WEHI student internship program&body=Hi All,%0D%0A%0D%0AThank you for applying for the WEHI Student Internship program.%0D%0A%0D%0AI will be calling you by mobile phone over the next week to get a better understanding of projects that fit your interests and career aspirations. Please let me know if you need to make other arrangements as I can be flexible.%0D%0A%0D%0AIf I am calling and it is a bad time, don’t answer. I can leave a message and call back later.%0D%0A%0D%0ATo make things clearer, I have provided the questions I will be asking in the call. Please look through the questions and websites to be prepared for the call.%0D%0A%0D%0A        1. How do I pronounce your name? I may ask you this to ensure I do the best I can to pronounce your name.%0D%0A        2. This is a 100%25 remote internship. This means all meetings are virtual. Are you okay with that?.%0D%0A        3. We take Diversity, Equity, and Inclusion seriously. We have a Code of Conduct that you have to abide by that is in the WEHI RCP Student Internship Handbook on page 10. Have you read it and are you willing to abide by it?%0D%0A        4. Are you a talker or are you more of a listener? The reason I ask is because I don't want a team of all listeners I need at least one talker.%0D%0A       5. Are you more of a facilitator/organiser or a follower? The reason I ask is because I don't want a team full of followers.%0D%0A        6. And are you more of a person who's an intentional thinker where you will need to go away think about it or are you more of a quick brainstormer who likes to share ideas in a meeting?%0D%0A        7. What projects are you interested in and why?%0D%0A        8. I will then show you the projects that are currently still available based on your interests.%0D%0A        9. I will then explain the next steps to you.%0D%0A       10. I will ask you if you have any other questions.%0D%0A%0D%0APlease also be acquainted with the program handbook.%0D%0Ahttps://doi.org/10.6084/m9.figshare.21259467.%0D%0A%0D%0APlease have a look through all the projects at https://wehi-researchcomputing.github.io/project-wikis%0D%0A%0D%0AOther key documents are available at https://wehi-researchcomputing.github.io/students#key-documents-to-review-and-faq%0D%0A%0D%0AMore details on how to apply are here: https://wehi-researchcomputing.github.io/how-to-apply%0D%0A%0D%0AA FAQ is also available at https://wehi-researchcomputing.github.io/faq" + "&to=" + emailString;
+                    //window.location.href = mailtoLink;
+                    window.open(mailtoLink, '_blank');
                 } else {
                     alert('No students selected.');
                 }
@@ -384,7 +386,8 @@
                 if (namesAndMobiles.length > 0) {
                     var formattedNamesAndMobiles = namesAndMobiles.join('%0D%0A%0D%0A');
                     var mailtoLink = "mailto:mosbergen.r@wehi.edu.au?subject=Details%20of%20Students&body=Name, Mobile, Link %0D%0A%0D%0A" + formattedNamesAndMobiles;
-                    window.location.href = mailtoLink;
+                    //window.location.href = mailtoLink;
+                    window.open(mailtoLink, '_blank');
                 } else {
                     alert('No students selected.');
                 }

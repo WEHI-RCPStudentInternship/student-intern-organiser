@@ -4,7 +4,13 @@
 
 {% block page_title %}Edit Student Details{% endblock %}
 
+{% block top_links_menu %}
+<a href="/view/{{ student[0] }}" id="viewBtn">View Student</a>
+<a href="/pre_int_st_evaluation/{{ student[0] }}" id="st_evaluation"> Pre-Internship Student Evaluation</a>
+{%endblock%}
+
 {% block content %}
+
     <form action="{{ url_for('edit_student', intern_id=student[0]) }}" method="POST">
         <table>
             <tr>
@@ -13,7 +19,7 @@
             </tr>
             <tr>
                 <td>intern_id</td>
-                <td><a href="/view/{{ student[0] }}">{{ student[0] }}</a></td>
+                <td><a href="/pre_int_st_evaluation/{{ student[0] }}">{{ student[0] }}</a></td>
             </tr>
             <tr>
                 <td>full_name</td>

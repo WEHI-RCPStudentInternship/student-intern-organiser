@@ -638,11 +638,11 @@ def download_contracts_and_applications():
     csv_path = os.path.join(temp_dir, 'student_data.csv')
     with open(csv_path, 'w') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(['Full Name', 'Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week'])
+        csv_writer.writerow(['Full Name', 'Phone', 'Email', 'Faculty', 'Start Date', 'End Date', 'Hours per Week'])
 
         for student in students:
             # Retrieve student data from the database
-            cursor.execute('SELECT full_name, mobile, email, start_date, end_date, hours_per_week FROM Students WHERE intern_id = ?', (student[0],))
+            cursor.execute('SELECT full_name, mobile, email, course, start_date, end_date, hours_per_week FROM Students WHERE intern_id = ?', (student[0],))
             student_data = cursor.fetchone()
 
             # Write the student data to the CSV file

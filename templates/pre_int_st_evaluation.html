@@ -12,6 +12,7 @@
         <a target="_blank" href="mailto:{{ student[4] }}?subject=Offer of a WEHI RCP Internship&body=Hi {{ student[1] }}, %0D%0A%0D%0ACongratulations! %0D%0A%0D%0A We would like to offer you an Internship at WEHI with the {{ student[15] }}  project. %0D%0A%0D%0A If you would like to accept this offer by replying to this email, we will then forward the email to the placement team at the University of Melbourne to start organising a contract. %0D%0A%0D%0ADetails of duties are available via the student projects page at https://wehi-researchcomputing.github.io/students.%0D%0A%0D%0ADetails of the intake dates are available at https://wehi-researchcomputing.github.io/intake_dates.%0D%0A%0D%0ADetails are also in the onboarding document at https://figshare.com/articles/presentation/Research_Computing_Platform_Student_Internship_Handbook/21259467 %0D%0A%0D%0A
 If you would like to decline this offer, please reply to this email if you would not like to be considered for other internships at WEHI.  ">Offer a project</a>
         <a href="#" id="copyCoordinatorText">Copy Email Text Coordinator</a>
+        <button id="toggleTextBox">Display Interview Questions</button>
 {% endblock %}
 
 {% block jQuery_scripts %}
@@ -35,7 +36,7 @@ If you would like to decline this offer, please reply to this email if you would
         form {
             width: 800px;
             margin: 0 auto;
-            margin-left: 100px;
+            margin-left: 80px;
             margin-right: 100px;
         }
 
@@ -52,7 +53,7 @@ If you would like to decline this offer, please reply to this email if you would
             width: 100px;
         }
 
-        label {
+        label.normal {
             margin-top:20px;
             display: inline-block;
             width: 25%;
@@ -60,13 +61,22 @@ If you would like to decline this offer, please reply to this email if you would
             float:left;
             clear:both;
         }
+        label.invisible {
+            margin-top:20px;
+            display: inline-block;
+            width: 25%;
+            margin-bottom: 5px;
+            float:left;
+            clear:both;
+            color: #f8f8f8;
+        }
         .r_overall {
             display: inline-block;
             margin-bottom: 5px;
             width: 100%;
             max-width: 100%;
         }
-        input {
+        input[type = "text"]{
             margin-top:20px;
             float:left;
             width: 74%;
@@ -98,7 +108,53 @@ If you would like to decline this offer, please reply to this email if you would
         button[type="submit"]:hover {
             background-color: #454ba0;
         }
+
+
+        input[type="radio"]{
+            margin-top:25px;
+            display: inline-block;
+            margin-right: 5px;
+
+        }
+        label.radio{
+            display: inline-block;
+            margin-right: 10px;
+            margin-top: -5px;
+            width: 100px;
+        }
+        label.others{
+            display: inline-block;
+            margin-right: 100px;
+            margin-top: -50px;
+        }
+
+        .container {
+            display: flex;
+        }
+        .text-box {
+            flex: 1;
+            border: 1px solid transparent;
+            color: #000;
+            margin-top: 140px;
+            padding: 10px;
+        }
+        #toggleTextBox {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
     </style>
+    <div class = "container">
+
 
     <form action="/submit_student_evaluation" method="POST">
         <input type="hidden" name="intern_id" value="{{ student[0] }}">
@@ -153,7 +209,7 @@ If you would like to decline this offer, please reply to this email if you would
         </table>
 
 
-        <label for="status">Status</label>
+        <label for="status" class= "normal">Status</label>
 
         <select name="status" required>
             {% for status in statuses %}
@@ -165,17 +221,68 @@ If you would like to decline this offer, please reply to this email if you would
             {% endfor %}
         </select>
 
+        <label for="pronunciation" class= "normal">Pronunciation</label>
+        <input type = "text" name="pronunciation" value="{{ student[14] }}"/>
 
-        <label for="pronunciation">Pronunciation</label>
-        <input name="pronunciation" value="{{ student[14] }}"/>
+        <label for="remote_internship" class= "normal">100% Remote Internship</label>
+        <div>
+            <input type="radio" id="accept_remote" name="remote_internship" value="{{student[1]}} is OK with 100% remote internship." {% if student[46] == student[1] ~ ' is OK with 100% remote internship.' %} checked {% endif %}>
+            <label for="accept_remote" class = "radio">Accept</label>
+            <input type="radio" id="reject_remote" name="remote_internship" value="{{student[1]}} is NOT OK with 100% remote internship." {% if student[46] == student[1] ~ ' is NOT OK with 100% remote internship.' %} checked {% endif %}>
+            <label for="reject_remote" class = "radio">Reject</label>
+        </div>
 
-        <label for="cover_letter_projects">Project Interest</label>
-        <textarea name="cover_letter_projects" id="summary_tech_skills" rows="3">{{ student[11] }}</textarea>
+        <label for = "code_of_conduct" class = "normal">Have read Code of Conduct?</label>
+        <div>
+            <input type = "radio" id ="coc_yes" name ="code_of_conduct" value = "{{student[1]}} has read the code of conduct." {% if student[47] == student[1] ~ ' has read the code of conduct.' %} checked {% endif %}>
+            <label for = "coc_yes" class = "radio"> Yes</label>
+            <input type = "radio" id ="coc_no" name ="code_of_conduct" value = "{{student[1]}} has NOT read the code of conduct." {% if student[47] == student[1] ~ ' has NOT read the code of conduct.' %} checked {% endif %}>
+            <label for = "coc_no" class = "radio"> No</label>
+        </div>
 
-        <label for="extra_notes">Extra Notes</label>
+        <label for = "listener_or_talker" class = "normal">Listener of Talker?</label>
+        <div>
+            <input type = "radio" id ="listener" name ="listener_or_talker" value = "{{student[1]}} is a Listener." {% if student[49] == student[1] ~ ' is a Listener.' %} checked {% endif %}>
+            <label for = "listener" class = "radio"> Listener</label>
+            <input type = "radio" id ="talker" name ="listener_or_talker" value = "{{student[1]}} is a Talker." {% if student[49] == student[1] ~ ' is a Talker.' %} checked {% endif %}>
+            <label for = "talker" class = "radio"> Talker</label>
+            <input type = "radio" id ="both_listener_talker" name ="listener_or_talker" value = "{{student[1]}} is BOTH a Listener and a Talker." {% if student[49] == student[1] ~ ' is BOTH a Listener and a Talker.' %} checked {% endif %}>
+            <label for = "both" class = "radio"> Both</label>
+        </div>
+
+        <label for = "facilitator_follower" class = "normal">Facilitator or Follower?</label>
+        <div>
+            <input type = "radio" id ="facilitator" name ="facilitator_follower" value = "{{student[1]}} is a Facilitator." {% if student[48] == student[1] ~ ' is a Facilitator.' %} checked {% endif %}>
+            <label for = "facilitator" class = "radio"> Facilitator</label>
+            <input type = "radio" id ="follower" name ="facilitator_follower" value = "{{student[1]}} is a Follower." {% if student[48] == student[1] ~ ' is a Follower.' %} checked {% endif %}>
+            <label for = "follower" class = "radio"> Follower</label>
+            <input type = "radio" id ="both_facilitator_follower" name ="facilitator_follower" value = "{{student[1]}} is BOTH a Facilitator and a Follower." {% if student[48] == student[1] ~ ' is a BOTH a Facilitator and a Follower.' %} checked {% endif %}>
+            <label for = "both_facilitator_follower" class = "radio"> Both</label>
+        </div>
+
+        <label for = "thinker_brainstormer" class = "normal">Thinker or Brainstormer?</label>
+        <div>
+            <input type = "radio" id ="thinker" name ="thinker_brainstormer" value = "{{student[1]}} is a Thinker." {% if student[50] == student[1] ~ ' is a Thinker.' %} checked {% endif %}>
+            <label for = "thinker" class = "radio">Thinker</label>
+            <input type = "radio" id ="brainstormer" name ="thinker_brainstormer" value = "{{student[1]}} is a Brainstormer." {% if student[50] == student[1] ~ ' is a Brainstormer.' %} checked {% endif %}>
+            <label for = "brainstormer" class = "radio">Brainstormer</label>
+            <input type = "radio" id ="both_thinker_brainstormer" name ="thinker_brainstormer" value = "{{student[1]}} is BOTH a Thinker and Brainstormer." {% if student[50] == student[1] ~ ' is BOTH a Thinker and a Brainstormer.' %} checked {% endif %}>
+            <label for = "both_thinker_brainstormer" class = "radio"> Both</label>
+        </div>
+
+        <label for="cover_letter_projects" class= "normal">Project Applied</label>
+        <textarea name="cover_letter_projects" id="summary_tech_skills" rows="1">{{ student[11] }}</textarea>
+
+        <label for = "why_applied" class = "normal"> Why Applied?</label>
+        <textarea name = "why_applied" id ="why_applied" rows = "3">{{ student[51] }}</textarea>
+
+        <label for = "projects_recommended" class = "normal"> Projects Recommended</label>
+        <textarea name = "projects_recommended" id ="projects_recommended" rows = "1">{{ student[52] }}</textarea>
+
+        <label for="extra_notes" class= "normal">Extra Notes</label>
         <textarea name="extra_notes" id="extra_notes" rows="3">{{ student[45] }}</textarea>
 
-        <label for="learn_quickly_technical">Quickly learn tech concepts:</label>
+        <label for="learn_quickly_technical" class= "normal">Quickly learn tech concepts:</label>
         <select name="learn_quickly_technical" id="learn_quickly_technical">
             {% if student[27] %}
                 <option value="{{ student[27] }}"selected>{{ student[27] }}</option>
@@ -188,7 +295,7 @@ If you would like to decline this offer, please reply to this email if you would
             <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} ability to learn technical concepts quickly. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} ability to learn technical concepts quickly. </option>
         </select>
 
-        <label for="learn_domain_concepts">Quickly learn domain:</label>
+        <label for="learn_domain_concepts" class= "normal">Quickly learn domain:</label>
         <select name="learn_domain_concepts" id="learn_domain_concepts">
             {% if student[29] %}
                 <option value="{{ student[29] }}"selected>{{ student[29] }}</option>
@@ -201,7 +308,7 @@ If you would like to decline this offer, please reply to this email if you would
             <option value="{{ student[1] }}I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} ability to learn domain concepts quickly. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} ability to learn domain concepts quickly. </option>
         </select>
 
-        <label for="Enthusiastic">Enthusiastic </label>
+        <label for="Enthusiastic" class= "normal">Enthusiastic </label>
         <select name="Enthusiastic" id="Enthusiastic">
             {% if student[30] %}
                 <option value="{{ student[30] }}"selected>{{ student[30] }}</option>
@@ -214,7 +321,7 @@ If you would like to decline this offer, please reply to this email if you would
             <option value=" I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} enthusiasm.">I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} enthusiasm. </option>
         </select>
 
-        <label for="Experience"> Experience:</label>
+        <label for="Experience" class= "normal"> Experience:</label>
         <select name="Experience" id="Experience">
             {% if student[31] %}
                 <option value="{{ student[31] }}"selected>{{ student[31] }}</option>
@@ -228,7 +335,60 @@ If you would like to decline this offer, please reply to this email if you would
             <option value="{{ student[1] }} has no prior experience in a volunteer, professional, or research environment. ">{{ student[1] }} has no prior experience in a volunteer, professional, or research environment. </option>
         </select>
 
-        <label for="Communication">Communication</label>
+        <label for = "Written_Application" class = "normal">Written Application</label>
+        <div>
+            <div>
+                <input type="radio" id="communicated_well" name="Written_Application" value="{{ student[1] }} has communicated well on their written application." {% if student[1] ~ ' has communicated well on their written application.' in student[32] %} checked {% endif %}>
+                <label for="communicated_well"> Communicated well</label>
+            </div>
+            <div>
+                <input type="radio" id="communicated_not_well" name="Written_Application" value="{{ student[1] }} did not communicate that well on their written application." {% if student[1] ~ ' did not communicate that well on their written application.' %} checked {% endif %}>
+                <label for="communicated_not_well"> Communicated not that well</label>
+            </div>
+
+        <label for = "Written_Application" class = "invisible">Written Application</label>
+            <div>
+                <input type="radio" id="communicated_well_in_application" name="Written_Application" value="{{ student[1] }} did not communicate as well as in the phone interview." {% if student[1] ~ ' did not communicate as well as in the phone interview.' %} checked {% endif %}>
+                <label for="communicated_well_in_application"> Communicated not as well as phone interview</label>
+            </div>
+            <div>
+                <input type="radio" id="communicated_well_in_phone" name="Written_Application" value="{{ student[1] }} communicated better than phone interview than their written application." {% if student[1] ~ ' communicated better than phone interview than their written application.' %} checked {% endif %}>
+                <label for="communicated_well_in_phone"> Communicated better than phone interview</label>
+            </div>
+        </div>
+
+        <label for = "Phone_Interview" class = "normal">Phone Interview</label>
+        <div>
+            <div>
+                <label for="communicated_well_phone">
+                    <input type="radio" id="communicated_well_phone" name="Phone_Interview" value="{{ student[1] }} communicated well on phone." {% if student[1] ~ ' communicated well on phone.' in student[32] %} checked {% endif %}>
+                    Communicated well
+                </label>
+            </div>
+            <div>
+                <label for="communicated_not_well_phone">
+                    <input type="radio" id="communicated_not_well_phone" name="Phone_Interview" value="{{ student[1] }} communicated not that well on phone." {% if student[1] ~ ' communicated not that well on phone.' in student[32] %} checked {% endif %}>
+                    Communicated not that well
+                </label>
+            </div>
+
+        <label for = "Phone_Interview" class = "invisible">Phone Interview</label>
+            <div>
+                <label for="communicated_well_in_phone_phone">
+                    <input type="radio" id="communicated_well_in_phone_phone" name="Phone_Interview" value="{{ student[1] }} communicated not as well as written application." {% if student[1] ~ ' communicated not as well as written application.' in student[32] %} checked {% endif %}>
+                    Communicated not as well as written application
+                </label>
+            </div>
+            <div>
+                <label for="not_done_yet">
+                    <input type="radio" id="not_done_yet" name="Phone_Interview" value="Phone interview is not done yet." {% if 'Phone interview is not done yet.' in student[32] %} checked {% endif %}>
+                    Not done yet
+                </label>
+            </div>
+        </div>
+
+        <!--
+        <label for="Communication" class= "normal">Communication</label>
         <select name="Communication" id="Communication">
             {% if student[32] %}
                 <option value="{{ student[32] }}"selected>{{ student[32] }}</option>
@@ -244,7 +404,8 @@ If you would like to decline this offer, please reply to this email if you would
             <option value="{{ student[1] }} did not communicate that well in the written application but did well with the phone interview.">{{ student[1] }} did not communicate that well in the written application but did well with the phone interview. </option>
         </select>
         <br>
-        <label for="Adaptability"> Adaptability </label>
+    -->
+        <label for="Adaptability" class= "normal"> Adaptability </label>
         <select name="Adaptability" id="Adaptability">
             {% if student[33] %}
                 <option value="{{ student[33] }}"selected>{{ student[33] }}</option>
@@ -256,21 +417,21 @@ If you would like to decline this offer, please reply to this email if you would
             <option value="I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} adaptability. ">I do not have enough information about {{ student[1] }} to provide feedback on {{ pronoun2 }} adaptability. </option>
         </select>
 
-        <label for="summary_tech_skills">Summary of Technical Skills:</label>
+        <label for="summary_tech_skills" class= "normal">Summary of Technical Skills:</label>
         {% if student[22] %}
             <textarea name="summary_tech_skills" id="summary_tech_skills" rows="3">{{ student[22] }}</textarea>
         {% else %}
             <textarea name="summary_tech_skills" id="summary_tech_skills" rows="3" placeholder="Write your Evaluation"></textarea>
         {% endif %}
 
-        <label for="summary_experience">Summary Experience:</label>
+        <label for="summary_experience" class= "normal">Summary Experience:</label>
         {% if student[23] %}
             <textarea name="summary_experience" id="summary_experience" rows="5">{{ student[23] }}</textarea>
         {% else %}
             <textarea name="summary_experience" id="summary_experience" rows="5" placeholder="write your Evaluation"></textarea>
         {% endif %}
 
-        <label for="Overall_Internal"> Overall Internal </label>
+        <label for="Overall_Internal" class= "normal"> Overall Internal </label>
         <select name="Overall_Internal" id="Overall_Internal">
             {% if student[26] %}
                 <option value="{{ student[26] }}"selected>{{ student[26] }}</option>
@@ -287,7 +448,7 @@ If you would like to decline this offer, please reply to this email if you would
             <option value="08 - TS - Recommend no sign up except under specific circumstances. "> 08 - TS - Recommend no sign up except under specific circumstances.</option>
         </select>
 
-        <label for="Overall_External">Overall External:</label>
+        <label for="Overall_External" class= "normal">Overall External:</label>
         <select name="Overall_External" id="Overall_External">
             {% if student[25] %}
                 <option value="{{ student[25] }}"selected>{{ student[25] }}</option>
@@ -302,14 +463,42 @@ If you would like to decline this offer, please reply to this email if you would
         </select>
 
         <div class="rev_overal">
-            <label for="review_overall">Review Overall:</label>
+            <label for="review_overall" class= "normal">Review Overall:</label>
             <div class="r_overall" id="review_overall"></div>
         </div>
         <br>
         <button type="submit">Submit</button>
     </form>
 
+    <div class="text-box hidden" id="text-box">
+        <p>Interview Questions</p>
+        <p>0. How do I pronounce your name? I may ask you this question to ensure I do the best I can to pronounce your name.</p>
+        <p>1. This is a 100% remote internship. This means all meetings are virtual. Are you OK with this?</p>
+        <p>2. We take Diversity, Equity, and Inclusion seriously. We have a Code of Conduct that you have to abide by that is in the WEHI RCP Student Internship Handbook on page 10. Have you read it and are you willing to abide by it?</p>
+        <p>3. Are you a talker or are you more of a listener? The reason I ask is because I don't want a team of all listeners I need at least one talker.</p>
+        <p>4. Are you more of a facilitator or a follower? The reason I ask is because I don't want a team full followers.</p>
+        <p>5. And are you more of a person who's an intentional thinker where you will need to go away think about it and come back this I'm suggestions or are you more of a quick brainstorm who likes to throw ideas around and see what comes up?</p>
+        <p>6. What projects are you interested in and why?</p>
+        <p>7. I will then show you the projects that are currently still available based on your interests.</p>
+        <p>8. I will then explain the next steps to you</p>
+        <p>9. I will ask you if you have any other questions.</p>
+    </div>
+    </div>
+
     <script>
+
+        document.getElementById("toggleTextBox").addEventListener("click", function() {
+            var textBox = document.querySelector(".text-box");
+            textBox.classList.toggle("hidden");
+        });
+
+        document.addEventListener("keydown", function(event) {
+
+            if (event.keyCode === 81) {
+                var textBox = document.getElementById("text-box");
+                textBox.classList.toggle("hidden");
+            }
+        });
 
         // Function to update the "Review Overall" section
         function updateReviewOverall() {
@@ -319,11 +508,74 @@ If you would like to decline this offer, please reply to this email if you would
             var learn_domain_concepts = document.getElementById("learn_domain_concepts").value;
             var Enthusiastic = document.getElementById("Enthusiastic").value;
             var Experience = document.getElementById("Experience").value;
-            var Communication = document.getElementById("Communication").value;
+
             var Adaptability = document.getElementById("Adaptability").value;
             var Overall_Internal = document.getElementById("Overall_Internal").value;
             var summary_tech_skills = document.getElementById("summary_tech_skills").value;
             var summary_experience = document.getElementById("summary_experience").value;
+
+            var remote_internship_value = '';
+            var remote_internship_radios = document.getElementsByName("remote_internship");
+            for (var i = 0; i < remote_internship_radios.length; i++) {
+                if (remote_internship_radios[i].checked) {
+                    remote_internship_value = remote_internship_radios[i].value;
+                    break;
+                }
+            }
+
+            var code_of_conduct_value = '';
+            var code_of_conduct = document.getElementsByName("code_of_conduct");
+            for (var i=0; i < code_of_conduct.length; i++) {
+                if (code_of_conduct[i].checked) {
+                    code_of_conduct_value = code_of_conduct[i].value;
+                    break;
+                }
+            }
+
+            var listener_or_talker_value = '';
+            var listener_or_talker = document.getElementsByName("listener_or_talker");
+            for (var i = 0; i < listener_or_talker.length; i++) {
+                if (listener_or_talker[i].checked) {
+                    listener_or_talker_value = listener_or_talker[i].value;
+                    break;
+                }
+            }
+
+            var facilitator_follower_value = '';
+            var facilitator_follower = document.getElementsByName("facilitator_follower");
+            for (var i =0; i< facilitator_follower.length; i++) {
+                if (facilitator_follower[i].checked) {
+                    facilitator_follower_value = facilitator_follower[i].value;
+                    break;
+                }
+            }
+
+            var thinker_brainstormer_value = '';
+            var thinker_brainstormer = document.getElementsByName("thinker_brainstormer");
+            for (var i =0; i < thinker_brainstormer.length; i++) {
+                if (thinker_brainstormer[i].checked) {
+                    thinker_brainstormer_value = thinker_brainstormer[i].value;
+                    break;
+                }
+            }
+
+            var written_application_value = '';
+            var written_application = document.getElementsByName("Written_Application");
+            for (var i = 0; i< written_application.length; i++) {
+                if (written_application[i].checked) {
+                    written_application_value = written_application[i].value;
+                    break;
+                }
+            }
+
+            var phone_interview_values = '';
+            var phone_interview = document.getElementsByName("Phone_Interview");
+            for (var i =0; i< phone_interview.length; i++) {
+                if (phone_interview[i].checked) {
+                    phone_interview_values = phone_interview[i].value;
+                    break;
+                }
+            }
 
             // Concatenate the selected values
             var reviewOverall = Overall_Internal + "<br>" + "<br>" +
@@ -332,10 +584,16 @@ If you would like to decline this offer, please reply to this email if you would
                 learn_domain_concepts + " " +
                 Enthusiastic + " " +
                 Experience + " " +
-                Communication + " " +
                 Adaptability + "<br> " +
                 summary_tech_skills + "<br>" +
-                summary_experience;
+                summary_experience + "<br>" + "<br>" +
+                remote_internship_value + " " +
+                code_of_conduct_value + " " +
+                listener_or_talker_value + " " +
+                facilitator_follower_value + " " +
+                thinker_brainstormer_value + " " +
+                written_application_value + " " +
+                phone_interview_values;
 
 
             // Update the "Review Overall" section
@@ -348,11 +606,32 @@ If you would like to decline this offer, please reply to this email if you would
         document.getElementById("learn_domain_concepts").addEventListener("change", updateReviewOverall);
         document.getElementById("Enthusiastic").addEventListener("change", updateReviewOverall);
         document.getElementById("Experience").addEventListener("change", updateReviewOverall);
-        document.getElementById("Communication").addEventListener("change", updateReviewOverall);
         document.getElementById("Adaptability").addEventListener("change", updateReviewOverall);
         document.getElementById("Overall_Internal").addEventListener("change", updateReviewOverall);
         document.getElementById("summary_tech_skills").addEventListener("change", updateReviewOverall);
         document.getElementById("summary_experience").addEventListener("change", updateReviewOverall);
+        document.getElementsByName("remote_internship").forEach(function(radio) {
+            radio.addEventListener("change", updateReviewOverall);
+        });
+        document.getElementsByName("code_of_conduct").forEach(function(radio) {
+            radio.addEventListener("change", updateReviewOverall);
+        });
+        document.getElementsByName("listener_or_talker").forEach(function(radio) {
+            radio.addEventListener("change", updateReviewOverall);
+        });
+        document.getElementsByName("facilitator_follower").forEach(function(radio) {
+            radio.addEventListener("change", updateReviewOverall);
+        });
+        document.getElementsByName("thinker_brainstormer").forEach(function(radio) {
+            radio.addEventListener("change", updateReviewOverall);
+        });
+        document.getElementsByName("Written_Application").forEach(function(radio) {
+            radio.addEventListener("change", updateReviewOverall);
+        });
+        document.getElementsByName("Phone_Interview").forEach(function(radio) {
+            radio.addEventListener("change", updateReviewOverall);
+        });
+
 
         // Initial update of the "Review Overall" section
         updateReviewOverall();

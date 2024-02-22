@@ -1,20 +1,22 @@
-from flask import Flask, render_template, request, redirect, send_file, url_for,jsonify
-import sqlite3
-import os
 import csv
-import zipfile
+import os
 import shutil
-from datetime import datetime, timedelta
-import import_csv_from_redcap
-
+import sqlite3
+import zipfile
 from collections import Counter
+from datetime import datetime, timedelta
+
+from flask import (Flask, jsonify, redirect, render_template, request,
+                   send_file, url_for)
+
+import import_csv_from_redcap
 
 app = Flask(__name__)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
  # Replace with your SQLite database file path
-db_path = 'student_intern_data/student_intern_data.db' 
+db_path = 'student_intern_data/student_intern_data.db'
 
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
@@ -57,8 +59,8 @@ def email_intake(intake_id):
 
 
 
-    science_student_emails = ",".join(x for x in student_emails['science']) 
-    engit_student_emails = ",".join(x for x in student_emails['engit']) 
+    science_student_emails = ",".join(x for x in student_emails['science'])
+    engit_student_emails = ",".join(x for x in student_emails['engit'])
 
     science_start_date_object = datetime.strptime(intake_science_start_date, '%Y-%m-%d').date()
     engit_start_date_object = datetime.strptime(intake_engit_start_date, '%Y-%m-%d').date()
@@ -170,19 +172,30 @@ def submit_student_evaluation():
     student_id = request.form.get('intern_id')
     status = request.form.get('status')
     pronunciation = request.form.get('pronunciation')
+    remote_internship = request.form.get('remote_internship')
+    code_of_conduct = request.form.get('code_of_conduct')
+    facilitator_follower = request.form.get('facilitator_follower')
+    listener_or_talker = request.form.get('listener_or_talker')
+    thinker_brainstormer = request.form.get('thinker_brainstormer')
     cover_letter_projects = request.form.get('cover_letter_projects')
+    why_applied = request.form.get('why_applied')
+    projects_recommended = request.form.get('projects_recommended')
     Overall_External = request.form.get('Overall_External')
     Overall_Internal = request.form.get('Overall_Internal')
     learn_quickly_technical = request.form.get('learn_quickly_technical')
     learn_domain_concepts = request.form.get('learn_domain_concepts')
     Enthusiastic = request.form.get('Enthusiastic')
     Experience = request.form.get('Experience')
-    Communication = request.form.get('Communication')
+    Written_application = request.form.get('Written_Application')
+    Phone_interview = request.form.get('Phone_Interview')
+    #Communication = request.form.get('Written_Application')
+
     Adaptability = request.form.get('Adaptability')
     summary_tech_skills = request.form.get('summary_tech_skills')
     summary_experience = request.form.get('summary_experience')
     extra_notes = request.form.get('extra_notes')
 
+    Communication = f"{Written_application} {Phone_interview}"
 
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
@@ -205,10 +218,17 @@ def submit_student_evaluation():
             pre_internship_adaptable = ?,
             summary_tech_skills = ?,
             extra_notes = ?,
-            summary_experience = ?
+            summary_experience = ?,
+            remote_internship = ?,
+            code_of_conduct = ?,
+            facilitator_follower = ?,
+            listener_or_talker = ?,
+            thinker_brainstormer = ?,
+            why_applied = ?,
+            projects_recommended = ?
 
         WHERE intern_id = ?
-    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, student_id))
+    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, remote_internship, code_of_conduct, facilitator_follower, listener_or_talker, thinker_brainstormer, why_applied, projects_recommended, student_id))
 
     # Commit the changes and close the database connection
     conn.commit()
@@ -231,7 +251,7 @@ def pre_int_st_evaluation(intern_id):
     conn.close()
     pronoun = student[2]
 
-    # Split the pronoun into multiple parts using the '/' delimiter 
+    # Split the pronoun into multiple parts using the '/' delimiter
     #he/him/his or she/her or they/them/their
     pronoun_parts = pronoun.split('/')
 
@@ -268,7 +288,7 @@ def student_evaluation(intern_id):
     return render_template('student_evaluation.html', st_eval=st_eval)
 
 #  Generic Post Internship Evaluation Per Student
-# Submit Feedback Route 
+# Submit Feedback Route
 @app.route('/submit_feedback', methods=['POST'])
 def submit_feedback():
     # Retrieve the feedback data from the request form
@@ -304,7 +324,7 @@ def submit_feedback():
 
     # Redirect to the student's details page
     return redirect(url_for('feedback_table', intern_id=student_id))
-# feedback 
+# feedback
 @app.route('/feedback/<int:intern_id>', methods=['GET'])
 def feedback(intern_id):
     # Connect to the SQLite database
@@ -354,10 +374,10 @@ def download_key_attributes():
     data = request.args.getlist('student_ids')
     values = data[0].split(',')
 
-    student_ids = [int(value) for value in values] 
+    student_ids = [int(value) for value in values]
 
 
- 
+
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -395,7 +415,7 @@ def download_key_attributes():
 
     return send_file(csv_path, as_attachment=True)
 
- 
+
 def get_statuses():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -478,14 +498,14 @@ def edit_student(intern_id):
             'post_internship_summary_rating_internal': request.form['post_internship_summary_rating_internal'],
             'cover_letter_projects': request.form['cover_letter_projects'],
         }
-        
+
         update_student(intern_id, data)  # Update the student record in the database
-        
+
         # Redirect to the student details page after updating
         # Get the referrer URL
         referrer = request.referrer
         return redirect(referrer)
-    
+
     else:
         # Retrieve the student record from the database based on the intern_id
         # Pass the student record, statuses, intakes, and projects to the edit.html template
@@ -493,7 +513,7 @@ def edit_student(intern_id):
         statuses = get_statuses()  # Retrieve the list of statuses from the database
         intakes = get_intakes()    # Retrieve the list of intakes from the database
         projects = get_projects()  # Retrieve the list of projects from the database
-        
+
     return render_template('edit.html', student=student, statuses=statuses, intakes=intakes, projects=projects)
 
 @app.route('/share_students/<int:project_id>')
@@ -535,10 +555,10 @@ def share_students(project_id):
         print(project)
 
         query = '''
-            SELECT intern_id, full_name, email, mobile, intake, course, course_major, cover_letter_projects, pronunciation, 
-            summary_tech_skills, summary_experience, pre_internship_summary_recommendation_external, 
-            pre_internship_technical_rating || ' ' || pre_internship_learning_quickly || ' ' || pre_internship_enthusiasm || 
-            ' ' || pre_internship_experience || ' ' || pre_internship_communication || ' ' || pre_internship_adaptable AS student_details, 
+            SELECT intern_id, full_name, email, mobile, intake, course, course_major, cover_letter_projects, pronunciation,
+            summary_tech_skills, summary_experience, pre_internship_summary_recommendation_external,
+            pre_internship_technical_rating || ' ' || pre_internship_learning_quickly || ' ' || pre_internship_enthusiasm ||
+            ' ' || pre_internship_experience || ' ' || pre_internship_communication || ' ' || pre_internship_adaptable AS student_details,
             github_username
             FROM Students
             WHERE intake = ? AND project = ? AND status IN ({})
@@ -587,7 +607,7 @@ def share_students(project_id):
                 dest_path = os.path.join(temp_dir, file)
                 shutil.copy(file_path, dest_path)
 
-            
+
     # Create a zip file of the other files
     with zipfile.ZipFile(zip_path, 'w') as zip_file:
         for folder_name, _, file_names in os.walk(temp_dir):
@@ -665,7 +685,7 @@ def download_contracts_and_applications():
                 dest_path = os.path.join(temp_dir, file)
                 shutil.copy(file_path, dest_path)
 
-            
+
     # Create a zip file of the other files
     with zipfile.ZipFile(zip_path, 'w') as zip_file:
         for folder_name, _, file_names in os.walk(temp_dir):
@@ -700,13 +720,13 @@ def import_redcap():
         print(request.files)
         csv_file = request.files['csv_file']
         if csv_file:
-            filename = csv_file.filename 
+            filename = csv_file.filename
             csv_file_path = os.path.join(import_dir, filename)
             csv_file.save(csv_file_path)
 
         zip_file = request.files['zip_file']
         if zip_file:
-            filename = zip_file.filename 
+            filename = zip_file.filename
             zip_file_path = os.path.join(import_dir, filename)
             zip_file.save(zip_file_path)
 
@@ -718,7 +738,7 @@ def import_redcap():
 
         # Redirect back to the previous page
         return redirect(referrer)
- 
+
     return render_template('import_redcap.html')
 
 
@@ -740,7 +760,7 @@ def upload_signed_contract(intern_id, full_name):
             # Redirect back to the previous page
             return redirect(referrer)
 
-    
+
     return render_template('upload_signed_contract.html', intern_id=intern_id, full_name=full_name)
 
 
@@ -1083,7 +1103,7 @@ def calculate_breakdown_of_students(students):
 
     return [breakdown_ratings,breakdown_courses,total_students,breakdown_statuses]
 
-#pronouns breakdown 
+#pronouns breakdown
 def calculate_breakdown_of_pronouns(students):
     pronoun_data = {}
     total_students = len(students)
@@ -1166,7 +1186,7 @@ def dashboard(dashboard_type):
     pronoun_data, pronoun_percentage, total_students = calculate_breakdown_of_pronouns(students)
 
     return render_template('dashboard.html', students=students, breakdown_ratings=breakdown_ratings,
-                        breakdown_courses=breakdown_courses, 
+                        breakdown_courses=breakdown_courses,
                         total_students=total_students, pronoun_data=pronoun_data,
                         pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses,total_students_current_and_past = total_students_current_and_past)
 
@@ -1203,7 +1223,7 @@ def edit_intake(intake_id):
     cursor.execute('SELECT * FROM Intakes where id = ?', (intake_id,))
     intake_data = cursor.fetchone()
     conn.close()
- 
+
 
     return render_template('edit_intake.html', intake=intake_data)
 
@@ -1280,7 +1300,7 @@ def edit_project(project_id):
     cursor.execute('SELECT * FROM projects where id = ?', (project_id,))
     project_data = cursor.fetchone()
     conn.close()
- 
+
 
     return render_template('edit_project.html', project=project_data)
 
@@ -1290,7 +1310,7 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
     body_first = """Hi All,%0D%0A%0D%0AThis is your email to start week 1 of your internship. You are probably excited and a little bit anxious too. That’s OK. Please remember you have other students to connect with and you can always ask your supervisor or me for help.%0D%0A%0D%0APlease read through the onboarding document https://doi.org/10.6084/m9.figshare.23280815 as this will help you ease your way into WEHI. %0D%0A%0D%0AI will be adding your student email to the WEHI system so you can gain access to our Sharepoint. This is temporary as you will be given a WEHI email address via Workday. %0D%0A%0D%0AWorkday is the Human Resources software tool at WEHI. You will find more details in the onbording document. Please also note that there is a Workday FAQ you can find in the FAQ below.%0D%0A%0D%0AHere are a few things you can do this week: %0D%0A%0D%0A- You can create your technical diary to help you track what you did to run a command or fix a mistake. This should be stored in Sharepoint under your project under its own folder. This folder should be shared in the weekly email update. %0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes%0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq%0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis%0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me after you have looked through these documents. We are here to assist you and provide any necessary support. %0D%0A%0D%0AWe are looking forward to working with you and wish you a rewarding and successful internship experience."""
 
-    body_second="""Hi All,%0D%0A%0D%0AThis is your email to start week 2 of your internship. You are probably getting your head around the concepts and perhaps still feeling a little bit anxious too. That’s OK. Please remember that this is a “best-effort” internship for most of you and we are trying to see how good you really are in a safe environment. Remember, you can always ask your supervisor or me for help. %0D%0A%0D%0APlease read through the onboarding document https://doi.org/10.6084/m9.figshare.23280815 as this will help you ease your way into WEHI. %0D%0A%0D%0APlease also make sure you have a system of emailing your supervisor at least once a week for an update, and that you are documenting what you are learning in a wiki and a technical document on Sharepoint. You will be expected to answer questions about the project by the end of week 4.%0D%0A%0D%0AHere are a few things you can do if you haven’t done already: %0D%0A%0D%0A- You can create your technical diary to help you track what you did to run a command or fix a mistake. This should be stored in Sharepoint under your project under its own folder. This folder should be shared in the weekly email update.%0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes%0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq%0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis%0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me after you have looked through these documents. We are here to assist you and provide any necessary support. %0D%0A%0D%0AWe are looking forward to working with you and wish you a rewarding and successful internship experience.""" 
+    body_second="""Hi All,%0D%0A%0D%0AThis is your email to start week 2 of your internship. You are probably getting your head around the concepts and perhaps still feeling a little bit anxious too. That’s OK. Please remember that this is a “best-effort” internship for most of you and we are trying to see how good you really are in a safe environment. Remember, you can always ask your supervisor or me for help. %0D%0A%0D%0APlease read through the onboarding document https://doi.org/10.6084/m9.figshare.23280815 as this will help you ease your way into WEHI. %0D%0A%0D%0APlease also make sure you have a system of emailing your supervisor at least once a week for an update, and that you are documenting what you are learning in a wiki and a technical document on Sharepoint. You will be expected to answer questions about the project by the end of week 4.%0D%0A%0D%0AHere are a few things you can do if you haven’t done already: %0D%0A%0D%0A- You can create your technical diary to help you track what you did to run a command or fix a mistake. This should be stored in Sharepoint under your project under its own folder. This folder should be shared in the weekly email update.%0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes%0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq%0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis%0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me after you have looked through these documents. We are here to assist you and provide any necessary support. %0D%0A%0D%0AWe are looking forward to working with you and wish you a rewarding and successful internship experience."""
     body_fourth="""Hi All, %0D%0A%0D%0AThis is your email to start week 4 of your internship. Hopefully you are in the swing of things by now. If not, please let me know if I can help. %0D%0A%0D%0AThis week we will be asking you to explain what you know about the high-level nuances of the project. This is to make sure you can understand why you are doing things and to make it easier and faster for you to work later in the project.%0D%0A%0D%0AAs always: %0D%0A%0D%0A- You can create your technical diary to help you track what you did to run a command or fix a mistake. This should be stored in Sharepoint under your project under its own folder. This folder should be shared in the weekly email update.%0D%0A%0D%0A- You can refer to the onboarding document https://doi.org/10.6084/m9.figshare.23280815%0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes %0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq %0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis %0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me. We are here to assist you and provide any necessary support."""
     body_tenth="""Hi All, %0D%0A%0D%0AThis is your email to start week 10 of your internship. This is the time when we want you to start reflecting and wrapping up the project. This is the time we want to see what your final presentations might look like, make sure the wiki is up to date and that your technical diary is in Sharepoint. When writing your presentation, please make sure the Acknowledgement slide is appropriate – you can see this in the onboarding document.%0D%0A%0D%0AAs always: %0D%0A%0D%0A- You can create your technical diary to help you track what you did to run a command or fix a mistake. This should be stored in Sharepoint under your project under its own folder. This folder should be shared in the weekly email update.%0D%0A%0D%0A- You can refer to the onboarding document https://doi.org/10.6084/m9.figshare.23280815%0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes %0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq %0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis %0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me. We are here to assist you and provide any necessary support. """
     body_end="""Hi All,%0D%0A%0D%0AI would like to thank you all for being a part of this intake at WEHI, and for all your efforts. I hope that you were able to benefit from this internship.%0D%0A%0D%0ATo help us improve, please provide anonymous feedback on the student internship https://forms.office.com/r/XLTukQ9stB %0D%0A%0D%0AWe hope you will keep in touch with your teammates and supervisors. One way of doing this is to reach out via LinkedIn.%0D%0A%0D%0AAnother way to continue sharing your work from the internship. With the permission of your supervisor, consider uploading your presentation to a platform like Figshare or Zenodo. By doing so, you can make your findings and insights accessible to a wider audience.%0D%0A%0D%0AWhen sharing your work on Figshare or a similar platform, remember to acknowledge your team mates as a co-author or contributor. Including them as an author ensures that credit is appropriately attributed to all individuals involved in the project.%0D%0A%0D%0AI hope the experience of this internship helps you in your future career and gives you more understanding of what you want out of a work environment. """

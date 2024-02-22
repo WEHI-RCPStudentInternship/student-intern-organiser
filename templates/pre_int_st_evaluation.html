@@ -226,58 +226,58 @@ If you would like to decline this offer, please reply to this email if you would
 
         <label for="remote_internship" class= "normal">100% Remote Internship</label>
         <div>
-            <input type="radio" id="accept_remote" name="remote_internship" value="{{student[1]}} is OK with 100% remote internship.">
+            <input type="radio" id="accept_remote" name="remote_internship" value="{{student[1]}} is OK with 100% remote internship." {% if student[46] == student[1] ~ ' is OK with 100% remote internship.' %} checked {% endif %}>
             <label for="accept_remote" class = "radio">Accept</label>
-            <input type="radio" id="reject_remote" name="remote_internship" value="{{student[1]}} is NOT OK with 100% remote internship.">
+            <input type="radio" id="reject_remote" name="remote_internship" value="{{student[1]}} is NOT OK with 100% remote internship." {% if student[46] == student[1] ~ ' is NOT OK with 100% remote internship.' %} checked {% endif %}>
             <label for="reject_remote" class = "radio">Reject</label>
         </div>
 
         <label for = "code_of_conduct" class = "normal">Have read Code of Conduct?</label>
         <div>
-            <input type = "radio" id ="coc_yes" name ="code_of_conduct" value = "{{student[1]}} has read the code of conduct.">
+            <input type = "radio" id ="coc_yes" name ="code_of_conduct" value = "{{student[1]}} has read the code of conduct." {% if student[47] == student[1] ~ ' has read the code of conduct.' %} checked {% endif %}>
             <label for = "coc_yes" class = "radio"> Yes</label>
-            <input type = "radio" id ="coc_no" name ="code_of_conduct" value = "{{student[1]}} has NOT read the code of conduct.">
+            <input type = "radio" id ="coc_no" name ="code_of_conduct" value = "{{student[1]}} has NOT read the code of conduct." {% if student[47] == student[1] ~ ' has NOT read the code of conduct.' %} checked {% endif %}>
             <label for = "coc_no" class = "radio"> No</label>
         </div>
 
         <label for = "listener_or_talker" class = "normal">Listener of Talker?</label>
         <div>
-            <input type = "radio" id ="listener" name ="listener_or_talker" value = "{{student[1]}} is a Listener.">
+            <input type = "radio" id ="listener" name ="listener_or_talker" value = "{{student[1]}} is a Listener." {% if student[49] == student[1] ~ ' is a Listener.' %} checked {% endif %}>
             <label for = "listener" class = "radio"> Listener</label>
-            <input type = "radio" id ="talker" name ="listener_or_talker" value = "{{student[1]}} is a Talker.">
+            <input type = "radio" id ="talker" name ="listener_or_talker" value = "{{student[1]}} is a Talker." {% if student[49] == student[1] ~ ' is a Talker.' %} checked {% endif %}>
             <label for = "talker" class = "radio"> Talker</label>
-            <input type = "radio" id ="both_listener_talker" name ="listener_or_talker" value = "{{student[1]}} is BOTH a Listener and a Talker.">
+            <input type = "radio" id ="both_listener_talker" name ="listener_or_talker" value = "{{student[1]}} is BOTH a Listener and a Talker." {% if student[49] == student[1] ~ ' is BOTH a Listener and a Talker.' %} checked {% endif %}>
             <label for = "both" class = "radio"> Both</label>
         </div>
 
         <label for = "facilitator_follower" class = "normal">Facilitator or Follower?</label>
         <div>
-            <input type = "radio" id ="facilitator" name ="facilitator_follower" value = "{{student[1]}} is a Facilitator.">
+            <input type = "radio" id ="facilitator" name ="facilitator_follower" value = "{{student[1]}} is a Facilitator." {% if student[48] == student[1] ~ ' is a Facilitator.' %} checked {% endif %}>
             <label for = "facilitator" class = "radio"> Facilitator</label>
-            <input type = "radio" id ="follower" name ="facilitator_follower" value = "{{student[1]}} is a Follower.">
+            <input type = "radio" id ="follower" name ="facilitator_follower" value = "{{student[1]}} is a Follower." {% if student[48] == student[1] ~ ' is a Follower.' %} checked {% endif %}>
             <label for = "follower" class = "radio"> Follower</label>
-            <input type = "radio" id ="both_facilitator_follower" name ="facilitator_follower" value = "{{student[1]}} is BOTH a Facilitator and a Follower.">
+            <input type = "radio" id ="both_facilitator_follower" name ="facilitator_follower" value = "{{student[1]}} is BOTH a Facilitator and a Follower." {% if student[48] == student[1] ~ ' is a BOTH a Facilitator and a Follower.' %} checked {% endif %}>
             <label for = "both_facilitator_follower" class = "radio"> Both</label>
         </div>
 
         <label for = "thinker_brainstormer" class = "normal">Thinker or Brainstormer?</label>
         <div>
-            <input type = "radio" id ="thinker" name ="thinker_brainstormer" value = "{{student[1]}} is a Thinker.">
+            <input type = "radio" id ="thinker" name ="thinker_brainstormer" value = "{{student[1]}} is a Thinker." {% if student[50] == student[1] ~ ' is a Thinker.' %} checked {% endif %}>
             <label for = "thinker" class = "radio">Thinker</label>
-            <input type = "radio" id ="brainstormer" name ="thinker_brainstormer" value = "{{student[1]}} is a Brainstormer.">
+            <input type = "radio" id ="brainstormer" name ="thinker_brainstormer" value = "{{student[1]}} is a Brainstormer." {% if student[50] == student[1] ~ ' is a Brainstormer.' %} checked {% endif %}>
             <label for = "brainstormer" class = "radio">Brainstormer</label>
-            <input type = "radio" id ="both_thinker_brainstormer" name ="thinker_brainstormer" value = "{{student[1]}} is BOTH a Thinker and Brainstormer.">
+            <input type = "radio" id ="both_thinker_brainstormer" name ="thinker_brainstormer" value = "{{student[1]}} is BOTH a Thinker and Brainstormer." {% if student[50] == student[1] ~ ' is BOTH a Thinker and a Brainstormer.' %} checked {% endif %}>
             <label for = "both_thinker_brainstormer" class = "radio"> Both</label>
         </div>
 
         <label for="cover_letter_projects" class= "normal">Project Applied</label>
-        <textarea name="cover_letter_projects" id="summary_tech_skills" rows="1"></textarea>
+        <textarea name="cover_letter_projects" id="summary_tech_skills" rows="1">{{ student[11] }}</textarea>
 
         <label for = "why_applied" class = "normal"> Why Applied?</label>
-        <textarea name = "why_applied" id ="why_applied" rows = "3"></textarea>
+        <textarea name = "why_applied" id ="why_applied" rows = "3">{{ student[51] }}</textarea>
 
         <label for = "projects_recommended" class = "normal"> Projects Recommended</label>
-        <textarea name = "projects_recommended" id ="projects_recommended" rows = "1"></textarea>
+        <textarea name = "projects_recommended" id ="projects_recommended" rows = "1">{{ student[52] }}</textarea>
 
         <label for="extra_notes" class= "normal">Extra Notes</label>
         <textarea name="extra_notes" id="extra_notes" rows="3">{{ student[45] }}</textarea>
@@ -338,44 +338,52 @@ If you would like to decline this offer, please reply to this email if you would
         <label for = "Written_Application" class = "normal">Written Application</label>
         <div>
             <div>
-                <input type = "radio" id ="communicated_well" name ="Written_Application" value = "{{student[1]}} has communicated well on their written application.">
-                <label for = "communicated_well" > Communicated well</label>
+                <input type="radio" id="communicated_well" name="Written_Application" value="{{ student[1] }} has communicated well on their written application." {% if student[1] ~ ' has communicated well on their written application.' in student[32] %} checked {% endif %}>
+                <label for="communicated_well"> Communicated well</label>
             </div>
             <div>
-                <input type = "radio" id ="communicated_not_well" name ="Written_Application" value = "{{student[1]}} did not communicate that well on their written application.">
-                <label for = "communicated_not_well" > Communicated not that well</label>
+                <input type="radio" id="communicated_not_well" name="Written_Application" value="{{ student[1] }} did not communicate that well on their written application." {% if student[1] ~ ' did not communicate that well on their written application.' %} checked {% endif %}>
+                <label for="communicated_not_well"> Communicated not that well</label>
             </div>
 
         <label for = "Written_Application" class = "invisible">Written Application</label>
             <div>
-            <input type = "radio" id ="communicated_well_in_application" name ="Written_Application" value = "{{student[1]}} did not communicate as well as in the phone interview.">
-            <label for = "communicated_well_in_application"> Communicated not as well as phone interview</label>
+                <input type="radio" id="communicated_well_in_application" name="Written_Application" value="{{ student[1] }} did not communicate as well as in the phone interview." {% if student[1] ~ ' did not communicate as well as in the phone interview.' %} checked {% endif %}>
+                <label for="communicated_well_in_application"> Communicated not as well as phone interview</label>
             </div>
             <div>
-                <input type = "radio" id ="communicated_well_in_phone" name ="Written_Application" value = "{{student[1]}} communicated better than phone interview.">
-                <label for = "communicated_well_in_phone"> Communicated better than phone interview</label>
+                <input type="radio" id="communicated_well_in_phone" name="Written_Application" value="{{ student[1] }} communicated better than phone interview than their written application." {% if student[1] ~ ' communicated better than phone interview than their written application.' %} checked {% endif %}>
+                <label for="communicated_well_in_phone"> Communicated better than phone interview</label>
             </div>
         </div>
 
         <label for = "Phone_Interview" class = "normal">Phone Interview</label>
         <div>
             <div>
-                <input type = "radio" id ="communicated_well_phone" name ="Phone_Interview" value = "{{student[1]}} communicated well on phone.">
-                <label for = "communicated_well_phone" > Communicated well</label>
+                <label for="communicated_well_phone">
+                    <input type="radio" id="communicated_well_phone" name="Phone_Interview" value="{{ student[1] }} communicated well on phone." {% if student[1] ~ ' communicated well on phone.' in student[32] %} checked {% endif %}>
+                    Communicated well
+                </label>
             </div>
             <div>
-                <input type = "radio" id ="communicated_not_well_phone" name ="Phone_Interview" value = "{{student[1]}} communicated not that well on phone.">
-                <label for = "communicated_not_well_phone" > Communicated not that well</label>
+                <label for="communicated_not_well_phone">
+                    <input type="radio" id="communicated_not_well_phone" name="Phone_Interview" value="{{ student[1] }} communicated not that well on phone." {% if student[1] ~ ' communicated not that well on phone.' in student[32] %} checked {% endif %}>
+                    Communicated not that well
+                </label>
             </div>
 
         <label for = "Phone_Interview" class = "invisible">Phone Interview</label>
             <div>
-            <input type = "radio" id ="communicated_well_in_phone_phone" name ="Phone_Interview" value = "{{student[1]}} communicated not as well as written application.">
-            <label for = "communicated_well_in_phone_phone"> Communicated not as well as written application</label>
+                <label for="communicated_well_in_phone_phone">
+                    <input type="radio" id="communicated_well_in_phone_phone" name="Phone_Interview" value="{{ student[1] }} communicated not as well as written application." {% if student[1] ~ ' communicated not as well as written application.' in student[32] %} checked {% endif %}>
+                    Communicated not as well as written application
+                </label>
             </div>
             <div>
-                <input type = "radio" id ="not_done_yet" name ="Phone_Interview" value = "Phone interview is not done yet.">
-                <label for = "not_done_yet"> Not done yet</label>
+                <label for="not_done_yet">
+                    <input type="radio" id="not_done_yet" name="Phone_Interview" value="Phone interview is not done yet." {% if 'Phone interview is not done yet.' in student[32] %} checked {% endif %}>
+                    Not done yet
+                </label>
             </div>
         </div>
 

@@ -5,6 +5,13 @@
 {% block page_title %}{{ title_of_page }}{% endblock %}
 
 {% block top_links_menu %}
+<div id="emptyEmailUsers">
+    <ul>
+        {% for user in empty_email_users %}
+            <li>Name: {{ user[1] }}, Email: {{ user[2] }}</li> 
+        {% endfor %}
+    </ul>
+</div>
 
     <a target="_blank" href="https://wehi-researchcomputing.github.io/students" >Student website</a>
     <a target="_blank" href="https://github.com/WEHI-ResearchComputing/WEHI-ResearchComputing.github.io" >Student website GitHub edit</a>

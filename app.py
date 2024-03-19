@@ -73,7 +73,14 @@ def email_intake(intake_id):
 
 @app.route('/links/', methods=['GET'])
 def links():
-    return render_template('links.html')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM students")
+    empty_email_users = cursor.fetchall()
+    conn.close()
+
+    #print(empty_email_users[1])
+    return render_template('links.html', empty_email_users=empty_email_users)
 
 # Allocating students projects
 @app.route('/assigned_projects/', methods=['GET', 'PUT'])
@@ -1326,6 +1333,18 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
 
     return table_rows
+
+##side menu functionalities
+@app.route('/links')
+def links_empty():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM students WHERE wehi_email = ''")
+    empty_email_users = cursor.fetchall()
+    conn.close()
+    print(empty_email_users)
+    return render_template('links.html', empty_email_users=empty_email_users)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

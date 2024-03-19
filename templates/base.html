@@ -59,7 +59,8 @@
             font-size: 16px;
             padding: 5px;
         }
-    /* Add your custom styles here */
+
+
     </style>
     {% block styles %}{% endblock %}
 </head>
@@ -77,15 +78,17 @@
         <a href="/new_intake">New Intake All</a>
         <a href="/share_students/0">Share Student Applications</a>
         <a href="/import_redcap">Import REDCap</a>
-        <a href="/intakes">Intakes</a>
-        <a href="/projects">Projects</a>
-        <a href="/links">Links</a>
-
      </div>
      <div class="second_level_top_links">
         {% block top_links_menu %}{% endblock %}
      </div>
- 
+
+     <div class = "side_menu">
+         <a href="/intakes">Intakes</a>
+         <a href="/projects">Projects</a>
+         <a href="/links">Links</a>
+     </div>
+
     {% block content %}{% endblock %}
 
     <!-- Include DataTables JavaScript -->

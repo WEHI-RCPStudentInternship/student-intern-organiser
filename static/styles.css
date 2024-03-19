@@ -62,3 +62,31 @@ Kanban boards styles
   margin-bottom: 4px;
   font-size: 14px;
 }
+
+.side_menu {
+    position: fixed; /* Fixed position relative to the viewport */
+    top: 0; /* Align to the top of the viewport */
+    left: 0; /* Align to the left of the viewport */
+    width: 200px; /* Set the width of the side menu */
+    height: 100%; /* Full height */
+    background-color: #f0f0f0; /* Background color of the menu */
+    overflow-x: hidden; /* Prevent horizontal overflow */
+    overflow-y: auto; /* Enable vertical scrolling if necessary */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: add some shadow for a subtle depth effect */
+    z-index: 1000; /* Ensure the menu is on top of other content */
+    padding-top: 20px; /* Add some padding at the top */
+}
+
+.side_menu a {
+    padding: 10px 15px; /* Padding inside the links for better clickability */
+    text-decoration: none; /* Remove underlines from links */
+    font-size: 16px; /* Set font size */
+    color: #333; /* Set text color */
+    display: block; /* Make the links fill the container width */
+    transition: 0.3s; /* Smooth transition for hover effect */
+}
+
+.side_menu a:hover {
+    color: #fff; /* Change text color on hover */
+    background-color: #575757; /* Change background color on hover */
+}

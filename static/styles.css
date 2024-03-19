@@ -73,8 +73,13 @@ Kanban boards styles
     overflow-x: hidden; /* Prevent horizontal overflow */
     overflow-y: auto; /* Enable vertical scrolling if necessary */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional: add some shadow for a subtle depth effect */
-    z-index: 1000; /* Ensure the menu is on top of other content */
+    /* z-index: 1000; /* Ensure the menu is on top of other content */
     padding-top: 20px; /* Add some padding at the top */
+}
+
+.main_content {
+    margin-left: 220px; /* Adjust the margin to be slightly more than the width of the side_menu */
+    padding: 20px;
 }
 
 .side_menu a {

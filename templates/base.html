@@ -64,21 +64,13 @@
     </style>
     {% block styles %}{% endblock %}
 </head>
+
 <body>
      <div class="banner">
         <img src="/static/logo.png" alt="Logo" class="logo">
         <h1>{% block page_title %}{% endblock %} Index</h1>
     </div>
-    <div class="top_links">
-        <a href="/">All Students Index</a>
-        <a href="/dashboard/all">Dashboard</a>
-        <a href="/download_contracts_and_applications">Download contracts</a>
-        <a href="/current">Current Intake</a>
-        <a href="/outstanding">New Intake WIP</a>
-        <a href="/new_intake">New Intake All</a>
-        <a href="/share_students/0">Share Student Applications</a>
-        <a href="/import_redcap">Import REDCap</a>
-     </div>
+
      <div class="second_level_top_links">
         {% block top_links_menu %}{% endblock %}
      </div>
@@ -90,8 +82,22 @@
          <a href="/links">Links</a>
 
      </div>
-
-    {% block content %}{% endblock %}
+     <div class="main_content">
+         <div class="top_links">
+             <a href="/">All Students Index</a>
+             <a href="/dashboard/all">Dashboard</a>
+             <a href="/download_contracts_and_applications">Download contracts</a>
+             <a href="/current">Current Intake</a>
+             <a href="/outstanding">New Intake WIP</a>
+             <a href="/new_intake">New Intake All</a>
+             <a href="/share_students/0">Share Student Applications</a>
+             <a href="/import_redcap">Import REDCap</a>
+         </div>
+         <!-- Page specific content will go here -->
+         {% block content %}
+         <!-- Default page content -->
+         {% endblock %}
+     </div>
 
     <!-- Include DataTables JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

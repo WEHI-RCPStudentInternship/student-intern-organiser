@@ -107,6 +107,15 @@
             // Add your JavaScript code here
             {% block jQuery_scripts %}    {% endblock %}
         });
+
+        document.querySelector('.menu_button').addEventListener('mouseover', function() {
+        document.querySelector('.side_menu').style.display = 'block';
+    });
+
+    document.querySelector('.side_menu').addEventListener('mouseleave', function() {
+        this.style.display = 'none';
+    });
+
     </script>
     {% block scripts %}{% endblock %}
 </body>

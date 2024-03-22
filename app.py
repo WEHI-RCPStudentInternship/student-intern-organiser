@@ -11,6 +11,7 @@ from flask import (Flask, jsonify, redirect, render_template, request,
                    send_file, url_for, Response)
 
 import import_csv_from_redcap
+import import_profile_csv
 
 app = Flask(__name__)
 
@@ -773,6 +774,42 @@ def import_redcap():
         return redirect(referrer)
 
     return render_template('import_redcap.html')
+
+
+@app.route('/import_profile', methods=['GET', 'POST'])
+def import_profile():
+
+    today = datetime.now()
+
+    import_dir = 'student_intern_data/Profile'
+    if request.method == 'POST':
+        print(request.files)
+        csv_file = request.files['csv_file']
+        if csv_file:
+            filename = csv_file.filename
+            csv_file_path = os.path.join(import_dir, filename)
+
+            os.makedirs(os.path.dirname(csv_file_path), exist_ok=True)
+            csv_file.save(csv_file_path)
+
+        # zip_file = request.files['zip_file']
+        # if zip_file:
+        #     filename = zip_file.filename
+        #     zip_file_path = os.path.join(import_dir, filename)
+        #     zip_file.save(zip_file_path)
+
+
+        import_profile_csv.read_csv_file(csv_file_path)
+
+        # Get the referrer URL
+        referrer = request.referrer
+
+        # Redirect back to the previous page
+        return redirect(referrer)
+
+    return render_template('import_profile.html')
+
+
 
 
 

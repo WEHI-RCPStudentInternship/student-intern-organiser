@@ -79,17 +79,19 @@
      </div>
 
 
-     <div class="side_menu_container">
-         <button class="menu_button">Menu</button>
-         <div class="side_menu">
-             <a href="/">Home</a>
-             <a href="/intakes">Intakes</a>
-             <a href="/projects">Projects</a>
-             <a href="/links">Links</a>
-         </div>
+     <div id="side_menu" class="side_menu">
+         <a href="/">Home</a>
+         <a href="/intakes">Intakes</a>
+         <a href="/projects">Projects</a>
+         <a href="/links">Links</a>
      </div>
 
-     <div class="main_content">
+     <div class="menu-trigger">
+         <span>&#9776; Menu</span>
+     </div>
+
+
+     <div div id="main_content" class="main_content">
          <div class="top_links">
              <a href="/">All Students Index</a>
              <a href="/dashboard/all">Dashboard</a>
@@ -110,19 +112,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
     <script>
-        $(document).ready(function() {
-            // Add your JavaScript code here
-            {% block jQuery_scripts %}    {% endblock %}
+        $(document).ready(function(){
+            $(".menu-trigger").click(function(){
+                var menuWidth = "250px";
+                if($("#side_menu").width() > 0){
+                    $("#side_menu").css("width", "0");
+                    $("#main_content").css("margin-left", "0");
+                } else {
+                    $("#side_menu").css("width", menuWidth);
+                    $("#main_content").css("margin-left", menuWidth);
+                }
+            });
         });
-
-        document.querySelector('.menu_button').addEventListener('mouseover', function() {
-        document.querySelector('.side_menu').style.display = 'block';
-    });
-
-    document.querySelector('.side_menu').addEventListener('mouseleave', function() {
-        this.style.display = 'none';
-    });
-
     </script>
     {% block scripts %}{% endblock %}
 </body>

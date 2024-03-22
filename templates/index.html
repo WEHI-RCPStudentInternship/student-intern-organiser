@@ -4,49 +4,50 @@
 
 {% block page_title %}{{ title_of_page }}{% endblock %}
 
-{% block top_links_menu %}
+<!--{% block top_links_menu %}-->
 
-        <a href="#" id="copyEmailsBtn">Copy Personal Emails</a>
-        <a href="#" id="copyWehiEmailsBtn">Copy WEHI Emails</a>
-        <a href="#" id="downloadKeyAttributesBtn">Download Key Attributes</a>
+<!--        <a href="#" id="copyEmailsBtn">Copy Personal Emails</a>-->
+<!--        <a href="#" id="copyWehiEmailsBtn">Copy WEHI Emails</a>-->
+<!--        <a href="#" id="downloadKeyAttributesBtn">Download Key Attributes</a>-->
 
-        <select id="statusDropdown">
-            {% for status in statuses %}
-            <option value="{{ status[0] }}">{{ status[1] }}</option>
-            {% endfor %}
-        </select>
-        <a id="changeStatusBtn" href="#">Change Status</a>
+<!--        <select id="statusDropdown">-->
+<!--            {% for status in statuses %}-->
+<!--            <option value="{{ status[0] }}">{{ status[1] }}</option>-->
+<!--            {% endfor %}-->
+<!--        </select>-->
+<!--        <a id="changeStatusBtn" href="#">Change Status</a>-->
 
-        <select id="projectDropdown">
-            {% for project in projects %}
-            <option value="{{ project[0] }}">{{ project[1] }}</option>
-            {% endfor %}
-        </select>
-        <a id="changeProjectBtn" href="#">Change Project</a>
+<!--        <select id="projectDropdown">-->
+<!--            {% for project in projects %}-->
+<!--            <option value="{{ project[0] }}">{{ project[1] }}</option>-->
+<!--            {% endfor %}-->
+<!--        </select>-->
+<!--        <a id="changeProjectBtn" href="#">Change Project</a>-->
 
-        <select id="post_internship_rating">
-            <option value="N/A">N/A</option>
-            <option value="Decent">Decent</option>
-            <option value="Impressive">Impressive</option>
-        </select>
-        <a id="change_post_internship_rating" href="#">Change Rating</a>
+<!--        <select id="post_internship_rating">-->
+<!--            <option value="N/A">N/A</option>-->
+<!--            <option value="Decent">Decent</option>-->
+<!--            <option value="Impressive">Impressive</option>-->
+<!--        </select>-->
+<!--        <a id="change_post_internship_rating" href="#">Change Rating</a>-->
 
-        {% if request.path == '/outstanding' or request.path == '/new_intake' %}
+<!--        {% if request.path == '/outstanding' or request.path == '/new_intake' %}-->
 
-        <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>
-        <a href="#" id="sendEmailToMyselfBtn">Send email to myself</a>
-        {% endif %}
+<!--        <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>-->
+<!--        <a href="#" id="sendEmailToMyselfBtn">Send email to myself</a>-->
+<!--        {% endif %}-->
 
-        <!-- Check if the current page is '/new_intake', then display the button -->
-        {% if request.path == '/new_intake' %}
-        <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>
-        {% endif %}
+<!--        &lt;!&ndash; Check if the current page is '/new_intake', then display the button &ndash;&gt;-->
+<!--        {% if request.path == '/new_intake' %}-->
+<!--        <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>-->
+<!--        {% endif %}-->
 
-{% endblock %}
+<!--{% endblock %}-->
 
 
 
 {% block content %}
+{% include 'batch_process.html' %}
     <table id="studentTable">
         <thead>
             <tr>

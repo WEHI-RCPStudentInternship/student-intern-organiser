@@ -1,0 +1,35 @@
+<div id="batch_process">
+    <a href="#" id="copyEmailsBtn">Copy Personal Emails</a>
+    <a href="#" id="copyWehiEmailsBtn">Copy WEHI Emails</a>
+    <a href="#" id="downloadKeyAttributesBtn">Download Key Attributes</a>
+
+    <select id="statusDropdown">
+        {% for status in statuses %}
+        <option value="{{ status[0] }}">{{ status[1] }}</option>
+        {% endfor %}
+    </select>
+    <a id="changeStatusBtn" href="#">Change Status</a>
+
+    <select id="projectDropdown">
+        {% for project in projects %}
+        <option value="{{ project[0] }}">{{ project[1] }}</option>
+        {% endfor %}
+    </select>
+    <a id="changeProjectBtn" href="#">Change Project</a>
+
+    <select id="post_internship_rating">
+        <option value="N/A">N/A</option>
+        <option value="Decent">Decent</option>
+        <option value="Impressive">Impressive</option>
+    </select>
+    <a id="change_post_internship_rating" href="#">Change Rating</a>
+
+    {% if request.path == '/outstanding' or request.path == '/new_intake' %}
+    <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>
+    <a href="#" id="sendEmailToMyselfBtn">Send email to myself</a>
+    {% endif %}
+
+    {% if request.path == '/new_intake' %}
+    <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>
+    {% endif %}
+</div>

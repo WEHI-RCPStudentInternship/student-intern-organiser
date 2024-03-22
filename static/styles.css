@@ -63,40 +63,34 @@ Kanban boards styles
   font-size: 14px;
 }
 /* This is the new CSS add by 2024 S1 */
-.side_menu_container {
-    position: relative;
-    display: inline-block;
-}
-
 .side_menu {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    height: 100%;
+    width: 0;
+    position: fixed;
     z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
 }
 
 .side_menu a {
-    color: black;
-    padding: 12px 16px;
+    padding: 8px 8px 8px 32px;
     text-decoration: none;
+    font-size: 25px;
+    color: #818181;
     display: block;
+    transition: 0.3s;
 }
 
 .side_menu a:hover {
-    background-color: #f1f1f1;
+    color: #f1f1f1;
 }
 
-.menu_button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 16px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-}
-
-.menu_button:hover .side_menu {
-    display: block;
+.main_content {
+    transition: margin-left .5s; /* Smooth transition for content sliding */
+    padding: 20px;
+    overflow: hidden;
 }

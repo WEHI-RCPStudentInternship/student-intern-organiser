@@ -75,11 +75,11 @@ def email_intake(intake_id):
 def links():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM students")
+    cursor.execute("SELECT * FROM students WHERE wehi_email IS NULL")
     empty_email_users = cursor.fetchall()
     conn.close()
 
-    #print(empty_email_users[1])
+    print(empty_email_users[1])
     return render_template('links.html', empty_email_users=empty_email_users)
 
 # Allocating students projects

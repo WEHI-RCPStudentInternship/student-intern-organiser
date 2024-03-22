@@ -60,7 +60,10 @@
             padding: 5px;
         }
 
-
+        .side_menu_container {
+    position: relative;
+    display: inline-block;
+}
     </style>
     {% block styles %}{% endblock %}
 </head>
@@ -75,13 +78,17 @@
         {% block top_links_menu %}{% endblock %}
      </div>
 
-     <div class = "side_menu">
-        <a href="/">Home</a>
-         <a href="/intakes">Intakes</a>
-         <a href="/projects">Projects</a>
-         <a href="/links">Links</a>
 
+     <div class="side_menu_container">
+         <button class="menu_button">Menu</button>
+         <div class="side_menu">
+             <a href="/">Home</a>
+             <a href="/intakes">Intakes</a>
+             <a href="/projects">Projects</a>
+             <a href="/links">Links</a>
+         </div>
      </div>
+
      <div class="main_content">
          <div class="top_links">
              <a href="/">All Students Index</a>

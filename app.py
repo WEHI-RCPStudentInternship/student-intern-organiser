@@ -91,11 +91,11 @@ def links():
 @app.route('/download_empty_emails')
 def download_empty_emails():
     empty_email_users = get_empty_email_users()
-
+    selected_columns = [ (user[0], user[1], user[4]) for user in empty_email_users ]
     si = io.StringIO()
     cw = csv.writer(si)
     cw.writerow(['User ID', 'Name', 'Email'])
-    cw.writerows(empty_email_users)
+    cw.writerows(selected_columns)
 
     output = si.getvalue()
     si.close()

@@ -5,9 +5,10 @@ import sqlite3
 import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
+import io
 
 from flask import (Flask, jsonify, redirect, render_template, request,
-                   send_file, url_for)
+                   send_file, url_for, Response)
 
 import import_csv_from_redcap
 
@@ -70,17 +71,42 @@ def email_intake(intake_id):
     print(table_rows)
 
     return render_template('email_intake.html', intake=intake, science_student_emails=science_student_emails, engit_student_emails=engit_student_emails, table_rows= table_rows)
+\
+
+def get_empty_email_users():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM students WHERE wehi_email IS NULL")
+    empty_email_users = cursor.fetchall()
+    conn.close()
+    return empty_email_users
+
 
 @app.route('/links/', methods=['GET'])
 def links():
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM students")
-    empty_email_users = cursor.fetchall()
-    conn.close()
+    empty_email_users = get_empty_email_users()
 
-    #print(empty_email_users[1])
     return render_template('links.html', empty_email_users=empty_email_users)
+
+@app.route('/download_empty_emails')
+def download_empty_emails():
+    empty_email_users = get_empty_email_users()
+
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['User ID', 'Name', 'Email'])
+    cw.writerows(empty_email_users)
+
+    output = si.getvalue()
+    si.close()
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=empty_email_users.csv"})
+
+
 
 # Allocating students projects
 @app.route('/assigned_projects/', methods=['GET', 'PUT'])

@@ -92,6 +92,14 @@ def download_empty_emails():
 
 
 
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    error_message = str(e) or "Unknown error occurred"
+    return render_template('2024error.html', error_message=error_message), 500
+
+
+
 ##-------- 2024 S1 New Code End -----------------##
 
 

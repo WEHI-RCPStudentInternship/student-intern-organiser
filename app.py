@@ -60,6 +60,15 @@ def current_student():
     return render_template('2024current_student.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 
+def get_empty_users(condition):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    query = f"SELECT * FROM students WHERE {condition} IS NULL"
+    cursor.execute(query)
+    users = cursor.fetchall()
+    conn.close()
+    return users
+
 @app.route('/download_empty_emails')
 def download_empty_emails():
     empty_email_users = get_empty_users('wehi_email')

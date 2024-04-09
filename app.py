@@ -18,6 +18,23 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
  # Replace with your SQLite database file path
 db_path = 'student_intern_data/student_intern_data.db'
 
+##----------- 2024 S1 New Code----------------##
+
+@app.route('/menu_page',methods=['GET'])
+def menu_page():
+    return render_template('menu_page.html')
+
+
+
+
+
+
+
+##-------- 2024 S1 New Code End -----------------##
+
+
+
+
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
     conn = sqlite3.connect(db_path)
@@ -1326,6 +1343,7 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
 
     return table_rows
+
 
 if __name__ == '__main__':
     app.run(debug=True)

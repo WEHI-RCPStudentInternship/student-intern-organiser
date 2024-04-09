@@ -6,7 +6,7 @@ import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
 
-from flask import (Flask, jsonify, redirect, render_template, request,
+from flask import (Flask, jsonify, redirect, render_template, request, Response,
                    send_file, url_for)
 
 import import_csv_from_redcap
@@ -19,6 +19,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 db_path = 'student_intern_data/student_intern_data.db'
 
 ##----------- 2024 S1 New Code----------------##
+import io
 
 @app.route('/menu_page',methods=['GET'])
 def menu_page():
@@ -57,7 +58,9 @@ def current_student():
     # Close the database connection
     conn.close()
     title_of_page = "Currently Signed Students"
-    return render_template('2024current_student.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+    empty_email_users = get_empty_users('wehi_email')
+
+    return render_template('2024current_student.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects, empty_email_users=empty_email_users)
 
 
 def get_empty_users(condition):

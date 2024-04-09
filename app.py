@@ -60,7 +60,23 @@ def current_student():
     return render_template('2024current_student.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 
+@app.route('/download_empty_emails')
+def download_empty_emails():
+    empty_email_users = get_empty_users('wehi_email')
+    selected_columns = [ (user[0], user[1], user[4]) for user in empty_email_users ]
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['User ID', 'Name', 'Email'])
+    cw.writerows(selected_columns)
 
+    output = si.getvalue()
+    si.close()
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=empty_email_users.csv"})
 
 
 

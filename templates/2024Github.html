@@ -4,14 +4,22 @@
 
 {% block page_title %}{{ title_of_page }}{% endblock %}
 
+{% block top_links_menu %}
+
+        <a href="#" id="copyEmailsBtn">Copy Personal Emails</a>
+        <a href="#" id="copyWehiEmailsBtn">Copy WEHI Emails</a>
+
+{% endblock %}
+
 {% block content %}
     <table id="studentTable">
         <thead>
             <tr>
                 <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column -->
                 <th>Name</th>
-                <th>University Email</th>
+                <th>WEHI Email</th>
                 <th>Github Username</th>
+                <th>Project</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -20,12 +28,13 @@
             <tr>
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                 <td>{{ student[1] }}</td>
-                {% if student[2] and student[2] != '' %}
-                    <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
+                {% if student[11] and student[11] != '' %}
+                    <td><a href="mailto:{{ student[11] }}">{{ student[11] }}</a></td>
                 {% else %}
                     <td></td>
                 {% endif %}
                 <td>{{ student[13] }}</td>
+                <td>{{ student[4] }}</td>
                 <td><a href="/view/{{ student[0] }}">View</a>&nbsp;<a href="/edit_student/{{ student[0] }}">Edit</a></td>
             </tr>
             {% endfor %}

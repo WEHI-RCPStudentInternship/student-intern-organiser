@@ -46,7 +46,7 @@ def current_student():
     query = '''
         SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
-        WHERE status IN ({})
+        WHERE status IN ({}) AND wehi_email IS NULL
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
     # Execute the query with the statuses list

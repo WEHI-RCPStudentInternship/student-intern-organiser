@@ -1,20 +1,75 @@
-{% extends 'base.html' %}
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
-{% block title %}Dashboard{% endblock %}
+    <style>
+        .dataTables_length {
+            margin-top: 9px;
+            margin-left: 10px;
+        }
+        body {
+            font-size: 16px;
+            font-weight: 300;
+            font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            color: #58595b;
+            background-color: #f8f8f8;
+        }
 
-{% block page_title %}Dashboard{% endblock %}
+        .banner {
+            background-color: #f8f8f8;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
 
-{% block top_links_menu %}
+        .logo {
+            margin-right: 10px;
+            height: 50px;
+        }
 
-        <a href="/dashboard/new_all">New All Intake Dashboard</a>
-        <a href="/dashboard/new_signed">New Signed Intake Dashboard</a>
-        <a href="/dashboard/new_signed_and_accepted">New Signed and Accepted Intake Dashboard</a>
-        <a href="/dashboard/new_signed_and_offered">New Signed and Offered Intake Dashboard</a>
-        <a href="/dashboard/current">Current Intake Dashboard</a>
-        <a href="/dashboard/finished">Finished Intake Dashboard</a>
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .dataTables_wrapper {
+            width:90%;
+        }
+        /* Style the buttons in the top_links div */
+        .second_level_top_links a, .top_links a {
+            display: inline-block;
+            margin-right: 10px;
+            padding: 5px 10px;
+            background-color: #49A942;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top:20px;
+            margin-bottom:20px;
+        }
 
-{% endblock %}
-
+        .second_level_top_links a:hover, .top_links a:hover {
+            background-color: #1976d2;
+        }
+        .second_level_top_links select , .top_links select {
+            font-size: 16px;
+            padding: 5px;
+        }
+        .banner{
+            display: flex;
+            gap: 2rem;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+<div class="banner">
+    <a href="/menu_page">
+        <img src="/static/logo.png" alt="Logo" class="logo">
+    </a>
+    <h1>Function Page</h1>
+</div>
 {% block content %}
 <style>
     table {
@@ -60,8 +115,9 @@
     .button-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        grid-gap: 40px;
-        padding: 40px;
+        grid-gap: 1rem;
+        padding: 5rem;
+        padding-top: 10rem;
         
     }
 
@@ -102,15 +158,6 @@
     <div class="button-container">
         <!-- New button grid with links -->
         <div class="button-grid">
-<!--            <a href="/phone_interview">Interview New Candidates</a>-->
-<!--            <a href="/new_intake_new">Announcement to Candidates</a>-->
-<!--            <a href="/current_student">Dowanload Empty WEHI email</a>-->
-<!--            <a href="/emailall">Announcement to All Students</a>-->
-<!--            <a href="/add_to_github">Add Student to Github</a>-->
-<!--            <a href="/your-link-6">Manage Student to Intake</a>-->
-<!--            <a href="/projects">Edit Intake</a>-->
-<!--            <a href="/intakes">Edit Project</a>-->
-<!--            <a href="/your-link-9">Allocate Project</a>-->
             <a href = "https://www.figma.com/file/SWDdu15gPGShSsOkPOsWnu/WEHI-Prototype?type=design&node-id=175-4233&mode=design&t=EJUmvnDP76ol4HTF-0#:~:text=2024S1%20Profile%20Pictures">Add Profile Picture</a>
             <a href = "/github_username">Github Username</a>
             <a href = "/current_student">Empty WEHI Email</a>

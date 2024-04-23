@@ -67,8 +67,8 @@
     <div class="banner">
         <a href="/menu_page">
             <img src="/static/logo.png" alt="Logo" class="logo">
-        </a >
-        <h1>{% block page_title %}{% endblock %} Index</h1>
+        </a>
+
     </div>
     <div class="top_links">
         <a href="/">All Students Index</a>
@@ -90,16 +90,6 @@
  
     {% block content %}{% endblock %}
 
-    <!-- Include DataTables JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Add your JavaScript code here
-            {% block jQuery_scripts %}    {% endblock %}
-        });
-    </script>
-    {% block scripts %}{% endblock %}
 </body>
 </html>
 

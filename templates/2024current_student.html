@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ title_of_page }} Index{% endblock %}
+{% block title %}{{ title_of_page }}Empty WEHI Email{% endblock %}
 
-{% block page_title %}{{ title_of_page }}{% endblock %}
+{% block page_title %}{{ title_of_page }}Empty WEHI Email{% endblock %}
 
 {% block top_links_menu %}
 
@@ -73,31 +73,35 @@
             </tr>
         </thead>
         <tbody>
-            {% for student in students %}
+            {% for empty_email_users in empty_email_users %}
             <tr>
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
-                <td><a href="/pre_int_st_evaluation/{{ student[0] }}">{{ student[0] }}</a></td>
-                <td>{{ student[1] }}</td>
-                <td>{{ student[9] }}</td>
-                {% if student[2] and student[2] != '' %}
-                    <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
+                <td><a href="/pre_int_st_evaluation/{{ empty_email_users[0] }}">{{ empty_email_users[0] }}</a></td>
+                <td>{{ empty_email_users[1] }}</td>
+                <td>{{ empty_email_users[9] }}</td>
+                {% if empty_email_users[2] and empty_email_users[2] != '' %}
+                    <td><a href="mailto:{{ empty_email_users[2] }}">{{ empty_email_users[2] }}</a></td>
                 {% else %}
                     <td></td>
                 {% endif %}
-                {% if student[11] and student[11] != '' %}
-                    <td><a href="mailto:{{ student[11] }}">{{ student[11] }}</a></td>
+                {% if empty_email_users[11] %}
+                    {% if '@wehi.edu.au' in empty_email_users[11] %}
+                        <td><a href="mailto:{{ empty_email_users[11] }}">{{ empty_email_users[11] }}</a></td>
+                    {% else %}
+                        <td>Wrong Address</td>
+                    {% endif %}
                 {% else %}
-                    <td>No WEHI Email</td>
+                     <td>No WEHI Email</td>
                 {% endif %}
-                <th>{{ student[12] }}</th>
-                <td>{{ student[3] }}</td>
-                <td>{{ student[4] }}</td>
-                <td>{{ student[5] }}</td>
-                <td>{{ student[6] }}</td>
-                <td>{{ student[7] }}</td>
-                <td>{{ student[10] }}</td>
-                <td>{{ student[8] }}</td>
-                <td><a href="/view/{{ student[0] }}">View</a>&nbsp;<a href="/edit_student/{{ student[0] }}">Edit</a></td>
+                <th>{{ empty_email_users[12] }}</th>
+                <td>{{ empty_email_users[3] }}</td>
+                <td>{{ empty_email_users[4] }}</td>
+                <td>{{ empty_email_users[5] }}</td>
+                <td>{{ empty_email_users[6] }}</td>
+                <td>{{ empty_email_users[7] }}</td>
+                <td>{{ empty_email_users[10] }}</td>
+                <td>{{ empty_email_users[8] }}</td>
+                <td><a href="/view/{{ empty_email_users[0] }}">View</a>&nbsp;<a href="/edit_student/{{ empty_email_users[0] }}">Edit</a></td>
             </tr>
             {% endfor %}
         </tbody>

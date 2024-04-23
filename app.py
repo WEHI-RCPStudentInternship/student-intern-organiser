@@ -21,6 +21,15 @@ db_path = 'student_intern_data/student_intern_data.db'
 ##----------- 2024 S1 New Code----------------##
 import io
 
+def get_empty_users(condition):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    query = f"SELECT * FROM students WHERE {condition} IS NULL OR {condition} NOT LIKE '%@wehi.edu.au%' "
+    cursor.execute(query)
+    users = cursor.fetchall()
+    conn.close()
+    return users
+
 @app.route('/menu_page',methods=['GET'])
 def menu_page():
     return render_template('2024menu_page.html')
@@ -31,54 +40,47 @@ def current_student():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    # Retrieve student data from the database
+    # Retrieve current student statuses and projects
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    status_of_students_current = [10,11,12,13]
+    # Define current student status IDs
+    status_of_students_current = [10, 11, 12, 13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
 
-    # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
-    query = '''
+    # Retrieve current students with specific status
+    placeholder = ','.join(['?'] * len(current_statuses_list))
+    query = f'''
         SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
-        WHERE status IN ({}) AND wehi_email IS NULL
-    '''.format(','.join(['?'] * len(current_statuses_list)))
-
-    # Execute the query with the statuses list
+        WHERE status IN ({placeholder}) AND wehi_email IS NULL
+    '''
     cursor.execute(query, current_statuses_list)
-
     students = cursor.fetchall()
 
+    # Query to fetch students with empty or incorrect email formats
+    empty_email_users = get_empty_users('wehi_email')
 
     # Close the database connection
     conn.close()
-    title_of_page = "Currently Signed Students"
-    empty_email_users = get_empty_users('wehi_email')
 
-    return render_template('2024current_student.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects, empty_email_users=empty_email_users)
+    # Title for the page
+
+    # Render the HTML page with all data
+    return render_template('2024current_student.html', students=students, statuses=statuses, projects=projects, empty_email_users=empty_email_users)
 
 
-def get_empty_users(condition):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    query = f"SELECT * FROM students WHERE {condition} IS NULL"
-    cursor.execute(query)
-    users = cursor.fetchall()
-    conn.close()
-    return users
 
 @app.route('/download_empty_emails')
 def download_empty_emails():
     empty_email_users = get_empty_users('wehi_email')
-    selected_columns = [ (user[0], user[1], user[4]) for user in empty_email_users ]
+    selected_columns = [ (user[0], user[1], user[4], '') for user in empty_email_users ]
     si = io.StringIO()
     cw = csv.writer(si)
-    cw.writerow(['User ID', 'Name', 'Email'])
+    cw.writerow(['User ID', 'Name', 'Email', 'WEHI_Email'])
     cw.writerows(selected_columns)
 
     output = si.getvalue()

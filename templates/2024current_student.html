@@ -56,19 +56,8 @@
         <thead>
             <tr>
                 <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column -->
-                <th>ID</th>
                 <th>Name</th>
-                <th>Pronouns</th>
                 <th>University Email</th>
-                <th>WEHI Email</th>
-                <th>Mobile</th>
-                <th>Pronunciation</th>
-                <th>Project</th>
-                <th>Intake</th>
-                <th>Course</th>
-                <th>Status</th>
-                <th>Pre Internship Summary</th>
-                <th>Post Internship Rating</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -76,14 +65,7 @@
             {% for empty_email_users in empty_email_users %}
             <tr>
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
-                <td><a href="/pre_int_st_evaluation/{{ empty_email_users[0] }}">{{ empty_email_users[0] }}</a></td>
                 <td>{{ empty_email_users[1] }}</td>
-                <td>{{ empty_email_users[9] }}</td>
-                {% if empty_email_users[2] and empty_email_users[2] != '' %}
-                    <td><a href="mailto:{{ empty_email_users[2] }}">{{ empty_email_users[2] }}</a></td>
-                {% else %}
-                    <td></td>
-                {% endif %}
                 {% if empty_email_users[11] %}
                     {% if '@wehi.edu.au' in empty_email_users[11] %}
                         <td><a href="mailto:{{ empty_email_users[11] }}">{{ empty_email_users[11] }}</a></td>
@@ -93,14 +75,6 @@
                 {% else %}
                      <td>No WEHI Email</td>
                 {% endif %}
-                <th>{{ empty_email_users[12] }}</th>
-                <td>{{ empty_email_users[3] }}</td>
-                <td>{{ empty_email_users[4] }}</td>
-                <td>{{ empty_email_users[5] }}</td>
-                <td>{{ empty_email_users[6] }}</td>
-                <td>{{ empty_email_users[7] }}</td>
-                <td>{{ empty_email_users[10] }}</td>
-                <td>{{ empty_email_users[8] }}</td>
                 <td><a href="/view/{{ empty_email_users[0] }}">View</a>&nbsp;<a href="/edit_student/{{ empty_email_users[0] }}">Edit</a></td>
             </tr>
             {% endfor %}

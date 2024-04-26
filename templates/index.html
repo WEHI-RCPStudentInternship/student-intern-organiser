@@ -55,11 +55,11 @@
                 <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column -->
                 <th>ID</th>
                 <th>Name</th>
+                <th>Pronunciation</th>
                 <th>Pronouns</th>
                 <th>University Email</th>
                 <th>WEHI Email</th>
                 <th>Mobile</th>
-                <th>Pronunciation</th>
                 <th>Project</th>
                 <th>Intake</th>
                 <th>Course</th>
@@ -75,6 +75,7 @@
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                 <td><a href="/pre_int_st_evaluation/{{ student[0] }}">{{ student[0] }}</a></td>
                 <td>{{ student[1] }}</td>
+                <td>{{ student[3] }}</td>
                 <td>{{ student[9] }}</td>
                 {% if student[2] and student[2] != '' %}
                     <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
@@ -87,7 +88,6 @@
                     <td>No WEHI Email</td>
                 {% endif %}
                 <th>{{ student[12] }}</th>
-                <td>{{ student[3] }}</td>
                 <td>{{ student[4] }}</td>
                 <td>{{ student[5] }}</td>
                 <td>{{ student[6] }}</td>
@@ -167,7 +167,7 @@
                     // Extract the email address from the text
                     try {
                         // Code that may throw an error or exception
-                        var email = text[4].match(/mailto:(.*?)"/)[1];
+                        var email = text[5].match(/mailto:(.*?)"/)[1];
                         // Output the extracted email address
                         emails.push(email); // Assuming email is in the third column (index 2)
                     } catch (error) {
@@ -198,8 +198,8 @@
                     // Extract the email address from the text
                     try {
                         // Code that may throw an error or exception
-                        if (text[5] != '') {
-                          var wehi_email = text[5].match(/mailto:(.*?)"/)[1];
+                        if (text[6] != '') {
+                          var wehi_email = text[6].match(/mailto:(.*?)"/)[1];
                           // Output the extracted email address
                           wehi_emails.push(wehi_email); // Assuming email is in the third column (index 2)
                         }
@@ -344,7 +344,7 @@
                 for (var i = 0; i < checkboxes.length; i++) {
                     if (checkboxes[i].checked) {
                         var row = checkboxes[i].closest('tr');
-                        var email = row.cells[4].innerText;
+                        var email = row.cells[5].innerText;
                         if (email) {
                             emails.push(email);
                         }
@@ -372,7 +372,7 @@
                         var row = checkboxes[i].closest('tr');
                         var id = row.cells[1].innerText;
                         var name = row.cells[2].innerText;
-                        var mobile = row.cells[6].innerText;
+                        var mobile = row.cells[7].innerText;
 
                         if (name && mobile) {
                             var studentLink = "http://127.0.0.1:5000/pre_int_st_evaluation/" + id;

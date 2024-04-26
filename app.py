@@ -752,7 +752,7 @@ def share_students(project_id):
         cursor.execute(query, [intake_current] + current_statuses_list )
 
     else:
-        status_of_students_to_filter = [8,9,10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
+        status_of_students_to_filter = [4,5,6,7,8,9,10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
         current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
         cursor.execute('SELECT * FROM Projects where id = ?',(project_id,))

@@ -173,11 +173,10 @@ def add_to_github():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    cursor.execute('SELECT name FROM Intakes where status  = "current"')
     intake_current = cursor.fetchall()[0][0]
 
 
@@ -185,7 +184,7 @@ def add_to_github():
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    status_of_students_to_filter = [1,2,3,4,5,6]
+    status_of_students_to_filter = [10, 11, 12, 13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
     # Retrieve student data from the database
@@ -752,7 +751,7 @@ def share_students(project_id):
         cursor.execute(query, [intake_current] + current_statuses_list )
 
     else:
-        status_of_students_to_filter = [4,5,6,7,8,9,10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
+        status_of_students_to_filter = [8,9,10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
         current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
         cursor.execute('SELECT * FROM Projects where id = ?',(project_id,))

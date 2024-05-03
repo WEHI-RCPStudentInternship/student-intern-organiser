@@ -237,10 +237,13 @@ def add_to_github():
     return render_template('2024Github.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 
+
 @app.errorhandler(Exception)
 def handle_error(e):
     error_message = str(e) or "Unknown error occurred"
     return render_template('2024error.html', error_message=error_message), 500
+
+
 
 @app.route('/quick_review')
 def quick_review():
@@ -248,13 +251,11 @@ def quick_review():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
     cursor.execute('SELECT name FROM Intakes where status  = "new"')
     intake_current = cursor.fetchall()[0][0]
-
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -276,12 +277,10 @@ def quick_review():
     cursor.execute(query, [intake_current] + current_statuses_list)
     students = cursor.fetchall()
 
-
     # Close the database connection
     conn.close()
     title_of_page = "New Intake Quick Review"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
-
 
 
 

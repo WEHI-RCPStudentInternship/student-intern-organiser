@@ -1314,7 +1314,7 @@ def change_student_status(student_ids, new_status):
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    # Prepare the SQL query
+    # Prepare the SQL query  
     query = '''
         UPDATE Students
         SET status = ?

@@ -283,7 +283,7 @@ def email_ack():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE intake = ? AND status IN ({}) ORDER BY status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -298,6 +298,9 @@ def email_ack():
     conn.close()
     title_of_page = "New Intake Email Acknowledgment"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+
+
+
 
 
 

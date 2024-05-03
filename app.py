@@ -216,7 +216,6 @@ def handle_error(e):
     return render_template('2024error.html', error_message=error_message), 500
 
 
-
 @app.route('/quick_review')
 def quick_review():
     # Connect to the SQLite database
@@ -258,8 +257,6 @@ def quick_review():
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 
-
-
 @app.route('/email_ack')
 def email_ack():
     # Connect to the SQLite database
@@ -299,8 +296,6 @@ def email_ack():
     conn.close()
     title_of_page = "New Intake Email Acknowledgment"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
-
-
 
 
 

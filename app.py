@@ -182,8 +182,6 @@ def update_email(csv_path):
 
 
 
-
-
 @app.route('/update_wehi',methods=['GET', 'POST'])
 def update_wehi():
     if request.method == 'POST':

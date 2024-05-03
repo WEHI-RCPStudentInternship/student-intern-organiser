@@ -47,28 +47,22 @@ def current_student():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    cursor.execute('SELECT name FROM Intakes where status  = "current"')
-    intake_current = cursor.fetchall()[0][0]
-
     # Define current student status IDs
     status_of_students_current = [10, 11, 12, 13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
 
     # Retrieve current students with specific status
     placeholder = ','.join(['?'] * len(current_statuses_list))
-    query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+    query = f'''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
-        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
-    '''.format(','.join(['?'] * len(current_statuses_list)))
-
-
-    # Execute the query with the statuses list
-    cursor.execute(query, [intake_current] + current_statuses_list)
+        WHERE status IN ({placeholder}) AND wehi_email IS NULL
+    '''
+    cursor.execute(query, current_statuses_list)
     students = cursor.fetchall()
 
     # Query to fetch students with empty or incorrect email formats
-    # empty_email_users = get_empty_users('wehi_email')
+    empty_email_users = get_empty_users('wehi_email')
 
     # Close the database connection
     conn.close()
@@ -76,7 +70,7 @@ def current_student():
     # Title for the page
 
     # Render the HTML page with all data
-    return render_template('2024current_student.html', students=students, statuses=statuses, projects=projects, empty_email_users=students)
+    return render_template('2024current_student.html', students=students, statuses=statuses, projects=projects, empty_email_users=empty_email_users)
 
 
 
@@ -1196,35 +1190,22 @@ def index_current():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
-    cursor.execute('SELECT name FROM Intakes where status  = "current"')
-    intake_current = cursor.fetchall()[0][0]
-
     status_of_students_current = [10,11,12,13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
-    # query = '''
-    #     SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
-    #     FROM Students
-    #     WHERE status IN ({})
-    # '''.format(','.join(['?'] * len(current_statuses_list)))
-
-    # # Execute the query with the statuses list
-    # cursor.execute(query, current_statuses_list)
-
-    # students = cursor.fetchall()
-
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
-        WHERE intake = ? AND status IN ({})
+        WHERE status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
-
     # Execute the query with the statuses list
-    cursor.execute(query, [intake_current] + current_statuses_list)
+    cursor.execute(query, current_statuses_list)
+
     students = cursor.fetchall()
+
 
     # Close the database connection
     conn.close()

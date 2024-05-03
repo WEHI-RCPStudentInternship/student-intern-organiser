@@ -58,7 +58,6 @@
                 <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column -->
                 <th>Name</th>
                 <th>University Email</th>
-                <th>WEHI Email</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -67,11 +66,6 @@
             <tr>
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                 <td>{{ empty_email_users[1] }}</td>
-                {% if empty_email_users[4] and empty_email_users[4] != '' %}
-                    <td><a href="mailto:{{ empty_email_users[4] }}">{{ empty_email_users[4] }}</a></td>
-                {% else %}
-                    <td></td>
-                {% endif %}
                 {% if empty_email_users[11] %}
                     {% if '@wehi.edu.au' in empty_email_users[11] %}
                         <td><a href="mailto:{{ empty_email_users[11] }}">{{ empty_email_users[11] }}</a></td>

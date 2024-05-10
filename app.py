@@ -414,7 +414,7 @@ def assigned_projects():
             # Retrieve student data from the database
             # Prepare the SQL query with a placeholder for the statuses filter
             query = '''
-                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects,pre_internship_summary_recommendation_internal
+                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects,pre_internship_summary_recommendation_internal, course
                 FROM Students
                 WHERE intake = ? AND status IN ({}) ORDER BY status desc, pre_internship_summary_recommendation_internal asc
             '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -693,7 +693,7 @@ def download_key_attributes():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
+    cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal, intake FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
 
     students = cursor.fetchall()
 
@@ -714,7 +714,7 @@ def download_key_attributes():
     csv_path = os.path.join(temp_dir, formatted_datetime+'_student_data.csv')
     with open(csv_path, 'w') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(['Full Name', 'Pronunciation','Project','Status','Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week','Pronouns','Summary pre-internship'])
+        csv_writer.writerow(['Full Name', 'Pronunciation','Project','Status','Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week','Pronouns','Summary pre-internship','Intake'])
 
 
         for student in students:

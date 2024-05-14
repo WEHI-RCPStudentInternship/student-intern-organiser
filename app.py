@@ -18,7 +18,6 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
  # Replace with your SQLite database file path
 db_path = 'student_intern_data/student_intern_data.db'
 
-##----------- 2024 S1 New Code----------------##
 import io
 
 def get_empty_users(condition):
@@ -32,7 +31,7 @@ def get_empty_users(condition):
 
 @app.route('/menu_page',methods=['GET'])
 def menu_page():
-    return render_template('2024menu_page.html')
+    return render_template('menu_page.html')
 
 @app.route('/current_student')
 def current_student():
@@ -73,7 +72,7 @@ def current_student():
     # Title for the page
 
     # Render the HTML page with all data
-    return render_template('2024current_student.html', students=students, statuses=statuses, projects=projects, empty_email_users=students)
+    return render_template('current_empty_email.html', students=students, statuses=statuses, projects=projects, empty_email_users=students)
 
 
 
@@ -196,7 +195,7 @@ def update_wehi():
                 pass
         else:
             pass
-    return render_template('2024Update_Wehi.html')
+    return render_template('update_wehi.html')
 
 @app.route('/github_username')
 def add_to_github():
@@ -234,14 +233,14 @@ def add_to_github():
     # Close the database connection
     conn.close()
     title_of_page = "Github Username"
-    return render_template('2024Github.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+    return render_template('empty_github_username.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 
 
 @app.errorhandler(Exception)
 def handle_error(e):
     error_message = str(e) or "Unknown error occurred"
-    return render_template('2024error.html', error_message=error_message), 500
+    return render_template('error_page.html', error_message=error_message), 500
 
 
 
@@ -323,10 +322,6 @@ def email_ack():
     conn.close()
     title_of_page = "New Intake Email Acknowledgment"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
-
-##-------- 2024 S1 New Code End -----------------##
-
-
 
 
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
@@ -1214,20 +1209,6 @@ def index_current():
 
     status_of_students_current = [10,11,12,13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
-
-    # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
-    # query = '''
-    #     SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
-    #     FROM Students
-    #     WHERE status IN ({})
-    # '''.format(','.join(['?'] * len(current_statuses_list)))
-
-    # # Execute the query with the statuses list
-    # cursor.execute(query, current_statuses_list)
-
-    # students = cursor.fetchall()
-
     query = '''
         SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
         FROM Students

@@ -17,6 +17,7 @@
             <tr>
                 <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column -->
                 <th>Name</th>
+                <th>University Email</th>
                 <th>WEHI Email</th>
                 <th>Github Username</th>
                 <th>Project</th>
@@ -28,6 +29,11 @@
             <tr>
                 <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                 <td>{{ student[1] }}</td>
+                {% if student[2] and student[2] != '' %}
+                    <td><a href="mailto:{{ student[2] }}">{{ student[2] }}</a></td>
+                {% else %}
+                    <td></td>
+                {% endif %}
                 {% if student[11] and student[11] != '' %}
                     <td><a href="mailto:{{ student[11] }}">{{ student[11] }}</a></td>
                 {% else %}
@@ -98,17 +104,16 @@
             });
 
 
-            // Copy Emails button action
+            // s button action
             $('#copyEmailsBtn').on('click', function() {
                 var emails = [];
                 var selectedRows = $('.studentCheckbox:checked').each(function() {
 
                     text = table.row($(this).closest('tr')).data();
-
                     // Extract the email address from the text
                     try {
                         // Code that may throw an error or exception
-                        var email = text[4].match(/mailto:(.*?)"/)[1];
+                        var email = text[2].match(/mailto:(.*?)"/)[1];
                         // Output the extracted email address
                         emails.push(email); // Assuming email is in the third column (index 2)
                     } catch (error) {
@@ -140,9 +145,9 @@
                     try {
                         // Code that may throw an error or exception
                         if (text[5] != '') {
-                          var wehi_email = text[5].match(/mailto:(.*?)"/)[1];
-                          // Output the extracted email address
-                          wehi_emails.push(wehi_email); // Assuming email is in the third column (index 2)
+                        var wehi_email = text[3].match(/mailto:(.*?)"/)[1];
+                        // Output the extracted email address
+                        wehi_emails.push(wehi_email); // Assuming email is in the third column (index 2)
                         }
                     } catch (error) {
                         // Code to handle the error or exception
@@ -159,7 +164,10 @@
                     alert('Unable to copy to clipboard!');
                 });
 
+
+
             });
+
 
             // Change Status button action
             $('#changeStatusBtn').on('click', function() {

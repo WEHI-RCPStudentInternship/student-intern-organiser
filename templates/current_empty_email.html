@@ -1,0 +1,401 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title_of_page }}Empty WEHI Email{% endblock %}
+
+{% block page_title %}{{ title_of_page }}Empty WEHI Email{% endblock %}
+
+{% block top_links_menu %}
+
+        <a href="#" id="copyEmailsBtn">Copy Personal Emails</a>
+        <a href="#" id="copyWehiEmailsBtn">Copy WEHI Emails</a>
+        <a href="#" id="downloadKeyAttributesBtn">Download Key Attributes</a>
+
+        <select id="statusDropdown">
+            {% for status in statuses %}
+            <option value="{{ status[0] }}">{{ status[1] }}</option>
+            {% endfor %}
+        </select>
+        <a id="changeStatusBtn" href="#">Change Status</a>
+
+        <select id="projectDropdown">
+            {% for project in projects %}
+            <option value="{{ project[0] }}">{{ project[1] }}</option>
+            {% endfor %}
+        </select>
+        <a id="changeProjectBtn" href="#">Change Project</a>
+
+        <select id="post_internship_rating">
+            <option value="N/A">N/A</option>
+            <option value="Decent">Decent</option>
+            <option value="Impressive">Impressive</option>
+        </select>
+        <a id="change_post_internship_rating" href="#">Change Rating</a>
+
+        {% if request.path == '/outstanding' or request.path == '/new_intake' %}
+
+        <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>
+        <a href="#" id="sendEmailToMyselfBtn">Send email to myself</a>
+        {% endif %}
+
+        <!-- Check if the current page is '/new_intake', then display the button -->
+        {% if request.path == '/new_intake' %}
+        <a style="background: rgb(73, 73, 223);" href="/assigned_projects">Allocate Students to Projects</a>
+        {% endif %}
+        <a href="/download_empty_emails" class="btn btn-primary">Download .csv File</a >
+        <a href="/update_wehi" class="btn btn-primary">Update WEHI Email from </a >
+
+
+{% endblock %}
+
+
+
+{% block content %}
+    <!-- Add your content specific to the child template -->
+
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column -->
+                <th>Name</th>
+                <th>University Email</th>
+                <th>WEHI Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for empty_email_users in empty_email_users %}
+            <tr>
+                <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
+                <td>{{ empty_email_users[1] }}</td>
+                <td>{{ empty_email_users[2] }}</td>
+                {% if empty_email_users[11] %}
+                    {% if '@wehi.edu.au' in empty_email_users[11] %}
+                        <td><a href="mailto:{{ empty_email_users[11] }}">{{ empty_email_users[11] }}</a></td>
+                    {% else %}
+                        <td>Wrong Address</td>
+                    {% endif %}
+                {% else %}
+                     <td>No WEHI Email</td>
+                {% endif %}
+                <td><a href="/view/{{ empty_email_users[0] }}">View</a>&nbsp;<a href="/edit_student/{{ empty_email_users[0] }}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#studentTable').DataTable({
+                "lengthMenu": [50, 100, 250, 500],  // Set the available options for the number of entries
+                "dom": '<"top"if>rt<"bottom"lp><"clear">', // Place the information at the top
+            });
+
+            // Select/Deselect All checkboxes
+            $('#selectAllBtn').on('click', function() {
+                $('.studentCheckbox').prop('checked', true);
+                table.rows().select();
+            });
+
+            $('#deselectAllBtn').on('click', function() {
+                $('.studentCheckbox').prop('checked', false);
+                table.rows().deselect();
+            });
+
+            // Select/Deselect All checkboxes
+            $('#selectAllCheckbox').on('change', function() {
+                var isChecked = $(this).is(':checked');
+                $('.studentCheckbox').prop('checked', isChecked);
+                table.rows().select(isChecked);
+            });
+
+
+            // Download Key attributes button action
+            $('#downloadKeyAttributesBtn').on('click', function() {
+
+                var student_ids = [];
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids
+                };
+
+                // Construct the query string
+                var queryString = 'student_ids=' + student_ids.join(',');
+
+                url = '/download_key_attributes';
+
+                // Append the query string to the URL
+                url += '?' + queryString;
+
+                window.location.href = url;
+
+            });
+
+
+            // s button action
+            $('#copyEmailsBtn').on('click', function() {
+                var emails = [];
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+
+                    text = table.row($(this).closest('tr')).data();
+
+                    // Extract the email address from the text
+                    try {
+                        // Code that may throw an error or exception
+                        var email = text[4].match(/mailto:(.*?)"/)[1];
+                        // Output the extracted email address
+                        emails.push(email); // Assuming email is in the third column (index 2)
+                    } catch (error) {
+                        // Code to handle the error or exception
+                        console.error('An error occurred:', error);
+                    }
+
+                });
+
+                var emailsString = emails.join('\n');
+
+                navigator.clipboard.writeText(emailsString).then(function() {
+                    alert('Copied to clipboard!');
+                }).catch(function() {
+                    alert('Unable to copy to clipboard!');
+                });
+
+
+
+            });
+
+            $('#copyWehiEmailsBtn').on('click', function() {
+                var wehi_emails = [];
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+
+                    text = table.row($(this).closest('tr')).data();
+
+                    // Extract the email address from the text
+                    try {
+                        // Code that may throw an error or exception
+                        if (text[5] != '') {
+                          var wehi_email = text[5].match(/mailto:(.*?)"/)[1];
+                          // Output the extracted email address
+                          wehi_emails.push(wehi_email); // Assuming email is in the third column (index 2)
+                        }
+                    } catch (error) {
+                        // Code to handle the error or exception
+                        console.error('An error occurred:', error);
+                    }
+
+                });
+
+                var wehi_emailsString = wehi_emails.join('\n');
+
+                navigator.clipboard.writeText(wehi_emailsString).then(function() {
+                    alert('Copied to clipboard!');
+                }).catch(function() {
+                    alert('Unable to copy to clipboard!');
+                });
+
+
+
+            });
+
+            // Change Status button action
+            $('#changeStatusBtn').on('click', function() {
+                var status_id = $('#statusDropdown').val();
+                var student_ids = [];
+                var status_name = $('#statusDropdown option:selected').text();
+
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids,
+                    new_status: status_name
+                };
+
+                url = '/change_status';
+                // Send the POST request
+                fetch(url, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                  .then(response => {
+                    if (response.ok) {
+                      console.log('Status changed successfully');
+                    } else {
+                      console.error('An error occurred:', response.statusText);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('An error occurred:', error);
+                  });
+            });
+
+            // Change project button action
+            $('#changeProjectBtn').on('click', function() {
+                var project_id = $('#projectDropdown').val();
+                var student_ids = [];
+                var project_name = $('#projectDropdown option:selected').text();
+
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids,
+                    new_project: project_name
+                };
+
+                url = '/change_project';
+                // Send the POST request
+                fetch(url, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                  .then(response => {
+                    if (response.ok) {
+                      console.log('Project changed successfully');
+                    } else {
+                      console.error('An error occurred:', response.statusText);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('An error occurred:', error);
+                  });
+            });
+
+
+            // Change post_internship_rating button action
+            $('#change_post_internship_rating').on('click', function() {
+                var post_internship_rating = $('#post_internship_rating').val();
+                var student_ids = [];
+
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids,
+                    new_post_internship_rating: post_internship_rating
+                };
+
+                url = '/change_post_internship_rating';
+                // Send the POST request
+                fetch(url, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                  .then(response => {
+                    if (response.ok) {
+                      console.log('Ratings changed successfully');
+                    } else {
+                      console.error('An error occurred:', response.statusText);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('An error occurred:', error);
+                  });
+            });
+
+            $('#emailAcknowledgementBtn').on('click', function() {
+                var emails = [];
+                var table = document.getElementById('studentTable');
+                var checkboxes = table.getElementsByClassName('studentCheckbox');
+
+                for (var i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].checked) {
+                        var row = checkboxes[i].closest('tr');
+                        var email = row.cells[4].innerText;
+                        if (email) {
+                            emails.push(email);
+                        }
+                    }
+                }
+
+                if (emails.length > 0) {
+                    var emailString = emails.join(',');
+                    var mailtoLink = "mailto:?subject=Acknowledgement of your application to the WEHI student internship program&body=Hi All,%0D%0A%0D%0AI will be calling you by mobile phone over the next week to get a better understanding of projects that fit your interests and career aspirations. Please let me know if you need to make other arrangements as I can be flexible.%0D%0A%0D%0AIf I am calling and it is a bad time, don’t answer. I can leave a message and call back later.%0D%0A%0D%0ATo find out more, please read the full email: https://wehi-researchcomputing.github.io/email_acknowledgement" + "&to=" + emailString;
+                    //window.location.href = mailtoLink;
+                    window.open(mailtoLink, '_blank');
+                } else {
+                    alert('No students selected.');
+                }
+            });
+
+            $('#sendEmailToMyselfBtn').on('click', function() {
+                var num = 1;
+                var namesAndMobiles = [];
+                var table = document.getElementById('studentTable');
+                var checkboxes = table.getElementsByClassName('studentCheckbox');
+
+                for (var i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].checked) {
+                        var row = checkboxes[i].closest('tr');
+                        var id = row.cells[1].innerText;
+                        var name = row.cells[2].innerText;
+                        var mobile = row.cells[6].innerText;
+
+                        if (name && mobile) {
+                            var studentLink = "http://127.0.0.1:5000/pre_int_st_evaluation/" + id;
+                            namesAndMobiles.push(num + ") " + name + ", " + mobile + ", " + studentLink);
+                            num ++;
+                        }
+                    }
+                }
+
+                if (namesAndMobiles.length > 0) {
+                    var formattedNamesAndMobiles = namesAndMobiles.join('%0D%0A%0D%0A');
+                    var mailtoLink = "mailto:mosbergen.r@wehi.edu.au?subject=Details%20of%20Students&body=Name, Mobile, Link %0D%0A%0D%0A" + formattedNamesAndMobiles;
+                    //window.location.href = mailtoLink;
+                    window.open(mailtoLink, '_blank');
+                } else {
+                    alert('No students selected.');
+                }
+            });
+
+        });
+    </script>
+    <div style="display:none" id="email_acknowledgement_text">
+    Hi All,
+
+    Thank you for applying for the WEHI Student Internship program.
+
+    I will be calling you by mobile phone over the next week to get a better understanding of projects that fit your interests and career aspirations. Please let me know if you need to make other arrangements as I can be flexible.
+
+    You can see a list of projects as well as other details on the WEHI Student Internship page, where you can click on the project to go to a project page.
+
+    Each project page has a rough description of the role outline, but the key information is the "Further Reading" section that may be available for that project.
+
+    Please also be acquainted with the program handbook.
+
+    Details of duties are available via the student projects page at https://wehi-researchcomputing.github.io/students.
+
+    Details of the intake dates are available at https://wehi-researchcomputing.github.io/intake_dates.
+
+    A FAQ is also available at https://wehi-researchcomputing.github.io/faq
+
+    </div>
+{% endblock %}
+

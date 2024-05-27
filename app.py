@@ -6,7 +6,7 @@ import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
 
-from flask import (Flask, jsonify, redirect, render_template, request,
+from flask import (Flask, jsonify, redirect, render_template, request, Response,
                    send_file, url_for)
 
 import import_csv_from_redcap
@@ -17,6 +17,312 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
  # Replace with your SQLite database file path
 db_path = 'student_intern_data/student_intern_data.db'
+
+import io
+
+def get_empty_users(condition):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    query = f"SELECT * FROM students WHERE {condition} IS NULL OR {condition} NOT LIKE '%@wehi.edu.au%' "
+    cursor.execute(query)
+    users = cursor.fetchall()
+    conn.close()
+    return users
+
+@app.route('/menu_page',methods=['GET'])
+def menu_page():
+    return render_template('menu_page.html')
+
+@app.route('/current_student')
+def current_student():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve current student statuses and projects
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "current"')
+    intake_current = cursor.fetchall()[0][0]
+
+    # Define current student status IDs
+    status_of_students_current = [10, 11, 12, 13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
+
+    # Retrieve current students with specific status
+    placeholder = ','.join(['?'] * len(current_statuses_list))
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        FROM Students
+        WHERE intake = ? AND status IN ({}) AND (wehi_email IS NULL OR wehi_email NOT LIKE '%@wehi.edu.au%') ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Title for the page
+
+    # Render the HTML page with all data
+    return render_template('current_empty_email.html', students=students, statuses=statuses, projects=projects, empty_email_users=students)
+
+
+
+@app.route('/download_empty_emails')
+def download_empty_emails():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve current student statuses and projects
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "current"')
+    intake_current = cursor.fetchall()[0][0]
+
+    # Define current student status IDs
+    status_of_students_current = [10, 11, 12, 13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
+
+    # Retrieve current students with specific status
+    placeholder = ','.join(['?'] * len(current_statuses_list))
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        FROM Students
+        WHERE intake = ? AND status IN ({}) AND (wehi_email IS NULL OR wehi_email NOT LIKE '%@wehi.edu.au%') ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    empty_email_users = cursor.fetchall()
+    selected_columns = [ (user[0], user[1], user[2], '') for user in empty_email_users ]
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['User ID', 'Name', 'Email', 'WEHI_Email'])
+    cw.writerows(selected_columns)
+
+    output = si.getvalue()
+    si.close()
+
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=empty_email_users.csv"})
+
+def update_students_by_criteria(criteria, update_fields):
+    # Check if criteria and update_fields are not empty
+    if not criteria or not update_fields:
+        return "Criteria and update fields cannot be empty."
+
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Constructing the WHERE part of the SQL query from criteria
+        criteria_query_parts = [f"{key} = ?" for key in criteria.keys()]
+        criteria_query = " AND ".join(criteria_query_parts)
+
+        # Constructing the SET part of the SQL query from update_fields
+        update_query_parts = [f"{key} = ?" for key in update_fields.keys()]
+        update_query = ", ".join(update_query_parts)
+
+        # Constructing the complete SQL query
+        sql_query = f"UPDATE Students SET {update_query} WHERE {criteria_query}"
+
+        # Executing the query
+        cursor.execute(sql_query, list(update_fields.values()) + list(criteria.values()))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            print("No rows were updated. Please check your criteria.")
+            return
+        else:
+            print(f"Successfully updated {cursor.rowcount} row(s).")
+            return
+
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+        return
+    finally:
+        if conn:
+            conn.close()
+
+
+def update_email(csv_path):
+    with open(csv_path, mode='r', encoding='utf-8') as file:
+        csv_reader = csv.reader(file)
+        # Skip the header
+        next(csv_reader, None)
+        # Read the data into a list of tuples
+        data_list = [(row[0], row[1], row[2], row[3]) for row in csv_reader]
+    
+    print(data_list)
+    
+    for student_id, student_name, student_email, wehi_email in data_list:
+        criteria = {"intern_id": student_id, "email": student_email, "full_name":student_name}
+        update_fields = {"wehi_email": wehi_email}
+        update_students_by_criteria(criteria, update_fields)
+
+
+
+
+
+@app.route('/update_wehi',methods=['GET', 'POST'])
+def update_wehi():
+    if request.method == 'POST':
+        if 'csv_file' in request.files:
+            file = request.files['csv_file']
+            if file and file.filename != '':
+                filename = file.filename
+                filepath = 'student_intern_data/attachments/' + filename
+                file.save(filepath)
+                update_email(filepath)
+            else:
+                pass
+        else:
+            pass
+    return render_template('update_wehi.html')
+
+@app.route('/github_username')
+def add_to_github():
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "current"')
+    intake_current = cursor.fetchall()[0][0]
+
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    status_of_students_to_filter = [10, 11, 12, 13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        FROM Students
+        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+
+    # Close the database connection
+    conn.close()
+    title_of_page = "Github Username"
+    return render_template('empty_github_username.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+
+
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    error_message = str(e) or "Unknown error occurred"
+    return render_template('error_page.html', error_message=error_message), 500
+
+
+
+@app.route('/quick_review')
+def quick_review():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    status_of_students_to_filter = [3]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+    title_of_page = "New Intake Quick Review"
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+
+
+
+@app.route('/email_ack')
+def email_ack():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    status_of_students_to_filter = [2]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+
+    # Close the database connection
+    conn.close()
+    title_of_page = "New Intake Email Acknowledgment"
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+
 
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
@@ -547,7 +853,7 @@ def share_students(project_id):
         cursor.execute(query, [intake_current] + current_statuses_list )
 
     else:
-        status_of_students_to_filter = [4,5,6,7,8,9,10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
+        status_of_students_to_filter = [8,9,10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
         current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
         cursor.execute('SELECT * FROM Projects where id = ?',(project_id,))
@@ -898,28 +1204,26 @@ def index_current():
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
 
+    cursor.execute('SELECT name FROM Intakes where status  = "current"')
+    intake_current = cursor.fetchall()[0][0]
+
     status_of_students_current = [10,11,12,13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
-
-    # Retrieve student data from the database
-    # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
         FROM Students
-        WHERE status IN ({})
+        WHERE intake = ? AND status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
+
     # Execute the query with the statuses list
-    cursor.execute(query, current_statuses_list)
-
+    cursor.execute(query, [intake_current] + current_statuses_list)
     students = cursor.fetchall()
-
 
     # Close the database connection
     conn.close()
     title_of_page = "Currently Signed Students"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
-
 
 @app.route('/')
 def index():
@@ -1326,6 +1630,7 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
 
     return table_rows
+
 
 if __name__ == '__main__':
     app.run(debug=True)

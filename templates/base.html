@@ -64,9 +64,13 @@
     {% block styles %}{% endblock %}
 </head>
 <body>
-     <div class="banner">
-        <img src="/static/logo.png" alt="Logo" class="logo">
-        <h1>{% block page_title %}{% endblock %} Index</h1>
+    <div class="banner">
+        <a href="/menu_page">
+            <img src="/static/logo.png" alt="Logo" class="logo">
+        </a >
+        <h1>{% block page_title %}{% endblock %}</h1>
+        </a>
+
     </div>
     <div class="top_links">
         <a href="/">All Students Index</a>
@@ -88,7 +92,9 @@
  
     {% block content %}{% endblock %}
 
-    <!-- Include DataTables JavaScript -->
+
+
+         <!-- Include DataTables JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
     <script>
@@ -98,6 +104,8 @@
         });
     </script>
     {% block scripts %}{% endblock %}
+
+
 </body>
 </html>
 

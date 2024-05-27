@@ -1,0 +1,173 @@
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        .dataTables_length {
+            margin-top: 9px;
+            margin-left: 10px;
+        }
+        body {
+            font-size: 16px;
+            font-weight: 300;
+            font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            color: #58595b;
+            background-color: #f8f8f8;
+        }
+
+        .banner {
+            background-color: #f8f8f8;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            margin-right: 10px;
+            height: 50px;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .dataTables_wrapper {
+            width:90%;
+        }
+        /* Style the buttons in the top_links div */
+        .second_level_top_links a, .top_links a {
+            display: inline-block;
+            margin-right: 10px;
+            padding: 5px 10px;
+            background-color: #49A942;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-top:20px;
+            margin-bottom:20px;
+        }
+
+        .second_level_top_links a:hover, .top_links a:hover {
+            background-color: #1976d2;
+        }
+        .second_level_top_links select , .top_links select {
+            font-size: 16px;
+            padding: 5px;
+        }
+        .banner{
+            display: flex;
+            gap: 2rem;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+<div class="banner">
+    <a href="/">
+        <img src="/static/logo.png" alt="Logo" class="logo">
+    </a >
+    <h1>Function Page</h1>
+</div>
+{% block content %}
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    th, td {
+        border: 1px solid #ccc;
+        padding: 5px;
+    }
+    
+    th {
+        background-color: #f2f2f2;
+    }
+    
+    caption {
+        font-weight: bold;
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+.dashboard-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .button-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .table-container {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .button-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 1rem;
+        padding: 5rem;
+        padding-top: 10rem;
+        
+    }
+
+    .button-grid a {
+        padding: 40px;
+        background-color: #49A942;
+        color: white;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: block; 
+        border-radius: 1rem;
+    }
+
+    .button-grid a:hover {
+        background-color: #b3e1af;
+        box-shadow: 2px 3px 5px 0px #677267;
+    }
+
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 5px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<div class="dashboard-container">
+    <div class="button-container">
+        <!-- New button grid with links -->
+        <div class="button-grid">
+            <a href = "https://wehieduau.sharepoint.com/sites/StudentInternGroupatWEHI/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=H7kduJ&cid=cc199a42%2Daf65%2D44f6%2D92ce%2D662a136c0b0f&FolderCTID=0x0120008FF8F20683AC284798EA496C639CC069&id=%2Fsites%2FStudentInternGroupatWEHI%2FShared%20Documents%2FIntroductions%2F2024S1%20Profile%20Pictures">Add Profile Picture</a >
+            <a href = "/github_username">Github Username</a >
+            <a href = "/current_student">Empty WEHI Email</a >
+            <a href = "/email_ack">New Intake Email ACK</a >
+            <a href = "/quick_review">New Intake Quick Review</a >
+            <a href = "/assigned_projects">Allocation</a >
+           
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

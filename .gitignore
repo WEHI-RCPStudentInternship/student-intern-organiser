@@ -5,3 +5,5 @@ student_intern_data/
 .env/
 __pycache__/
 student_intern_data-old/
+.idea/workspace.xml
+.idea/workspace.xml

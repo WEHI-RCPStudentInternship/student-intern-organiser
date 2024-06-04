@@ -37,19 +37,25 @@
         margin-bottom: 10px;
     }
 </style>
-
+    <h1>{{ dashboard_type }}</h1>
+    <div>Note that the default is accepted, signed, current and previously finished students</div>
+    <br/>
 <div style="display: flex; flex-wrap: wrap;">
     <div style="flex: 1; margin-right: 20px;">
+
+
         <table>
             <caption style="color: #3173ee;">Breakdown by Value</caption>
             <tr>
-                <th>Value of signed-up and previous students</th>
+                <th>Value of students</th>
                 <th>Count</th>
+                <th>Total Hours</th>
                 <th>Equivalent</th>
             </tr>
 
             {% set ns = namespace() %}
             {% set ns.total_equiv = 0 %}
+            {% set ns.total_hours = 0 %}
             {% set ns.total_count = 0 %}
             {% for value, count in breakdown_courses.items() %}
             <tr>
@@ -59,12 +65,18 @@
                 
                 {% if value == "Engineering and IT"%}
                     {% set ns.total_equiv = ns.total_equiv + (count * 9000)  %}
+                    {% set ns.total_hours = ns.total_hours + (count * 300)  %}
+                    <td>{{ count * 300 }} {{ total_hours }}</td>
                     <td>{{ count * 9000 }} {{ total_equiv }}</td>
                 {% elif value == "Science Full Year" %}
                     {% set ns.total_equiv = ns.total_equiv + (count * 6000)  %}
+                    {% set ns.total_hours = ns.total_hours + (count * 200)  %}
+                    <td>{{ count * 200 }} {{ total_hours }}</td>
                     <td>{{ count * 6000 }} {{ total_equiv }} </td>
                 {% else %}
+                    {% set ns.total_hours = ns.total_hours + (count * 100)  %}
                     {% set ns.total_equiv = ns.total_equiv + (count * 3000)  %}
+                    <td>{{ count * 100 }} {{ total_hours }}</td>
                     <td>{{ count * 3000 }}</td>
                 {% endif %}
             </tr>
@@ -72,6 +84,7 @@
             <tr>
                 <td></td>
                 <td>{{ ns.total_count }}</td>
+                <td>{{ ns.total_hours }}</td>
                 <td>{{ ns.total_equiv }}</td>
             </tr>
         </table>

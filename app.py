@@ -1459,7 +1459,7 @@ def dashboard(dashboard_type):
     if dashboard_type == "new_signed":
         status_of_students_current_and_past = [9,10,11,12]
     if dashboard_type == "all":
-        status_of_students_current_and_past = [9, 10, 11, 12, 13, 14]
+        status_of_students_current_and_past = [8,9, 10, 11, 12, 13, 14]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current_and_past]
 
     # Retrieve student data from the database
@@ -1492,7 +1492,8 @@ def dashboard(dashboard_type):
     return render_template('dashboard.html', students=students, breakdown_ratings=breakdown_ratings,
                         breakdown_courses=breakdown_courses,
                         total_students=total_students, pronoun_data=pronoun_data,
-                        pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses,total_students_current_and_past = total_students_current_and_past)
+                        pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses,total_students_current_and_past = total_students_current_and_past,
+                        dashboard_type = dashboard_type)
 
 
 @app.route('/intakes')

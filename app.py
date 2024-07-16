@@ -629,7 +629,7 @@ def submit_feedback():
     conn.close()
 
     # Redirect to the student's details page
-    return redirect(url_for('feedback_table', intern_id=student_id))
+    return redirect(url_for('student', intern_id=student_id))
 # feedback
 @app.route('/feedback/<int:intern_id>', methods=['GET'])
 def feedback(intern_id):

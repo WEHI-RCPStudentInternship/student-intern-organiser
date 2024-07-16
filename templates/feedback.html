@@ -145,7 +145,7 @@
             {% else %}
                 <option value="" selected disabled>Select your Feedback</option>
             {% endif %}                        
-            <option value="{{ student[1] }} has a high tolerance for complexity, as {{ pronoun1 }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ pronoun1 }} may come across in {{ pronoun2 }} career. ">{{ student[1] }} has a high tolerance for complexity, as {{ pronoun1 }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ pronoun1 }} may come across in {{ pronoun2 }} career. </option>
+            <option value="{{ student[1] }} has a high tolerance for complexity, as {{ pronoun1 }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ pronoun1 }} may come across in their career. ">{{ student[1] }} has a high tolerance for complexity, as {{ pronoun1 }} dived into the complexity of the project and demonstrated the ability to handle almost any project {{ pronoun1 }} may come across in their career. </option>
             <option value="{{ student[1] }} has a reasonable tolerance for complexity, as {{ pronoun1 }} handled the complexity of the project with some support and was comfortable in working at that level with prompting. ">{{ student[1] }} has a reasonable tolerance for complexity, as {{ pronoun1 }} handled the complexity of the project with some support and was comfortable in working at that level with prompting. </option>
             <option value="{{ student[1] }} could benefit from increasing their tolerance for complexity, as {{ pronoun1 }} needed help to deal with the complexity on a regular basis. ">{{ student[1] }} could benefit from increasing their tolerance for complexity, as {{ pronoun1 }} needed help to deal with the complexity on a regular basis. </option>
             <option value="I do not have enough information about {{ student[1] }} to provide feedback on their ability to tolerate complexity. ">I do not have enough information about {{ student[1] }} to provide feedback on their ability to tolerate complexity. </option>
@@ -181,14 +181,15 @@
             var ambiguity = document.getElementById("ambiguity").value;
             var complexity = document.getElementById("complexity").value;
             var myReaction = document.getElementById("my_reaction").value;
-    
-            // Concatenate the selected values
-            var reviewOverall = adaptability + " " +
+
+            var reviewOverall = "To whom it may concern,<br/><br/>" + 
+                "{{ student[1] }} was a student intern at WEHI where I was the supervisor for around three months during the {{ student[19] }} intake.  {{ pronoun1.capitalize() }} worked on the {{ student[15] }} student internship project within a team of students.<br/><br/>"+ 
+                adaptability + " " +
                 learnTechnical + " " +
-                learnConceptual + " " +
+                learnConceptual + "<br/><br/> " +
                 collaborative + " " +
                 ambiguity + " " +
-                complexity + "<br>" + 
+                complexity + "<br/><br/>" + 
                 myReaction;
     
             // Update the "Review Overall" section

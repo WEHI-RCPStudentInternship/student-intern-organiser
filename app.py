@@ -1632,6 +1632,73 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
     return table_rows
 
+@app.route('/student_list', methods=['GET', 'POST'])
+def student_list():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Initialize filters with default values (or values from the form submission)
+    selected_intake = request.form.get('intake', '')
+    selected_project = request.form.get('project', '')
+    selected_status = request.form.get('status', '')
+    selected_course = request.form.get('course', '')
+
+    # Base SQL query
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, 
+               post_internship_summary_rating_internal, pronouns, 
+               pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE 1=1
+    '''
+    
+    # Parameters list
+    parameters = []
+
+    # Add filtering based on selected intake
+    if selected_intake:
+        query += ' AND intake = ?'
+        parameters.append(selected_intake)
+    
+    # Add filtering based on selected project
+    if selected_project:
+        query += ' AND project = ?'
+        parameters.append(selected_project)
+    
+    # Add filtering based on selected status
+    if selected_status:
+        query += ' AND status = ?'
+        parameters.append(selected_status)
+    
+    # Add filtering based on selected course
+    if selected_course:
+        query += ' AND course = ?'
+        parameters.append(selected_course)
+
+    # Execute query with filters
+    cursor.execute(query, parameters)
+    students = cursor.fetchall()
+
+    # Fetch all projects, intakes, statuses, and courses for the dropdowns
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT DISTINCT intake FROM Students')
+    intakes = cursor.fetchall()
+
+    cursor.execute('SELECT DISTINCT status FROM Students')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT DISTINCT course FROM Students')
+    courses = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Render the template with the students, projects, intakes, statuses, and courses data
+    return render_template('student_list.html', students=students, projects=projects, intakes=intakes, statuses=statuses, courses=courses)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

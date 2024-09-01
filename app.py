@@ -1646,12 +1646,13 @@ def student_list():
 
     # Base SQL query
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, 
-               post_internship_summary_rating_internal, pronouns, 
-               pre_internship_summary_recommendation_internal, wehi_email, mobile
+        SELECT intern_id, full_name, pronunciation, pronouns, email, wehi_email, mobile, 
+            project, intake, course, status, pre_internship_summary_recommendation_internal, 
+            post_internship_summary_rating_internal
         FROM Students
         WHERE 1=1
     '''
+
     
     # Parameters list
     parameters = []

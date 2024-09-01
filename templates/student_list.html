@@ -43,17 +43,28 @@
         <button type="submit">Filter</button>
     </form>
 
+    <!-- Add the Copy Email Buttons-->
+    <div style="margin-top: 20px;">
+        <button onclick="copyEmails('personal_email')">Copy Personal Emails</button>
+        <button onclick="copyEmails('wehi_email')">Copy WEHI Emails</button>
+    </div>
+    
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Email</th>
                 <th>Pronunciation</th>
+                <th>Pronouns</th>
+                <th data-email-type="personal_email">Personal Email</th>
+                <th data-email-type="wehi_email">WEHI Email</th>
+                <th>Mobile</th>
                 <th>Project</th>
                 <th>Intake</th>
                 <th>Course</th>
                 <th>Status</th>
+                <th>Pre Internship Summary</th>
+                <th>Post Internship Rating</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -64,13 +75,33 @@
                     <td>{{ student[1] }}</td>
                     <td>{{ student[2] }}</td>
                     <td>{{ student[3] }}</td>
-                    <td>{{ student[4] }}</td>
-                    <td>{{ student[5] }}</td>
+                    <td data-email-type="personal_email">{{ student[4] }}</td> <!-- Personal Email -->
+                    <td data-email-type="wehi_email">{{ student[5] }}</td> <!-- WEHI Email -->
                     <td>{{ student[6] }}</td>
                     <td>{{ student[7] }}</td>
+                    <td>{{ student[8] }}</td>
+                    <td>{{ student[9] }}</td>
+                    <td>{{ student[10] }}</td>
+                    <td>{{ student[11] }}</td>
+                    <td>{{ student[12] }}</td>
                     <td><a href="/view/{{ student[0] }}">View</a> | <a href="/edit/{{ student[0] }}">Edit</a></td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    
+    <!-- JavaScript function for copying emails -->
+    <script>
+    function copyEmails(emailType) {
+        let emails = [];
+        document.querySelectorAll(`td[data-email-type="${emailType}"]`).forEach(td => {
+            emails.push(td.innerText.trim());
+        });
+        let emailsString = emails.join('; ');
+        navigator.clipboard.writeText(emailsString).then(() => {
+            alert('Emails copied to clipboard!');
+        });
+    }
+    </script>
+
 {% endblock %}

@@ -1632,61 +1632,192 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
     return table_rows
 
-@app.route('/student_list', methods=['GET', 'POST'])
-def student_list():
+
+@app.route('/student_list/current', methods=['GET', 'POST'])
+def current_students():
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    # Initialize filters with default values (or values from the form submission)
-    selected_intake = request.form.get('intake', '')
+    # Step 1: Fetch the current intake from the Intakes table
+    cursor.execute("SELECT name FROM Intakes WHERE status = 'current'")
+    current_intake = cursor.fetchone()  # Fetch the current intake name
+
+    if not current_intake:
+        # If no current intake is found, show an empty list
+        students = []
+    else:
+        current_intake = current_intake[0]  # Get the actual intake name
+
+        # Step 2: Initialize filters with default values (or values from the form submission)
+        selected_project = request.form.get('project', '')
+        selected_status = request.form.get('status', '')  # Allow the user to select a student status
+        selected_course = request.form.get('course', '')
+
+        # Step 3: Base SQL query to filter students by the current intake
+        query = '''
+            SELECT intern_id, full_name, pronunciation, pronouns, email, wehi_email, mobile, 
+                project, intake, course, status, pre_internship_summary_recommendation_internal, 
+                post_internship_summary_rating_internal
+            FROM Students
+            WHERE intake = ?
+        '''
+        parameters = [current_intake]
+
+        # Add filtering based on selected student status
+        if selected_status:
+            query += ' AND status = ?'
+            parameters.append(selected_status)
+
+        # Add filtering based on selected project
+        if selected_project:
+            query += ' AND project = ?'
+            parameters.append(selected_project)
+        
+        # Add filtering based on selected course
+        if selected_course:
+            query += ' AND course = ?'
+            parameters.append(selected_course)
+
+        # Execute the query with the parameters
+        cursor.execute(query, parameters)
+        students = cursor.fetchall()
+
+    # Step 4: Fetch all projects, statuses, and courses for the dropdowns
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT DISTINCT status FROM Students')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT DISTINCT course FROM Students')
+    courses = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Render the template with the students, projects, statuses, and courses data
+    return render_template('student_list.html', students=students, projects=projects, statuses=statuses, courses=courses, title_of_page=f"Current Intake Students ({current_intake})")
+
+@app.route('/student_list/future', methods=['GET', 'POST'])
+def future_students():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Step 1: Fetch the future intake from the Intakes table
+    cursor.execute("SELECT name FROM Intakes WHERE status = 'new'")
+    future_intake = cursor.fetchone()  # Fetch the future intake name
+
+    if not future_intake:
+        # If no future intake is found, show an empty list
+        students = []
+    else:
+        future_intake = future_intake[0]  # Get the actual intake name
+
+        # Step 2: Initialize filters with default values (or values from the form submission)
+        selected_project = request.form.get('project', '')
+        selected_status = request.form.get('status', '')  # Allow the user to select a student status
+        selected_course = request.form.get('course', '')
+
+        # Step 3: Base SQL query to filter students by the future intake
+        query = '''
+            SELECT intern_id, full_name, pronunciation, pronouns, email, wehi_email, mobile, 
+                project, intake, course, status, pre_internship_summary_recommendation_internal, 
+                post_internship_summary_rating_internal
+            FROM Students
+            WHERE intake = ?
+        '''
+        parameters = [future_intake]
+
+        # Add filtering based on selected student status
+        if selected_status:
+            query += ' AND status = ?'
+            parameters.append(selected_status)
+
+        # Add filtering based on selected project
+        if selected_project:
+            query += ' AND project = ?'
+            parameters.append(selected_project)
+        
+        # Add filtering based on selected course
+        if selected_course:
+            query += ' AND course = ?'
+            parameters.append(selected_course)
+
+        # Execute the query with the parameters
+        cursor.execute(query, parameters)
+        students = cursor.fetchall()
+
+    # Step 4: Fetch all projects, statuses, and courses for the dropdowns
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT DISTINCT status FROM Students')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT DISTINCT course FROM Students')
+    courses = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    # Render the template with the students, projects, statuses, and courses data
+    return render_template('student_list.html', students=students, projects=projects, statuses=statuses, courses=courses, title_of_page=f"Future Intake Students ({future_intake})")
+
+@app.route('/student_list/past', methods=['GET', 'POST'])
+def past_students():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Step 1: Fetch all past intakes from the Intakes table
+    cursor.execute("SELECT name FROM Intakes WHERE status = 'no'")
+    past_intakes = cursor.fetchall()  # Fetch all past intake names
+
+    # Step 2: Initialize filters with default values (or values from the form submission)
+    selected_intake = request.form.get('intake', '')  # Allow the user to select a specific intake
     selected_project = request.form.get('project', '')
-    selected_status = request.form.get('status', '')
+    selected_status = request.form.get('status', '')  # Allow the user to select a student status
     selected_course = request.form.get('course', '')
 
-    # Base SQL query
+    # Base SQL query to filter students by the selected past intake (if any)
     query = '''
         SELECT intern_id, full_name, pronunciation, pronouns, email, wehi_email, mobile, 
             project, intake, course, status, pre_internship_summary_recommendation_internal, 
             post_internship_summary_rating_internal
         FROM Students
-        WHERE 1=1
+        WHERE intake IN (SELECT name FROM Intakes WHERE status = 'no')
     '''
-
-    
-    # Parameters list
     parameters = []
 
-    # Add filtering based on selected intake
+    # If a specific intake is selected, filter by that intake
     if selected_intake:
         query += ' AND intake = ?'
         parameters.append(selected_intake)
-    
+
+    # Add filtering based on selected student status
+    if selected_status:
+        query += ' AND status = ?'
+        parameters.append(selected_status)
+
     # Add filtering based on selected project
     if selected_project:
         query += ' AND project = ?'
         parameters.append(selected_project)
-    
-    # Add filtering based on selected status
-    if selected_status:
-        query += ' AND status = ?'
-        parameters.append(selected_status)
     
     # Add filtering based on selected course
     if selected_course:
         query += ' AND course = ?'
         parameters.append(selected_course)
 
-    # Execute query with filters
+    # Execute the query with the parameters
     cursor.execute(query, parameters)
     students = cursor.fetchall()
 
-    # Fetch all projects, intakes, statuses, and courses for the dropdowns
+    # Step 3: Fetch all projects, statuses, and courses for the dropdowns
     cursor.execute('SELECT * FROM Projects')
     projects = cursor.fetchall()
-
-    cursor.execute('SELECT DISTINCT intake FROM Students')
-    intakes = cursor.fetchall()
 
     cursor.execute('SELECT DISTINCT status FROM Students')
     statuses = cursor.fetchall()
@@ -1698,7 +1829,12 @@ def student_list():
     conn.close()
 
     # Render the template with the students, projects, intakes, statuses, and courses data
-    return render_template('student_list.html', students=students, projects=projects, intakes=intakes, statuses=statuses, courses=courses)
+    return render_template('student_list.html', students=students, projects=projects, intakes=past_intakes, statuses=statuses, courses=courses, title_of_page="Past Intake Students")
+
+@app.route('/student_list/menu', methods=['GET'])
+def student_list_menu():
+    return render_template('student_list_menu.html')
+
 
 
 if __name__ == '__main__':

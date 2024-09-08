@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Student List Menu{% endblock %}
+
+{% block content %}
+    <h1>Student List Menu</h1>
+
+    <div style="margin-top: 20px;">
+        <a href="/">All Students</a>
+        <a href="{{ url_for('current_students') }}" class="btn btn-primary">Current Intake Students</a>
+        <a href="{{ url_for('future_students') }}" class="btn btn-primary">Future Students</a>
+        <a href="{{ url_for('past_students') }}" class="btn btn-primary">Past Students</a>
+    </div>
+{% endblock %}

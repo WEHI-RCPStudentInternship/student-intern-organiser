@@ -43,7 +43,7 @@
             display: inline-block;
             margin-right: 10px;
             padding: 5px 10px;
-            background-color: #49A942;
+            background-color: #2263b0;
             color: white;
             text-decoration: none;
             border-radius: 5px;
@@ -53,15 +53,19 @@
         }
     
         .second_level_top_links a:hover, .top_links a:hover {
-            background-color: #1976d2;
+            background-color: #2295b0;
         }
         .second_level_top_links select , .top_links select {
             font-size: 16px;
             padding: 5px;
         }
+        /* Style the navigation bar on the top */
         .navbar {
             overflow: hidden;
             background-color: #333;
+            top: 0;
+            z-index: 1000;
+            font-family: inherit;
           }
           
         .navbar a {
@@ -90,7 +94,7 @@
           }
           
         .navbar a:hover, .dropdown:hover .dropbtn {
-            background-color: green;
+            background-color: #2263b0;
           }
           
         .dropdown-content {
@@ -99,7 +103,7 @@
             background-color: #f9f9f9;
             min-width: 160px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
+            z-index: 1001;
           }
           
         .dropdown-content a {
@@ -134,48 +138,69 @@
     <div class = "navbar">
         <div class = "dropdown">
             <button class = "dropbtn">Student Management
-                <span class="caret"><span>&#9660;</span>
+                <span class ="caret"><span>&#9660;</span>
             </button>
             <div class = "dropdown-content">
+                <a href = "/assigned_projects">Allocation</a>
+                <a href ="/import_redcap">Import REDCap</a>
+                <a href ="/share_students/0">Share Student Applications</a>
+                <a href="/download_contracts_and_applications">Download contracts</a>
+            </div>
+        </div>
+        <div class = "dropdown">
+            <button class = "dropbtn">Student Information
+                <span class ="caret"><span>&#9660;</span>
+            </button>
+            <div class = "dropdown-content">
+                <a href="/">All Students Index</a>
+                <a href="{{ url_for('student_list_menu') }}" class="btn btn-secondary">Student List</a>
                 <a href = "https://wehieduau.sharepoint.com/sites/StudentInternGroupatWEHI/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=H7kduJ&cid=cc199a42%2Daf65%2D44f6%2D92ce%2D662a136c0b0f&FolderCTID=0x0120008FF8F20683AC284798EA496C639CC069&id=%2Fsites%2FStudentInternGroupatWEHI%2FShared%20Documents%2FIntroductions%2F2024S1%20Profile%20Pictures">Add Profile Picture</a>
                 <a href = "/github_username">Github Username</a>
                 <a href = "/current_student">Empty WEHI Email</a>
-                <a href = "/assigned_projects">Allocation</a>
+                <a href="/current">Current Intake</a>
+                <a href="/outstanding">New Intake WIP</a>
+                <a href="/new_intake">New Intake All</a>
             </div>
         </div>
         <div class = "dropdown">
             <button class = "dropbtn">Application Progress
-                <span class="caret"><span>&#9660;</span>
+                <span class ="caret"><span>&#9660;</span>
             </button>
             <div class = "dropdown-content">
                 <a href = "/email_ack">Applicants ready to review</a>
                 <a href = "/quick_review">Applicants ready to call</a>
-                <a href = "/import_redcap">Import REDCap</a>
             </div>
         </div>
         <div class = "dropdown">
-            <button class = "dropbtn">Statistics
-                <span class="caret"><span>&#9660;</span>
+            <button class = "dropbtn">Statistics Dashboard
+                <span class ="caret"><span>&#9660;</span>
             </button>
             <div class = "dropdown-content">
-                <a href = "/dashboard/all">Default Dashboard</a>
-                <a href = "/dashboard/new_signed_and_accepted">Signed and Accepted Dashboard</a>
+                <a href="/dashboard/new_all">New All Intake Dashboard</a>
+                <a href="/dashboard/new_signed">New Signed Intake Dashboard</a>
+                <a href="/dashboard/new_signed_and_accepted">New Signed and Accepted Intake Dashboard</a>
+                <a href="/dashboard/new_signed_and_offered">New Signed and Offered Intake Dashboard</a>
+                <a href="/dashboard/current">Current Intake Dashboard</a>
+                <a href="/dashboard/finished">Finished Intake Dashboard</a>
             </div>
         </div>
-    </div>
-    <div class="top_links">
-        <a href="/">All Students Index</a>
-        <a href="/dashboard/all">Dashboard</a>
-        <a href="/download_contracts_and_applications">Download contracts</a>
-        <a href="/current">Current Intake</a>
-        <a href="/outstanding">New Intake WIP</a>
-        <a href="/new_intake">New Intake All</a>
-        <a href="/share_students/0">Share Student Applications</a>
-        <a href="/import_redcap">Import REDCap</a>
+        <div class = "dropdown">
+            <button class = "dropbtn">Links
+                <span class ="caret"><span>&#9660;</span>
+            </button>
+            <div class = "dropdown-content">
+                <a target="_blank" href ="https://wehi-researchcomputing.github.io/students" >Student website</a>
+                <a target="_blank" href ="https://github.com/WEHI-ResearchComputing/WEHI-ResearchComputing.github.io" >Student website GitHub edit</a>
+                <a target="_blank" href ="https://wehi-researchcomputing.github.io/project-wikis" >Wikis</a>
+                <a target="_blank" href ="https://redcap.wehi.edu.au/surveys/?s=AMYXK9FFHXR9LE9T" >REDCap Enrollment Form</a>
+                <a target="_blank" href ="https://wehieduau.sharepoint.com/:w:/r/sites/rcp/Shared%20Documents/Student%20internships/RDM%230235%20Email%20templates%20for%20Student%20Internship%20Programme.docx?d=wb7b5709838c24f229cb1c5e79f6119c2&amp;csf=1&amp;web=1&amp;e=DcOcRO">RDM#0235 Email templates for Students</a>
+            </div>
+        </div>
         <a href="/intakes">Intakes</a>
         <a href="/projects">Projects</a>
-        <a href="/links">Links</a>
-        <a href="{{ url_for('student_list_menu') }}" class="btn btn-secondary">Student List</a>
+    </div>
+     
+    
 
 
      </div>

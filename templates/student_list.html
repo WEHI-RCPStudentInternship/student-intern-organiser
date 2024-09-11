@@ -6,10 +6,8 @@
 
 {% block content %}
     <h1>{{ title_of_page }}</h1>
-
-    <form method="POST" action="{{ url_for(request.endpoint) }}">
-        <!-- Conditional Intake Filter: Only show if more than one intake exists -->
-        {% if intakes|length > 1 %}
+    
+    <form method="POST" action="{{ request.url }}">
         <label for="intake">Filter by Intake:</label>
         <select name="intake" id="intake">
             <option value="">All Intakes</option>
@@ -17,13 +15,12 @@
                 <option value="{{ intake[0] }}" {% if intake[0] == request.form.get('intake') %}selected{% endif %}>{{ intake[0] }}</option>
             {% endfor %}
         </select>
-        {% endif %}
     
         <label for="project">Filter by Project:</label>
         <select name="project" id="project">
             <option value="">All Projects</option>
             {% for project in projects %}
-                <option value="{{ project[1] }}" {% if project[1] == request.form.get('project') %}selected{% endif %}>{{ project[1] }}</option>
+                <option value="{{ project[0] }}" {% if project[0] == request.form.get('project') %}selected{% endif %}>{{ project[0] }}</option>
             {% endfor %}
         </select>
     
@@ -43,17 +40,18 @@
             {% endfor %}
         </select>
     
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit">Filter</button>
     </form>
+    
+    
 
-    <!-- Copy Email Buttons -->
+    <!-- Add the Copy Email Buttons -->
     <div style="margin-top: 20px;">
-        <button onclick="copyEmails('personal_email')" class="btn btn-secondary">Copy Personal Emails</button>
-        <button onclick="copyEmails('wehi_email')" class="btn btn-secondary">Copy WEHI Emails</button>
+        <button onclick="copyEmails('personal_email')">Copy Personal Emails</button>
+        <button onclick="copyEmails('wehi_email')">Copy WEHI Emails</button>
     </div>
     
-    <!-- Displaying the students in a table -->
-    <table class="table table-striped table-bordered mt-3">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>ID</th>
@@ -61,35 +59,14 @@
                 <th>Pronunciation</th>
                 <th>Pronouns</th>
                 <th data-email-type="personal_email">Personal Email</th>
-                
-                <!-- Show WEHI Email and Mobile for Current and Future students -->
-                {% if title_of_page != "Past Intake Students" %}
                 <th data-email-type="wehi_email">WEHI Email</th>
                 <th>Mobile</th>
-                {% endif %}
-                
                 <th>Project</th>
-
-                <!-- Show Intake except for Current and Future pages -->
-                {% if title_of_page == "Past Intake Students" %}
                 <th>Intake</th>
-                {% endif %}
-                
-                <!-- Show Status for Future and All students, not for Past students -->
-                {% if title_of_page != "Past Intake Students" and title_of_page != "Current Intake Students" %}
+                <th>Course</th>
                 <th>Status</th>
-                {% endif %}
-                
-                <!-- Show Pre Internship Summary for All and Future students, not for Current or Past -->
-                {% if title_of_page == "All Students" or title_of_page == "Future Intake Students" %}
                 <th>Pre Internship Summary</th>
-                {% endif %}
-                
-                <!-- Show Post Internship Rating for All and Past students, not for Current or Future -->
-                {% if title_of_page == "All Students" or title_of_page == "Past Intake Students" %}
                 <th>Post Internship Rating</th>
-                {% endif %}
-                
                 <th>Actions</th>
             </tr>
         </thead>
@@ -101,39 +78,16 @@
                     <td>{{ student[2] }}</td>
                     <td>{{ student[3] }}</td>
                     <td data-email-type="personal_email">{{ student[4] }}</td>
-                    
-                    <!-- Show WEHI Email and Mobile for Current and Future students -->
-                    {% if title_of_page != "Past Intake Students" %}
                     <td data-email-type="wehi_email">{{ student[5] }}</td>
                     <td>{{ student[6] }}</td>
-                    {% endif %}
-
                     <td>{{ student[7] }}</td>
-
-                    <!-- Show Intake only for Past students -->
-                    {% if title_of_page == "Past Intake Students" %}
                     <td>{{ student[8] }}</td>
-                    {% endif %}
-                    
-                    <!-- Show Status for Future and All students, not for Past or Current -->
-                    {% if title_of_page != "Past Intake Students" and title_of_page != "Current Intake Students" %}
                     <td>{{ student[9] }}</td>
-                    {% endif %}
-
-                    <!-- Show Pre Internship Summary for All and Future students -->
-                    {% if title_of_page == "All Students" or title_of_page == "Future Intake Students" %}
                     <td>{{ student[10] }}</td>
-                    {% endif %}
-                    
-                    <!-- Show Post Internship Rating for All and Past students -->
-                    {% if title_of_page == "All Students" or title_of_page == "Past Intake Students" %}
                     <td>{{ student[11] }}</td>
-                    {% endif %}
-                    
-                    <td>
-                        <a href="/view/{{ student[0] }}" class="btn btn-info btn-sm">View</a>
-                        <a href="/edit/{{ student[0] }}" class="btn btn-warning btn-sm">Edit</a>
-                    </td>
+                    <td>{{ student[12] }}</td>
+                    <td><a href="/view/{{ student[0] }}" class="btn btn-info btn-sm">View</a> 
+                        <a href="/edit_student/{{ student[0] }}" class="btn btn-warning btn-sm">Edit</a></td>
                 </tr>
             {% endfor %}
         </tbody>

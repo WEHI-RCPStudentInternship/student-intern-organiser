@@ -6,7 +6,7 @@
 
 {% block top_links_menu %}
     <!-- Your top links menu goes here if needed -->
-        <a href="/add_intake" >Add Intake</a>
+    <a href="/add_intake">Add Intake</a>
 {% endblock %}
 
 {% block content %}
@@ -26,7 +26,14 @@
                 <td>{{ intake[0] }}</td>
                 <td>{{ intake[1] }}</td>
                 <td>{{ intake[2] }}</td>
-                <td><a href="/edit_intake/{{ intake[0] }}">Edit</a>&nbsp;<a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;</td>
+                <td>
+                    <!-- Edit and Emails links -->
+                    <a href="/edit_intake/{{ intake[0] }}">Edit</a>&nbsp;
+                    <a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;
+
+                    <!-- New "Show All Students" and "Show Current Students" buttons -->
+                    <a href="/student_list/all?intake={{ intake[1] }}">Show All Students</a>&nbsp;
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -44,4 +51,3 @@
         });
     </script>
 {% endblock %}
-

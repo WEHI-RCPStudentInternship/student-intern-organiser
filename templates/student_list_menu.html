@@ -3,12 +3,12 @@
 {% block title %}Student List Menu{% endblock %}
 
 {% block content %}
-    <h1>Student List Menu</h1>
+<h1>Student List Menu</h1>
 
-    <div style="margin-top: 20px;">
-        <a href="/">All Students</a>
-        <a href="{{ url_for('current_students') }}" class="btn btn-primary">Current Intake Students</a>
-        <a href="{{ url_for('future_students') }}" class="btn btn-primary">Future Students</a>
-        <a href="{{ url_for('past_students') }}" class="btn btn-primary">Past Students</a>
-    </div>
+<ul>
+    <li><a href="{{ url_for('all_students') }}">All Students</a></li>
+    <li><a href="{{ url_for('current_students') }}">Current Intake Students</a></li>
+    <li><a href="{{ url_for('future_students') }}">Future Students</a></li>
+    <li><a href="{{ url_for('past_students') }}">Past Students</a></li>
+</ul>
 {% endblock %}

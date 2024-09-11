@@ -5,8 +5,7 @@
 {% block page_title %}Projects{% endblock %}
 
 {% block top_links_menu %}
-    <!-- Your top links menu goes here if needed -->
-        <a href="/add_project">Add Project</a>
+    <a href="/add_project">Add Project</a>
 {% endblock %}
 
 {% block content %}
@@ -26,7 +25,15 @@
                 <td>{{ project[0] }}</td>
                 <td>{{ project[1] }}</td>
                 <td>{{ project[2] }}</td>
-                <td><a href="/edit_project/{{ project[0] }}">Edit</a></td>
+                <td>
+                    <a href="{{ url_for('edit_project', project_id=project[0]) }}">Edit</a> |
+                    <!-- Link to All Students filtered by Project -->
+                    <a href="{{ url_for('all_students', project_id=project[0]) }}" class="btn btn-info">Show All Students</a> |
+                    <!-- Link to Current Students filtered by Project -->
+                    <a href="{{ url_for('current_students', project_id=project[0]) }}">Show Current Students</a>
+                </td>
+                
+                
             </tr>
             {% endfor %}
         </tbody>
@@ -35,13 +42,10 @@
 
 {% block scripts %}
     <script>
-        // Your JavaScript code for DataTables or other functionality goes here
         $(document).ready(function() {
-            var table = $('#projectsTable').DataTable({
-                "lengthMenu": [10, 25, 50, 100], // Customize the number of entries per page
-                // Other DataTables options and initialization code can go here
+            $('#projectsTable').DataTable({
+                "lengthMenu": [10, 25, 50, 100],
             });
         });
     </script>
 {% endblock %}
-

@@ -1,4 +1,4 @@
--- Upgrade script for student_intern_data.db
+-- Upgrade script for student_intern_data.db from Semester 1, 2024 to Semester 2, 2024
 
 -- To upgrade your local database:
 -- 1. Make sure you have a backup of your current database.

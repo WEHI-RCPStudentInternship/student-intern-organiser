@@ -32,7 +32,7 @@
                     <a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;
 
                     <!-- New "Show All Students" and "Show Current Students" buttons -->
-                    <a href="/student_list/all?intake={{ intake[1] }}">Show All Students</a>&nbsp;
+                    <a href="{{ url_for('all_students') }}?intake={{ intake[1] }}" class="btn btn-info">Show All Students</a>&nbsp;
                 </td>
             </tr>
             {% endfor %}

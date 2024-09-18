@@ -28,9 +28,9 @@
                 <td>
                     <a href="{{ url_for('edit_project', project_id=project[0]) }}">Edit</a> |
                     <!-- Link to All Students filtered by Project -->
-                    <a href="{{ url_for('all_students', project_id=project[0]) }}" class="btn btn-info">Show All Students</a> |
+                    <a href="{{ url_for('all_students') }}?project={{ project[1] }}" class="btn btn-info">Show All Students</a>
                     <!-- Link to Current Students filtered by Project -->
-                    <a href="{{ url_for('current_students', project_id=project[0]) }}">Show Current Students</a>
+                    <a href="{{ url_for('current_students') }}?project={{ project[1] }}" class="btn btn-info">Show Current Students</a>
                 </td>
                 
                 

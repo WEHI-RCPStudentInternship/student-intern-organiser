@@ -8,40 +8,47 @@
     <h1>{{ title_of_page }}</h1>
     
     <form method="POST" action="{{ request.url }}">
+        <!-- Intake Filter -->
+        {% if show_intake_filter %}
         <label for="intake">Filter by Intake:</label>
         <select name="intake" id="intake">
-            <option value="">All Intakes</option>
+            <option value="">All Intakes</option> <!-- Default option for all intakes -->
             {% for intake in intakes %}
-                <option value="{{ intake[0] }}" {% if intake[0] == request.form.get('intake') %}selected{% endif %}>{{ intake[0] }}</option>
+                <option value="{{ intake[0] }}" {% if intake[0] == intake_filter %}selected{% endif %}>{{ intake[0] }}</option>
             {% endfor %}
         </select>
+        {% endif %}
     
+        <!-- Project Filter -->
         <label for="project">Filter by Project:</label>
         <select name="project" id="project">
-            <option value="">All Projects</option>
+            <option value="">All Projects</option> <!-- Default option for all projects -->
             {% for project in projects %}
-                <option value="{{ project[0] }}" {% if project[0] == request.form.get('project') %}selected{% endif %}>{{ project[0] }}</option>
+                <option value="{{ project[0] }}" {% if project[0] == project_filter %}selected{% endif %}>{{ project[0] }}</option>
             {% endfor %}
         </select>
     
+        <!-- Status Filter -->
         <label for="status">Filter by Status:</label>
         <select name="status" id="status">
-            <option value="">All Statuses</option>
+            <option value="">All Statuses</option> <!-- Default option for all statuses -->
             {% for status in statuses %}
-                <option value="{{ status[0] }}" {% if status[0] == request.form.get('status') %}selected{% endif %}>{{ status[0] }}</option>
+                <option value="{{ status[0] }}" {% if status[0] == status_filter %}selected{% endif %}>{{ status[0] }}</option>
             {% endfor %}
         </select>
     
+        <!-- Course Filter -->
         <label for="course">Filter by Course:</label>
         <select name="course" id="course">
-            <option value="">All Courses</option>
+            <option value="">All Courses</option> <!-- Default option for all courses -->
             {% for course in courses %}
-                <option value="{{ course[0] }}" {% if course[0] == request.form.get('course') %}selected{% endif %}>{{ course[0] }}</option>
+                <option value="{{ course[0] }}" {% if course[0] == course_filter %}selected{% endif %}>{{ course[0] }}</option>
             {% endfor %}
         </select>
     
         <button type="submit">Filter</button>
     </form>
+    
     
     
 

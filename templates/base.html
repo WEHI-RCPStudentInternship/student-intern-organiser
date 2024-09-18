@@ -66,8 +66,7 @@
             top: 0;
             z-index: 1000;
             font-family: inherit;
-          }
-          
+        }
         .navbar a {
             float: left;
             font-size: 16px;
@@ -75,13 +74,14 @@
             text-align: center;
             padding: 14px 16px;
             text-decoration: none;
-          }
-          
+        }
+        .navbar .icon{
+            display: none;
+        }
         .dropdown {
             float: left;
             overflow: hidden;
-          }
-          
+        }
         .dropdown .dropbtn {
             font-size: 16px;  
             border: none;
@@ -91,11 +91,11 @@
             background-color: inherit;
             font-family: inherit;
             margin: 0;
-          }
+        }
           
         .navbar a:hover, .dropdown:hover .dropbtn {
             background-color: #2263b0;
-          }
+        }
           
         .dropdown-content {
             display: none;
@@ -103,8 +103,8 @@
             background-color: #f9f9f9;
             min-width: 160px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1001;
-          }
+            z-index: 1;
+        }
           
         .dropdown-content a {
             float: none;
@@ -113,15 +113,42 @@
             text-decoration: none;
             display: block;
             text-align: left;
-          }
-          
+        }
         .dropdown-content a:hover {
             background-color: #ddd;
-          }
-          
+        }
         .dropdown:hover .dropdown-content {
             display: block;
-          }
+        }
+        @media screen and (max-width: 600px) {
+            .navbar a:not(:first-child), .dropdown .dropbtn {
+              display: none;
+            }
+            .navbar a.icon {
+              float: right;
+              display: block;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .navbar.responsive {position: relative;}
+            .navbar.responsive .icon {
+              position: absolute;
+              right: 0;
+              top: 0;
+            }
+            .navbar.responsive a {
+              float: none;
+              display: block;
+              text-align: left;
+            }
+            .navbar.responsive .dropdown {float: none;}
+            .navbar.responsive .dropdown-content {position: relative;}
+            .navbar.responsive .dropdown .dropbtn {
+              display: block;
+              width: 100%;
+              text-align: left;
+            }
+        }
     /* Add your custom styles here */
     </style>
     {% block styles %}{% endblock %}
@@ -132,11 +159,10 @@
             <img src="/static/logo.png" alt="Logo" class="logo">
         </a >
         <h1>{% block page_title %}{% endblock %}</h1>
-        </a>
 
     </div>
-    <div class = "navbar">
-        <div class = "dropdown">
+    <div class = "navbar" id = "Topnavbar">
+        <div class = "dropdown" >
             <button class = "dropbtn">Student Management
                 <span class ="caret"><span>&#9660;</span>
             </button>
@@ -153,13 +179,23 @@
             </button>
             <div class = "dropdown-content">
                 <a href="/">All Students Index</a>
-                <a href="{{ url_for('student_list_menu') }}" class="btn btn-secondary">Student List</a>
                 <a href = "https://wehieduau.sharepoint.com/sites/StudentInternGroupatWEHI/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=H7kduJ&cid=cc199a42%2Daf65%2D44f6%2D92ce%2D662a136c0b0f&FolderCTID=0x0120008FF8F20683AC284798EA496C639CC069&id=%2Fsites%2FStudentInternGroupatWEHI%2FShared%20Documents%2FIntroductions%2F2024S1%20Profile%20Pictures">Add Profile Picture</a>
                 <a href = "/github_username">Github Username</a>
                 <a href = "/current_student">Empty WEHI Email</a>
                 <a href="/current">Current Intake</a>
                 <a href="/outstanding">New Intake WIP</a>
                 <a href="/new_intake">New Intake All</a>
+            </div>
+        </div>
+        <div class = "dropdown">
+            <button class = "dropbtn">Student List
+                <span class ="caret"><span>&#9660;</span>
+            </button>
+            <div class = "dropdown-content">
+                <a href="{{ url_for('all_students') }}">All Students</a>
+                <a href="{{ url_for('current_students') }}" class="btn btn-primary">Current Intake Students</a>
+                <a href="{{ url_for('future_students') }}" class="btn btn-primary">Future Students</a>
+                <a href="{{ url_for('past_students') }}" class="btn btn-primary">Past Students</a>
             </div>
         </div>
         <div class = "dropdown">
@@ -198,17 +234,25 @@
         </div>
         <a href="/intakes">Intakes</a>
         <a href="/projects">Projects</a>
+        <a href = "javascript:void(0);" style = "font-size:15px;" class = "icon" onclick = "responsiveBar()">&#9776;</a>
     </div>
      
-    
-
-
-     </div>
-     <div class="second_level_top_links">
+    <div class="second_level_top_links">
         {% block top_links_menu %}{% endblock %}
-     </div>
+    </div>
  
     {% block content %}{% endblock %}
+
+    <script>
+        function responsiveBar(){
+            var x = document.getElementById("Topnavbar");
+            if (x.className === "navbar"){
+                x.className += " responsive";
+            } else {
+                x.className = "navbar";
+            }
+        }
+    </script>
 
 
 
@@ -226,4 +270,3 @@
 
 </body>
 </html>
-

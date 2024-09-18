@@ -192,7 +192,7 @@
                 <span class ="caret"><span>&#9660;</span>
             </button>
             <div class = "dropdown-content">
-                <a href="/">All Students</a>
+                <a href="{{ url_for('all_students') }}">All Students</a>
                 <a href="{{ url_for('current_students') }}" class="btn btn-primary">Current Intake Students</a>
                 <a href="{{ url_for('future_students') }}" class="btn btn-primary">Future Students</a>
                 <a href="{{ url_for('past_students') }}" class="btn btn-primary">Past Students</a>

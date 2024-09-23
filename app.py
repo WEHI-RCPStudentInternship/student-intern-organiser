@@ -1629,6 +1629,216 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
     return table_rows
 
+@app.route('/student_list/all', methods=['GET', 'POST'])
+def all_students():
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Fetch distinct values for filters (including all intakes)
+    cursor.execute('SELECT DISTINCT name FROM Intakes')
+    intakes = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT project FROM Students')
+    projects = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT status FROM Students')
+    statuses = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT course FROM Students')
+    courses = cursor.fetchall()
+
+    # Initialize all filters to empty strings
+    intake_filter = ""
+    project_filter = ""
+    status_filter = ""
+    course_filter = ""
+
+    # Handle form submission (POST request)
+    if request.method == 'POST':
+        intake_filter = request.form.get('intake') or ""
+        project_filter = request.form.get('project') or ""
+        status_filter = request.form.get('status') or ""
+        course_filter = request.form.get('course') or ""
+
+    else:
+        # Handle GET request (pre-filtering from buttons)
+        intake_filter = request.args.get('intake') or ""
+        project_filter = request.args.get('project') or ""
+
+    # Build the query with filters applied, ignoring the filters set to "All" (i.e., empty strings)
+    query = '''
+        SELECT intern_id, full_name, pronunciation, pronouns, email, wehi_email, mobile, 
+               project, intake, course, status, pre_internship_summary_recommendation_internal, 
+               post_internship_summary_rating_internal
+        FROM Students
+        WHERE (? = "" OR intake = ?)
+          AND (? = "" OR project = ?)
+          AND (? = "" OR status = ?)
+          AND (? = "" OR course = ?)
+    '''
+    cursor.execute(query, (intake_filter, intake_filter, project_filter, project_filter, status_filter, status_filter, course_filter, course_filter))
+    students = cursor.fetchall()
+    conn.close()
+
+    return render_template('student_list.html', students=students, title_of_page="All Students",
+                           intakes=intakes, projects=projects, statuses=statuses, courses=courses, 
+                           intake_filter=intake_filter, project_filter=project_filter, status_filter=status_filter, course_filter=course_filter, show_intake_filter=True)
+
+
+@app.route('/student_list/current', methods=['GET', 'POST'])
+def current_students():
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Fetch the intake name for the current intake
+    cursor.execute('SELECT name FROM Intakes WHERE status = "current"')
+    intake_data = cursor.fetchone()
+    intake_name = intake_data[0] if intake_data else "Current Intake"
+
+    # Fetch distinct values for filters
+    cursor.execute('SELECT DISTINCT project FROM Students')
+    projects = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT status FROM Students')
+    statuses = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT course FROM Students')
+    courses = cursor.fetchall()
+
+    # Initialize filters with empty strings to handle "All" as default
+    project_filter = ""
+    status_filter = ""
+    course_filter = ""
+
+    # Handle filters: first check for POST data, then fallback to query parameters
+    if request.method == 'POST':
+        project_filter = request.form.get('project') or ""
+        status_filter = request.form.get('status') or ""
+        course_filter = request.form.get('course') or ""
+
+    else:
+        # Pre-applied project filter from query parameters (GET)
+        project_filter = request.args.get('project') or ""
+
+    query = '''
+        SELECT s.intern_id, s.full_name, s.pronunciation, s.pronouns, s.email, s.wehi_email, s.mobile, 
+               s.project, s.intake, s.course, s.status, s.pre_internship_summary_recommendation_internal, 
+               s.post_internship_summary_rating_internal
+        FROM Students s
+        WHERE s.intake = ?
+          AND (? = "" OR s.project = ?)
+          AND (? = "" OR s.status = ?)
+          AND (? = "" OR s.course = ?)
+    '''
+    cursor.execute(query, (intake_name, project_filter, project_filter, status_filter, status_filter, course_filter, course_filter))
+
+    students = cursor.fetchall()
+    conn.close()
+
+    return render_template('student_list.html', students=students, title_of_page=f"Current Students - Intake {intake_name}",
+                           projects=projects, statuses=statuses, courses=courses, project_filter=project_filter, 
+                           status_filter=status_filter, course_filter=course_filter, show_intake_filter=False)
+
+
+@app.route('/student_list/future', methods=['GET', 'POST'])
+def future_students():
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Fetch the intake name for the future intake
+    cursor.execute('SELECT name FROM Intakes WHERE status = "new"')
+    intake_data = cursor.fetchone()
+    intake_name = intake_data[0] if intake_data else "Future Intake"
+
+    # Fetch distinct values for filters
+    cursor.execute('SELECT DISTINCT project FROM Students')
+    projects = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT status FROM Students')
+    statuses = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT course FROM Students')
+    courses = cursor.fetchall()
+
+    # Initialize filters with empty strings to handle "All" as default
+    project_filter = ""
+    status_filter = ""
+    course_filter = ""
+
+    # Handle form submission or query parameters
+    if request.method == 'POST':
+        project_filter = request.form.get('project') or ""
+        status_filter = request.form.get('status') or ""
+        course_filter = request.form.get('course') or ""
+
+    query = '''
+        SELECT s.intern_id, s.full_name, s.pronunciation, s.pronouns, s.email, s.wehi_email, s.mobile, 
+               s.project, s.intake, s.course, s.status, s.pre_internship_summary_recommendation_internal, 
+               s.post_internship_summary_rating_internal
+        FROM Students s
+        WHERE s.intake = ?
+          AND (? = "" OR s.project = ?)
+          AND (? = "" OR s.status = ?)
+          AND (? = "" OR s.course = ?)
+    '''
+    cursor.execute(query, (intake_name, project_filter, project_filter, status_filter, status_filter, course_filter, course_filter))
+
+    students = cursor.fetchall()
+    conn.close()
+
+    title_of_page = f"Future Students - Intake {intake_name}"
+
+    return render_template('student_list.html', students=students, title_of_page=title_of_page,
+                           projects=projects, statuses=statuses, courses=courses, project_filter=project_filter,
+                           status_filter=status_filter, course_filter=course_filter, show_intake_filter=False)
+
+
+@app.route('/student_list/past', methods=['GET', 'POST'])
+def past_students():
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Fetch only past intakes (intake status = 'no')
+    cursor.execute('SELECT DISTINCT name FROM Intakes WHERE status = "no"')
+    intakes = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT project FROM Students')
+    projects = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT status FROM Students')
+    statuses = cursor.fetchall()
+    cursor.execute('SELECT DISTINCT course FROM Students')
+    courses = cursor.fetchall()
+
+    # Initialize all filters to empty strings
+    intake_filter = ""
+    project_filter = ""
+    status_filter = ""
+    course_filter = ""
+
+    # Handle form submission (POST request)
+    if request.method == 'POST':
+        intake_filter = request.form.get('intake') or ""
+        project_filter = request.form.get('project') or ""
+        status_filter = request.form.get('status') or ""
+        course_filter = request.form.get('course') or ""
+
+    # Build the query with filters applied for past students
+    query = '''
+        SELECT s.intern_id, s.full_name, s.pronunciation, s.pronouns, s.email, s.wehi_email, s.mobile, 
+               s.project, s.intake, s.course, s.status, pre_internship_summary_recommendation_internal, 
+               post_internship_summary_rating_internal
+        FROM Students s
+        WHERE s.intake IN (SELECT name FROM Intakes WHERE status = 'no')
+          AND (? = "" OR s.intake = ?)
+          AND (? = "" OR s.project = ?)
+          AND (? = "" OR s.status = ?)
+          AND (? = "" OR s.course = ?)
+    '''
+    cursor.execute(query, (intake_filter, intake_filter, project_filter, project_filter, status_filter, status_filter, course_filter, course_filter))
+    students = cursor.fetchall()
+    conn.close()
+
+    return render_template('student_list.html', students=students, title_of_page="Past Students",
+                           intakes=intakes, projects=projects, statuses=statuses, courses=courses, 
+                           intake_filter=intake_filter, project_filter=project_filter, status_filter=status_filter, course_filter=course_filter, show_intake_filter=True)
+
+@app.route('/student_list/menu', methods=['GET'])
+def student_list_menu():
+    return render_template('student_list_menu.html')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

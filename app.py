@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
  # Replace with your SQLite database file path
-db_path = 'student_intern_data/student_intern_data.db'
+db_path = 'student_intern_data_public/student_intern_data.db'
 
 import io
 
@@ -36,7 +36,7 @@ def menu_page():
 @app.route('/current_student')
 def current_student():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve current student statuses and projects
@@ -79,7 +79,7 @@ def current_student():
 @app.route('/download_empty_emails')
 def download_empty_emails():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve current student statuses and projects
@@ -178,9 +178,6 @@ def update_email(csv_path):
         update_students_by_criteria(criteria, update_fields)
 
 
-
-
-
 @app.route('/update_wehi',methods=['GET', 'POST'])
 def update_wehi():
     if request.method == 'POST':
@@ -199,7 +196,7 @@ def update_wehi():
 
 @app.route('/github_username')
 def add_to_github():
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     cursor.execute('SELECT * FROM Projects')
@@ -247,7 +244,7 @@ def handle_error(e):
 @app.route('/quick_review')
 def quick_review():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     cursor.execute('SELECT * FROM Projects')
@@ -286,7 +283,7 @@ def quick_review():
 @app.route('/email_ack')
 def email_ack():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
 
@@ -385,7 +382,7 @@ def links():
 @app.route('/assigned_projects/', methods=['GET', 'PUT'])
 def assigned_projects():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
     try:
         if request.method == 'GET':
@@ -454,7 +451,7 @@ def update_project_assignment():
         new_project_id = data['projectId']
 
         # Connect to the SQLite database
-        conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+        conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
         cursor = conn.cursor()
 
         # Update the student's project assignment in the database
@@ -504,7 +501,7 @@ def submit_student_evaluation():
     Communication = f"{Written_application} {Phone_interview}"
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Update Students Evaluation data in the Students table
@@ -546,7 +543,7 @@ def submit_student_evaluation():
 @app.route('/pre_int_st_evaluation/<int:intern_id>', methods=['GET'])
 def pre_int_st_evaluation(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve the student's details from the database
@@ -567,7 +564,7 @@ def pre_int_st_evaluation(intern_id):
 
 
     # Find matching PDF files
-    attachments_dir = 'student_intern_data/attachments'
+    attachments_dir = 'student_intern_data_public/attachments'
     matching_files = []
     for filename in os.listdir(attachments_dir):
         if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf'):
@@ -581,7 +578,7 @@ def pre_int_st_evaluation(intern_id):
 @app.route('/student_evaluation/<int:intern_id>', methods=['GET'])
 def student_evaluation(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve the feedback data from the Students table
@@ -608,7 +605,7 @@ def submit_feedback():
     my_reaction = request.form.get('my_reaction')
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Update the feedback data in the Students table
@@ -634,7 +631,7 @@ def submit_feedback():
 @app.route('/feedback/<int:intern_id>', methods=['GET'])
 def feedback(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve the student's details from the database
@@ -662,7 +659,7 @@ def feedback(intern_id):
 @app.route('/feedback_table/<int:intern_id>', methods=['GET'])
 def feedback_table(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve the feedback data from the Students table
@@ -685,7 +682,7 @@ def download_key_attributes():
 
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal, intake FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
@@ -694,7 +691,7 @@ def download_key_attributes():
 
 
     # Create a temporary directory to store the files
-    temp_dir = 'student_intern_data/attachments/tmp'
+    temp_dir = 'student_intern_data_public/attachments/tmp'
 
     try:
         os.makedirs(temp_dir)
@@ -825,7 +822,7 @@ def edit_student(intern_id):
 @app.route('/share_students/<int:project_id>')
 def share_students(project_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     cursor.execute('SELECT name FROM Intakes where status  = "new"')
@@ -877,7 +874,7 @@ def share_students(project_id):
     students = cursor.fetchall()
 
     # Create a temporary directory to store the files
-    temp_dir = 'student_intern_data/attachments/tmp'
+    temp_dir = 'student_intern_data_public/attachments/tmp'
 
     try:
         os.makedirs(temp_dir)
@@ -897,7 +894,7 @@ def share_students(project_id):
             csv_writer.writerow(student)
 
     # Create the ZIP file
-    zip_path = 'student_intern_data/attachments/share_student_applications_temp.zip'
+    zip_path = 'student_intern_data_public/attachments/share_student_applications_temp.zip'
     with zipfile.ZipFile(zip_path, 'w') as zip_file:
         # Add the PDF files for each student to the ZIP file
         for student in students:
@@ -905,11 +902,11 @@ def share_students(project_id):
             intern_id = student[0]
 
             # Get all PDF files starting with the intern_id
-            matching_files = [filename for filename in os.listdir('student_intern_data/attachments') if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf')]
+            matching_files = [filename for filename in os.listdir('student_intern_data_public/attachments') if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf')]
 
             # Copy the matching PDF files to the temporary directory
             for file in matching_files:
-                file_path = os.path.join('student_intern_data/attachments', file)
+                file_path = os.path.join('student_intern_data_public/attachments', file)
                 dest_path = os.path.join(temp_dir, file)
                 shutil.copy(file_path, dest_path)
 
@@ -944,7 +941,7 @@ def share_students(project_id):
 @app.route('/download_contracts_and_applications')
 def download_contracts_and_applications():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve students with status '09 Signed contract' from the database
@@ -953,7 +950,7 @@ def download_contracts_and_applications():
 
 
     # Create a temporary directory to store the files
-    temp_dir = 'student_intern_data/attachments/tmp'
+    temp_dir = 'student_intern_data_public/attachments/tmp'
 
     try:
         os.makedirs(temp_dir)
@@ -975,7 +972,7 @@ def download_contracts_and_applications():
             csv_writer.writerow(student_data)
 
     # Create the ZIP file
-    zip_path = 'student_intern_data/attachments/contract_downloads_temp.zip'
+    zip_path = 'student_intern_data_public/attachments/contract_downloads_temp.zip'
     with zipfile.ZipFile(zip_path, 'w') as zip_file:
         # Add the PDF files for each student to the ZIP file
         for student in students:
@@ -983,11 +980,11 @@ def download_contracts_and_applications():
             intern_id = student[0]
 
             # Get all PDF files starting with the intern_id
-            matching_files = [filename for filename in os.listdir('student_intern_data/attachments') if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf')]
+            matching_files = [filename for filename in os.listdir('student_intern_data_public/attachments') if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf')]
 
             # Copy the matching PDF files to the temporary directory
             for file in matching_files:
-                file_path = os.path.join('student_intern_data/attachments', file)
+                file_path = os.path.join('student_intern_data_public/attachments', file)
                 dest_path = os.path.join(temp_dir, file)
                 shutil.copy(file_path, dest_path)
 
@@ -1021,7 +1018,7 @@ def import_redcap():
 
     today = datetime.now()
 
-    import_dir = 'student_intern_data/import/archive'
+    import_dir = 'student_intern_data_public/import/archive'
     if request.method == 'POST':
         print(request.files)
         csv_file = request.files['csv_file']
@@ -1052,7 +1049,7 @@ def import_redcap():
 @app.route('/upload_signed_contract/<int:intern_id>/<string:full_name>', methods=['GET', 'POST'])
 def upload_signed_contract(intern_id, full_name):
 
-    attachments_dir = 'student_intern_data/attachments'
+    attachments_dir = 'student_intern_data_public/attachments'
     if request.method == 'POST':
         file = request.files['file']
         if file:
@@ -1075,7 +1072,7 @@ def upload_signed_contract(intern_id, full_name):
 def index_new_intake_unavailable():
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
 
@@ -1114,7 +1111,7 @@ def index_new_intake_unavailable():
 def index_new_intake():
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
 
@@ -1152,7 +1149,7 @@ def index_new_intake():
 @app.route('/outstanding')
 def index_outstanding():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
 
@@ -1194,7 +1191,7 @@ def index_outstanding():
 @app.route('/current')
 def index_current():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve student data from the database
@@ -1228,7 +1225,7 @@ def index_current():
 @app.route('/')
 def index():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve student data from the database
@@ -1250,14 +1247,14 @@ def index():
 # Route to serve the file from a different directory
 @app.route('/view_docs/<path:filename>')
 def view_docs(filename):
-    directory = 'student_intern_data/attachments/'  # Replace with the actual directory path
+    directory = 'student_intern_data_public/attachments/'  # Replace with the actual directory path
     filepath = directory + '/' + filename
     return send_file(filepath, as_attachment=True)
 
 @app.route('/view/<int:intern_id>')
 def student(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve student data from the database
@@ -1268,7 +1265,7 @@ def student(intern_id):
     conn.close()
 
     # Find matching PDF files
-    attachments_dir = 'student_intern_data/attachments'
+    attachments_dir = 'student_intern_data_public/attachments'
     matching_files = []
     for filename in os.listdir(attachments_dir):
         if filename.startswith(str(intern_id)) and filename.lower().endswith('.pdf'):
@@ -1329,7 +1326,7 @@ def change_status():
     return redirect('/')
 
 def change_student_status(student_ids, new_status):
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Prepare the SQL query
@@ -1348,7 +1345,7 @@ def change_student_status(student_ids, new_status):
 
 
 def change_post_internship_rating(student_ids, new_post_internship_rating):
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Prepare the SQL query
@@ -1369,7 +1366,7 @@ def change_post_internship_rating(student_ids, new_post_internship_rating):
 
 
 def change_student_project(student_ids, new_project):
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Prepare the SQL query
@@ -1440,7 +1437,7 @@ def calculate_breakdown_of_pronouns(students):
 def dashboard(dashboard_type):
     print(dashboard_type)
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Retrieve student data from the database

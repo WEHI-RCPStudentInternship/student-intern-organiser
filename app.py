@@ -1634,7 +1634,7 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
 @app.route('/student_list/all', methods=['GET', 'POST'])
 def all_students():
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Fetch distinct values for filters (including all intakes)
@@ -1687,7 +1687,7 @@ def all_students():
 
 @app.route('/student_list/current', methods=['GET', 'POST'])
 def current_students():
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Fetch the intake name for the current intake
@@ -1740,7 +1740,7 @@ def current_students():
 
 @app.route('/student_list/future', methods=['GET', 'POST'])
 def future_students():
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Fetch the intake name for the future intake
@@ -1791,7 +1791,7 @@ def future_students():
 
 @app.route('/student_list/past', methods=['GET', 'POST'])
 def past_students():
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
     # Fetch only past intakes (intake status = 'no')

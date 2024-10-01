@@ -1791,8 +1791,8 @@ def past_students():
     conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
     cursor = conn.cursor()
 
-    # Fetch only past intakes (intake status = 'no')
-    cursor.execute('SELECT DISTINCT name FROM Intakes WHERE status = "no"')
+    # Fetch only past intakes (intake status = 'no') ==> "no" is modified to "finished"
+    cursor.execute('SELECT DISTINCT name FROM Intakes WHERE status = "finished"')
     intakes = cursor.fetchall()
     cursor.execute('SELECT DISTINCT project FROM Students')
     projects = cursor.fetchall()
@@ -1820,12 +1820,13 @@ def past_students():
                s.project, s.intake, s.course, s.status, pre_internship_summary_recommendation_internal, 
                post_internship_summary_rating_internal
         FROM Students s
-        WHERE s.intake IN (SELECT name FROM Intakes WHERE status = 'no')
+        WHERE s.intake IN (SELECT name FROM Intakes WHERE status = 'finished')
           AND (? = "" OR s.intake = ?)
           AND (? = "" OR s.project = ?)
           AND (? = "" OR s.status = ?)
           AND (? = "" OR s.course = ?)
     '''
+    # In the query SQL, "no" ==> "finished"
     cursor.execute(query, (intake_filter, intake_filter, project_filter, project_filter, status_filter, status_filter, course_filter, course_filter))
     students = cursor.fetchall()
     conn.close()

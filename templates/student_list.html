@@ -61,6 +61,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th><input type="checkbox" id="selectAllCheckbox"></th> <!-- Checkbox column for selecting all -->
                 <th>ID</th>
                 <th>Name</th>
                 <th>Pronunciation</th>
@@ -80,6 +81,7 @@
         <tbody>
             {% for student in students %}
                 <tr>
+                    <td><input type="checkbox" class="studentCheckbox"></td> <!-- Checkbox column -->
                     <td>{{ student[0] }}</td>
                     <td>{{ student[1] }}</td>
                     <td>{{ student[2] }}</td>
@@ -98,20 +100,42 @@
                 </tr>
             {% endfor %}
         </tbody>
+        
     </table>
     
     <!-- JavaScript function for copying emails -->
     <script>
-    function copyEmails(emailType) {
-        let emails = [];
-        document.querySelectorAll(`td[data-email-type="${emailType}"]`).forEach(td => {
-            emails.push(td.innerText.trim());
+        // Select/Deselect All checkboxes
+        document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+            const isChecked = this.checked; // Check if the "Select All" checkbox is checked
+            const checkboxes = document.querySelectorAll('.studentCheckbox'); // Get all student checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked; // Set each checkbox to match the "Select All" checkbox
+            });
         });
-        let emailsString = emails.join('; ');
-        navigator.clipboard.writeText(emailsString).then(() => {
-            alert('Emails copied to clipboard!');
-        });
-    }
+    
+        // Function to copy emails from selected rows
+        function copyEmails(emailType) {
+            let emails = [];
+            document.querySelectorAll('.studentCheckbox:checked').forEach(checkbox => {
+                const row = checkbox.closest('tr'); // Get the closest row for the selected checkbox
+                const emailCell = row.querySelector(`td[data-email-type="${emailType}"]`); // Get the email cell based on the type (personal or WEHI)
+                if (emailCell && emailCell.innerText.trim()) { // Ensure the email cell has text
+                    emails.push(emailCell.innerText.trim()); // Add the email to the list
+                }
+            });
+            if (emails.length > 0) {
+                let emailsString = emails.join('; '); // Join emails with '; ' separator
+                navigator.clipboard.writeText(emailsString).then(() => {
+                    alert('Selected emails copied to clipboard!');
+                });
+            } else {
+                alert('No emails selected.');
+            }
+        }
     </script>
+    
+    
+    
 
 {% endblock %}

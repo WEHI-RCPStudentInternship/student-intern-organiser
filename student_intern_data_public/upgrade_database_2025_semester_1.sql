@@ -1,0 +1,2 @@
+-- Upgrade script for student_intern_data.db from Semester 2, 2024 to Semester 1, 2025
+-- Please see upgrade_database_2024_semester_2 and use that as a template

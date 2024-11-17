@@ -36,7 +36,7 @@ def menu_page():
 @app.route('/current_student')
 def current_student():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve current student statuses and projects
@@ -79,7 +79,7 @@ def current_student():
 @app.route('/download_empty_emails')
 def download_empty_emails():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve current student statuses and projects
@@ -196,7 +196,7 @@ def update_wehi():
 
 @app.route('/github_username')
 def add_to_github():
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute('SELECT * FROM Projects')
@@ -244,7 +244,7 @@ def handle_error(e):
 @app.route('/quick_review')
 def quick_review():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute('SELECT * FROM Projects')
@@ -283,7 +283,7 @@ def quick_review():
 @app.route('/email_ack')
 def email_ack():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
 
@@ -382,7 +382,7 @@ def links():
 @app.route('/assigned_projects/', methods=['GET', 'PUT'])
 def assigned_projects():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     try:
         if request.method == 'GET':
@@ -451,7 +451,7 @@ def update_project_assignment():
         new_project_id = data['projectId']
 
         # Connect to the SQLite database
-        conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         # Update the student's project assignment in the database
@@ -501,7 +501,7 @@ def submit_student_evaluation():
     Communication = f"{Written_application} {Phone_interview}"
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Update Students Evaluation data in the Students table
@@ -543,7 +543,7 @@ def submit_student_evaluation():
 @app.route('/pre_int_st_evaluation/<int:intern_id>', methods=['GET'])
 def pre_int_st_evaluation(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve the student's details from the database
@@ -578,7 +578,7 @@ def pre_int_st_evaluation(intern_id):
 @app.route('/student_evaluation/<int:intern_id>', methods=['GET'])
 def student_evaluation(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve the feedback data from the Students table
@@ -605,7 +605,7 @@ def submit_feedback():
     my_reaction = request.form.get('my_reaction')
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Update the feedback data in the Students table
@@ -631,7 +631,7 @@ def submit_feedback():
 @app.route('/feedback/<int:intern_id>', methods=['GET'])
 def feedback(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve the student's details from the database
@@ -659,7 +659,7 @@ def feedback(intern_id):
 @app.route('/feedback_table/<int:intern_id>', methods=['GET'])
 def feedback_table(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve the feedback data from the Students table
@@ -682,7 +682,7 @@ def download_key_attributes():
 
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal, intake FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
@@ -822,7 +822,7 @@ def edit_student(intern_id):
 @app.route('/share_students/<int:project_id>')
 def share_students(project_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute('SELECT name FROM Intakes where status  = "new"')
@@ -941,7 +941,7 @@ def share_students(project_id):
 @app.route('/download_contracts_and_applications')
 def download_contracts_and_applications():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve students with status '09 Signed contract' from the database
@@ -1072,7 +1072,7 @@ def upload_signed_contract(intern_id, full_name):
 def index_new_intake_unavailable():
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
 
@@ -1111,7 +1111,7 @@ def index_new_intake_unavailable():
 def index_new_intake():
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
 
@@ -1149,7 +1149,7 @@ def index_new_intake():
 @app.route('/outstanding')
 def index_outstanding():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
 
@@ -1191,7 +1191,7 @@ def index_outstanding():
 @app.route('/current')
 def index_current():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve student data from the database
@@ -1225,7 +1225,7 @@ def index_current():
 @app.route('/')
 def index():
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve student data from the database
@@ -1254,7 +1254,7 @@ def view_docs(filename):
 @app.route('/view/<int:intern_id>')
 def student(intern_id):
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve student data from the database
@@ -1326,7 +1326,7 @@ def change_status():
     return redirect('/')
 
 def change_student_status(student_ids, new_status):
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Prepare the SQL query
@@ -1345,7 +1345,7 @@ def change_student_status(student_ids, new_status):
 
 
 def change_post_internship_rating(student_ids, new_post_internship_rating):
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Prepare the SQL query
@@ -1366,7 +1366,7 @@ def change_post_internship_rating(student_ids, new_post_internship_rating):
 
 
 def change_student_project(student_ids, new_project):
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Prepare the SQL query
@@ -1437,7 +1437,7 @@ def calculate_breakdown_of_pronouns(students):
 def dashboard(dashboard_type):
     print(dashboard_type)
     # Connect to the SQLite database
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Retrieve student data from the database
@@ -1631,7 +1631,7 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
 @app.route('/student_list/all', methods=['GET', 'POST'])
 def all_students():
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Fetch distinct values for filters (including all intakes)
@@ -1684,7 +1684,7 @@ def all_students():
 
 @app.route('/student_list/current', methods=['GET', 'POST'])
 def current_students():
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Fetch the intake name for the current intake
@@ -1737,7 +1737,7 @@ def current_students():
 
 @app.route('/student_list/future', methods=['GET', 'POST'])
 def future_students():
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Fetch the intake name for the future intake
@@ -1788,7 +1788,7 @@ def future_students():
 
 @app.route('/student_list/past', methods=['GET', 'POST'])
 def past_students():
-    conn = sqlite3.connect('student_intern_data_public/student_intern_data.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     # Fetch only past intakes (intake status = 'no') ==> "no" is modified to "finished"

@@ -381,9 +381,10 @@ def email_intake(intake_id):
 def links():
     return render_template('links.html')
 
-# Allocating students projects
 @app.route('/assigned_projects/', methods=['GET', 'PUT'])
-def assigned_projects():
+@app.route('/assigned_projects/<intake_type>', methods=['GET', 'PUT'])
+def assigned_projects(intake_type=None):
+    intake_type = intake_type or 'new'
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -394,7 +395,7 @@ def assigned_projects():
             projects = cursor.fetchall()
             print(projects)
 
-            cursor.execute('SELECT name FROM Intakes where status  = "new"')
+            cursor.execute('SELECT name FROM Intakes where status  = "'+intake_type+'"')
             intake_current = cursor.fetchall()[0][0]
 
             cursor.execute('SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects FROM Students WHERE intake = ?',(intake_current,))
@@ -688,7 +689,7 @@ def download_key_attributes():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal, intake FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
+    cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal, intake, course FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
 
     students = cursor.fetchall()
 
@@ -709,7 +710,7 @@ def download_key_attributes():
     csv_path = os.path.join(temp_dir, formatted_datetime+'_student_data.csv')
     with open(csv_path, 'w') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(['Full Name', 'Pronunciation','Project','Status','Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week','Pronouns','Summary pre-internship','Intake'])
+        csv_writer.writerow(['Full Name', 'Pronunciation','Project','Status','Phone', 'Email', 'Start Date', 'End Date', 'Hours per Week','Pronouns','Summary pre-internship','Intake','Faculty'])
 
 
         for student in students:

@@ -163,7 +163,7 @@ def update_students_by_criteria(criteria, update_fields):
 
 
 def update_email(csv_path):
-    with open(csv_path, mode='r', encoding='utf-8') as file:
+    with open(csv_path, mode='r', encoding='Windows-1252') as file:
         csv_reader = csv.reader(file)
         # Skip the header
         next(csv_reader, None)

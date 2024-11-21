@@ -37,6 +37,12 @@ Kanban boards styles
     color: white !important;
 }
 
+.sysadmin {
+    background-color: #98118b !important;
+    color: white !important;
+}
+
+
 
 
 .accepted a, .offered a, .interesting a {

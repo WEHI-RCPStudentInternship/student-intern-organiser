@@ -14,23 +14,23 @@
             {% if student[4] in("08 Accepted contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started")  %}
 
               <div class="accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-		      {{ student[1] }} ({{ student[7][:3] }})<br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
+		      {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
               </div>
             {% elif student[4] in ("07 Offered contact")  %}
               <div class="offered kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
+	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
               </div>
-            {% elif student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ")  %}
+             {% elif student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ")  %}
               <div class="not-accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
+	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
               </div>
              {% elif student[6] in ("05 - ETS - Recommend sign up for a specific project. ")  %}
               <div class="partially-accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
+	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
               </div>
             {% else %}
               <div class="interesting kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
+	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
               </div>
             {% endif %}
         {% endif %}

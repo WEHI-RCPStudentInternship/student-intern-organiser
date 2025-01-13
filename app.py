@@ -410,7 +410,7 @@ def assigned_projects(intake_type=None):
             # Retrieve student data from the database
             # Prepare the SQL query with a placeholder for the statuses filter
             query = '''
-                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects,pre_internship_summary_recommendation_internal, course
+                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects,pre_internship_summary_recommendation_internal, course, show_key_skill
                 FROM Students
                 WHERE intake = ? AND status IN ({}) ORDER BY status desc, pre_internship_summary_recommendation_internal asc
             '''.format(','.join(['?'] * len(current_statuses_list)))
@@ -495,6 +495,7 @@ def submit_student_evaluation():
     Experience = request.form.get('Experience')
     Written_application = request.form.get('Written_Application')
     Phone_interview = request.form.get('Phone_Interview')
+    show_key_skill = request.form.get('show_key_skill')
     #Communication = request.form.get('Written_Application')
 
     Adaptability = request.form.get('Adaptability')
@@ -503,6 +504,9 @@ def submit_student_evaluation():
     extra_notes = request.form.get('extra_notes')
 
     Communication = f"{Written_application} {Phone_interview}"
+    print("---------")
+    print(show_key_skill)
+    print("---------")
 
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
@@ -532,10 +536,11 @@ def submit_student_evaluation():
             listener_or_talker = ?,
             thinker_brainstormer = ?,
             why_applied = ?,
+            show_key_skill = ?,
             projects_recommended = ?
 
         WHERE intern_id = ?
-    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, remote_internship, code_of_conduct, facilitator_follower, listener_or_talker, thinker_brainstormer, why_applied, projects_recommended, student_id))
+    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, remote_internship, code_of_conduct, facilitator_follower, listener_or_talker, thinker_brainstormer, why_applied, show_key_skill, projects_recommended, student_id))
 
     # Commit the changes and close the database connection
     conn.commit()

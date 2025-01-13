@@ -1253,7 +1253,7 @@ def index():
 def view_docs(filename):
     directory = 'student_intern_data/attachments/'  # Replace with the actual directory path
     filepath = directory + '/' + filename
-    return send_file(filepath, as_attachment=True)
+    return send_file(filepath, as_attachment=False)
 
 @app.route('/view/<int:intern_id>')
 def student(intern_id):

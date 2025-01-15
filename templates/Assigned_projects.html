@@ -5,34 +5,31 @@
 
 {% block content %}
 
+{% macro studentKanbanCard(classes,student) -%}
+    <div class="{{ classes }}" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
+        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
+    </div>
+{%- endmacro %}
+
+
 <div class="kanban-container">
   {% for project in projects %}
     <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
       <h3 class="column-header"><a href="/share_students/{{ project[0] }}">{{ project[1] }}</a></h3>
       {% for student in students %}
         {% if project[1] == student[2]  %}
-            {% if student[4] in("08 Accepted contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started")  %}
-
-              <div class="accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-		      {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
-              </div>
-            {% elif student[4] in ("07 Offered contact")  %}
-              <div class="offered kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
-              </div>
-             {% elif student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ")  %}
-              <div class="not-accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
-              </div>
-             {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ")  %}
-              <div class="partially-accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
-              </div>
+            {% if student[4] in ("08 Accepted contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started") %}
+                {{ studentKanbanCard('acccepted kanban-card',student) }}
+            {% elif student[4] in ("07 Offered contact") %}
+                {{ studentKanbanCard('offered kanban-card',student) }}
+            {% elif student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %}
+                {{ studentKanbanCard('not-accepted kanban-card',student) }}
+            {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ") %}
+                {{ studentKanbanCard('partially-accepted kanban-card',student) }}
             {% else %}
-              <div class="interesting kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
-              </div>
+                {{ studentKanbanCard('interesting kanban-card',student) }}
             {% endif %}
+
         {% endif %}
       {% endfor %}
     </div>

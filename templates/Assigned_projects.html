@@ -24,7 +24,7 @@
               <div class="not-accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
 	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
               </div>
-             {% elif student[6] in ("05 - ETS - Recommend sign up for a specific project. ")  %}
+             {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ")  %}
               <div class="partially-accepted kanban-card" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
 	        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
               </div>

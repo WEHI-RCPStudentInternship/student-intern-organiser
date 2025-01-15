@@ -31,19 +31,29 @@ Kanban boards styles
     background-color: orange !important;
     color: white !important;
 }
-
-.interesting {
-    background-color: #00008b !important;
+.translator {
+    background-color: #037bdb !important;
     color: white !important;
+}
+
+.experienced {
+    background-color: #ddf0ff !important;
+    color: black !important;
 }
 
 .sysadmin {
-    background-color: #98118b !important;
+    background-color: #70a3cc !important;
     color: white !important;
 }
 
+.fts {
+    background-color: #ffde59 !important;
+    color: black !important;
+}
 
-
+.female {
+    border: 5px solid black !important;
+}
 
 .accepted a, .offered a, .interesting a {
     color: white !important;

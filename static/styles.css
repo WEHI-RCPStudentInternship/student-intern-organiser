@@ -51,6 +51,10 @@ Kanban boards styles
     color: white !important;
 }
 
+.female {
+    border: 5px solid black !important;
+}
+
 .accepted a, .offered a, .interesting a {
     color: white !important;
 

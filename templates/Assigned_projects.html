@@ -24,11 +24,17 @@
                 {{ studentKanbanCard('offered kanban-card',student) }}
             {% elif student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %}
                 {{ studentKanbanCard('not-accepted kanban-card',student) }}
-            {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ","02 - F ETS/Fast Learner - Recommend sign up even without a project. ") %}
+            {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even without a project. ") %}
+                {{ studentKanbanCard('experienced kanban-card female',student) }}
+            {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ") %}
                 {{ studentKanbanCard('experienced kanban-card',student) }}
-            {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a project. ","04 - Sysadmin - Recommend sign up even without a project. ") %}
+            {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a project. ") %}
+                {{ studentKanbanCard('sysadmin kanban-card female',student) }}
+            {% elif student[6] in ("04 - Sysadmin - Recommend sign up even without a project. ") %}
                 {{ studentKanbanCard('sysadmin kanban-card',student) }}
-            {% elif student[6] in ("01 - F Translator - Recommend sign up even without a project. ","04 - Translator - Recommend sign up even without a project. ") %}
+            {% elif student[6] in ("01 - F Translator - Recommend sign up even without a project. ") %}
+                {{ studentKanbanCard('translator kanban-card female',student) }}
+            {% elif student[6] in ("04 - Translator - Recommend sign up even without a project. ") %}
                 {{ studentKanbanCard('translator kanban-card',student) }}
             {% elif student[6] in ("03 - F Technical Skills - Recommend sign up for a specific project. ") %}
                 {{ studentKanbanCard('fts kanban-card',student) }}

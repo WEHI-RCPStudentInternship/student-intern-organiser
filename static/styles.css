@@ -4,6 +4,7 @@ Kanban boards styles
 
 .kanban-container {
   display: flex;
+  clear: both;
   gap: 5px; /* Add space between project columns */
 }
 
@@ -60,6 +61,9 @@ Kanban boards styles
 .accepted a, .offered a, .interesting a {
     color: white !important;
 
+}
+.counts {
+    float: left;
 }
 
 .column-header {

@@ -23,7 +23,7 @@
             {% elif student[4] in ("07 Offered contact") %}
                 {{ studentKanbanCard('offered kanban-card',student) }}
             {% elif student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %}
-                {{ studentKanbanCard('other not-accepted kanban-card',student) }}
+                {{ studentKanbanCard('male other not-accepted kanban-card',student) }}
             {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even without a project. ") %}
                 {{ studentKanbanCard('experienced kanban-card female',student) }}
             {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ") %}

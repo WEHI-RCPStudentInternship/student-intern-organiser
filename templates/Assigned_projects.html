@@ -13,6 +13,8 @@
 
 <div class="kanban-total-counts">
 </div>
+<div class="kanban-total-assigned-counts">
+</div>
 <div class="kanban-container">
   {% for project in projects %}
     <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -160,8 +162,11 @@ function updateKanbanColumnCounts(targetClasses) {
                     columnCounts[cls]++;
                     totalCounts[cls]++;
 
-                    // if this isn't unassigned project
-                    // totalAssignedCounts[cls]++;
+                    // if this isn't unassigned project under data-project-id
+                    projectId = card.parentElement.getAttribute('data-project-id');
+                    if (projectId != 'Unassigned'){
+                      totalAssignedCounts[cls]++;
+                    }
                 }
             });
         });
@@ -204,6 +209,27 @@ function updateKanbanColumnCounts(targetClasses) {
     totalDiv.innerHTML = targetClasses.map(cls => {
         return `<div>Total ${cls}: ${totalCounts[cls]}</div>`;
     }).join('');
+
+    // Create or update the total assigned counts element
+    let totalAssignedDiv = document.querySelector('.kanban-total-assigned-counts');
+    if (!totalAssignedDiv) {
+        totalAssignedDiv = document.createElement('div');
+        totalAssignedDiv.className = 'kanban-total-assigned-counts';
+        totalAssignedDiv.style.marginTop = '10px';
+        totalAssignedDiv.style.fontSize = '16px'; // Larger font size for total
+        totalAssignedDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
+        // Assuming there is a container for kanban columns
+        const kanbanContainer = document.querySelector('.kanban-container');
+        if (kanbanContainer) {
+            kanbanContainer.appendChild(totalAssignedDiv);
+        }
+    }
+
+    // Update the content of the total counts element
+    totalAssignedDiv.innerHTML = targetClasses.map(cls => {
+        return `<div>Total Assigned ${cls}: ${totalAssignedCounts[cls]}</div>`;
+    }).join('');
+
 
 }
 

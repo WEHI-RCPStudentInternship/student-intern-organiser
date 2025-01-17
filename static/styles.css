@@ -17,8 +17,9 @@ Kanban boards styles
 }
 
 .accepted {
-    background-color: green !important;
-    color: white !important;
+    background-image: url('/static/tick.png');
+    background-position: right bottom;
+    background-repeat: no-repeat;
 }
 
 .partially-accepted {
@@ -28,8 +29,9 @@ Kanban boards styles
 
 
 .offered {
-    background-color: orange !important;
-    color: white !important;
+    background-image: url('/static/wait.png');
+    background-position: right bottom;
+    background-repeat: no-repeat;
 }
 .translator {
     background-color: #037bdb !important;

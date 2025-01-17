@@ -11,7 +11,8 @@
     </div>
 {%- endmacro %}
 
-
+<div class="kanban-total-counts">
+</div>
 <div class="kanban-container">
   {% for project in projects %}
     <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -129,6 +130,20 @@ const targetClasses = ["translator","sysadmin","experienced","other","female","m
 
 
 function updateKanbanColumnCounts(targetClasses) {
+
+    // Initialize total counts object
+    const totalCounts = {};
+    targetClasses.forEach(cls => {
+        totalCounts[cls] = 0;
+    });
+
+    // Initialize total counts object
+    const totalAssignedCounts = {};
+    targetClasses.forEach(cls => {
+        totalAssignedCounts[cls] = 0;
+    });
+
+
     // Iterate through each kanban column
     document.querySelectorAll('.kanban-column').forEach(column => {
         const columnCounts = {};
@@ -143,6 +158,10 @@ function updateKanbanColumnCounts(targetClasses) {
             targetClasses.forEach(cls => {
                 if (card.classList.contains(cls)) {
                     columnCounts[cls]++;
+                    totalCounts[cls]++;
+
+                    // if this isn't unassigned project
+                    // totalAssignedCounts[cls]++;
                 }
             });
         });
@@ -165,6 +184,27 @@ function updateKanbanColumnCounts(targetClasses) {
             return `<div>${cls}: ${columnCounts[cls]}</div>`;
         }).join('');
     });
+
+    // Create or update the total counts element
+    let totalDiv = document.querySelector('.kanban-total-counts');
+    if (!totalDiv) {
+        totalDiv = document.createElement('div');
+        totalDiv.className = 'kanban-total-counts';
+        totalDiv.style.marginTop = '10px';
+        totalDiv.style.fontSize = '16px'; // Larger font size for total
+        totalDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
+        // Assuming there is a container for kanban columns
+        const kanbanContainer = document.querySelector('.kanban-container');
+        if (kanbanContainer) {
+            kanbanContainer.appendChild(totalDiv);
+        }
+    }
+
+    // Update the content of the total counts element
+    totalDiv.innerHTML = targetClasses.map(cls => {
+        return `<div>Total ${cls}: ${totalCounts[cls]}</div>`;
+    }).join('');
+
 }
 
 updateKanbanColumnCounts(targetClasses);

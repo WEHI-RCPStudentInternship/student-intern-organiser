@@ -283,6 +283,48 @@ def quick_review():
 
 
 
+@app.route('/new_applications')
+def new_applications():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    status_of_students_to_filter = [1]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+
+    # Close the database connection
+    conn.close()
+    title_of_page = "New Intake Applications"
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+
+
+
 @app.route('/email_ack')
 def email_ack():
     # Connect to the SQLite database

@@ -323,6 +323,14 @@ def quick_review():
     html_to_render = filter_students(statuses,title)
     return html_to_render
 
+@app.route('/have_interviewed')
+def have_interviewed():
+    statuses = [4]
+    title = "New Intake - Have Interviewed" 
+    html_to_render = filter_students(statuses,title,"interview")
+    return html_to_render
+
+
 @app.route('/to_interview')
 def to_interview():
     statuses = [3]

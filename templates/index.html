@@ -31,7 +31,7 @@
         </select>
         <a id="change_post_internship_rating" href="#">Change Rating</a>
 
-        {% if request.path == '/outstanding' or request.path == '/new_intake' or request.path == '/new_applications' %}
+        {% if request.path in ('/outstanding','/new_intake','/new_applications','/to_interview') %}
 
         <a href="#" id="emailAcknowledgementBtn">Email Acknowledgement</a>
         <a href="#" id="sendEmailToMyselfBtn">Send email to myself</a>

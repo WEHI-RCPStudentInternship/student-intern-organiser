@@ -13,8 +13,8 @@
 
 <div class="counts kanban-total-counts"> </div>
 <div class="counts kanban-total-assigned-counts"> </div>
-<div class="counts kanban-total-accepted-counts"> </div>
 <div class="counts kanban-total-offered-counts"> </div>
+<div class="counts kanban-total-accepted-counts"> </div>
 <div class="kanban-container">
   {% for project in projects %}
     <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">

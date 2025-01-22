@@ -224,45 +224,12 @@ function updateKanbanColumnCounts(targetClasses) {
         }).join('');
     });
 
-    // Create or update the total counts element
-    let totalDiv = document.querySelector('.kanban-total-counts');
-    if (!totalDiv) {
-        totalDiv = document.createElement('div');
-        totalDiv.className = 'kanban-total-counts';
-        totalDiv.style.marginTop = '10px';
-        totalDiv.style.fontSize = '16px'; // Larger font size for total
-        totalDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalDiv);
-        }
-    }
+    createOrUpdateDiv(
+        '.kanban-total-counts',
+        '',
+        totalCounts
+    ); 
 
-    // Update the content of the total counts element
-    totalDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total ${cls}: ${totalCounts[cls]}</div>`;
-    }).join('');
-
-    // Create or update the total assigned counts element
-    let totalAssignedDiv = document.querySelector('.kanban-total-assigned-counts');
-    if (!totalAssignedDiv) {
-        totalAssignedDiv = document.createElement('div');
-        totalAssignedDiv.className = 'kanban-total-assigned-counts';
-        totalAssignedDiv.style.marginTop = '10px';
-        totalAssignedDiv.style.fontSize = '16px'; // Larger font size for total
-        totalAssignedDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalAssignedDiv);
-        }
-    }
-
-    // Update the content of the total assigned counts element
-    totalAssignedDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total Assigned ${cls}: ${totalAssignedCounts[cls]}</div>`;
-    }).join('');
 
     createOrUpdateDiv(
         '.kanban-total-accepted-counts',

@@ -64,6 +64,7 @@ Kanban boards styles
 }
 .counts {
     float: left;
+    margin-left: 10px;
 }
 
 .column-header {

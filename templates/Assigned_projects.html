@@ -59,6 +59,15 @@
 <!-- Drag and Drop Functionnality -->
 
 <script>
+function createOrUpdateDiv(selector, count_type, totalCounts) {
+    let div = document.querySelector(selector);
+    // Update the content of the div
+    div.innerHTML = targetClasses.map(cls => {
+        return `<div>Total ${count_type} ${cls}: ${totalCounts[cls]}</div>`;
+    }).join('');
+
+}
+
 
 // Example usage:
 // Call the function with the classes you want to count
@@ -255,46 +264,18 @@ function updateKanbanColumnCounts(targetClasses) {
         return `<div>Total Assigned ${cls}: ${totalAssignedCounts[cls]}</div>`;
     }).join('');
 
-    // Create or update the total accepted counts element
-    let totalAcceptedDiv = document.querySelector('.kanban-total-accepted-counts');
-    if (!totalAcceptedDiv) {
-        totalAcceptedDiv = document.createElement('div');
-        totalAcceptedDiv.className = 'kanban-total-accepted-counts';
-        totalAcceptedDiv.style.marginTop = '10px';
-        totalAcceptedDiv.style.fontSize = '16px'; // Larger font size for total
-        totalAcceptedDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalAcceptedDiv);
-        }
-    }
+    createOrUpdateDiv(
+        '.kanban-total-accepted-counts',
+        'Accepted',
+        totalAcceptedCounts
+    ); 
 
-    // Update the content of the total accepted counts element
-    totalAcceptedDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total Accepted ${cls}: ${totalAcceptedCounts[cls]}</div>`;
-    }).join('');
 
-    // Create or update the total offered counts element
-    let totalOfferedDiv = document.querySelector('.kanban-total-offered-counts');
-    if (!totalOfferedDiv) {
-        totalOfferedDiv = document.createElement('div');
-        totalOfferedDiv.className = 'kanban-total-offered-counts';
-        totalOfferedDiv.style.marginTop = '10px';
-        totalOfferedDiv.style.fontSize = '16px'; // Larger font size for total
-        totalOfferedDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalOfferedDiv);
-        }
-    }
-
-    // Update the content of the total accepted counts element
-    totalOfferedDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total Offered ${cls}: ${totalOfferedCounts[cls]}</div>`;
-    }).join('');
-
+    createOrUpdateDiv(
+        '.kanban-total-offered-counts',
+        'Offered',
+        totalOfferedCounts
+    ); 
 
 
 

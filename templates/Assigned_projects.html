@@ -47,6 +47,14 @@
                 {% set classes = classes + ' offered' %}
             {% endif %}
 
+            <!-- this is for course -->
+            {% if student[7] in ("Engineering and IT") %}
+                {% set classes = classes + ' engit' %}
+            {% elif student[7] in ("Science") %}
+                {% set classes = classes + ' science' %}
+            {% elif student[7] in ("Volunteer") %}
+                {% set classes = classes + ' volunteer' %}
+            {% endif %}
 
             {{ studentKanbanCard(classes, student) }}
 
@@ -71,7 +79,7 @@ function createOrUpdateDiv(selector, count_type, totalCounts) {
 
 // Example usage:
 // Call the function with the classes you want to count
-const targetClasses = ["translator","sysadmin","experienced","other","female","male"];
+const targetClasses = ["translator","sysadmin","experienced","other","female","male","volunteer","engit","science"];
 
   function allowDrop(event) {
     event.preventDefault();

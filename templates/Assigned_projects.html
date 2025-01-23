@@ -238,6 +238,10 @@ function updateKanbanColumnCounts(targetClasses) {
         resultsDiv.innerHTML = targetClasses.map(cls => {
             return `<div>${cls}: ${columnCounts[cls]}</div>`;
         }).join('');
+
+        hours_per_week = 0 + columnCounts['volunteer']*2 + columnCounts['engit']*24 + columnCounts['science']*8
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Hours per week: '+hours_per_week+' </div>';
+        
     });
 
     createOrUpdateDiv(

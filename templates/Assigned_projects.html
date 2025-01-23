@@ -192,9 +192,19 @@ function updateKanbanColumnCounts(targetClasses) {
     });
 
 
-   // Iterate through each kanban column
+   // Iterate through each kanban column ie. project
     document.querySelectorAll('.kanban-column').forEach(column => {
         const columnCounts = {};
+
+        // Initialize project counts objects
+        const projectAcceptedCounts = {};
+        const projectOfferedCounts = {};
+
+        targetClasses.forEach(cls => {
+            projectAcceptedCounts[cls] = 0;
+            projectOfferedCounts[cls] = 0;
+        });
+
 
         // Initialize counts for each target class
         targetClasses.forEach(cls => {
@@ -213,9 +223,11 @@ function updateKanbanColumnCounts(targetClasses) {
                     if (projectId != 'Unassigned'){
                         totalAssignedCounts[cls]++;
                         if (card.classList.contains('accepted')) {
+                            projectAcceptedCounts[cls]++;
                             totalAcceptedCounts[cls]++;
                         }
                         if (card.classList.contains('offered')) {
+                            projectOfferedCounts[cls]++;
                             totalOfferedCounts[cls]++;
                         }
                     }
@@ -241,7 +253,11 @@ function updateKanbanColumnCounts(targetClasses) {
             return `<div>${cls}: ${columnCounts[cls]}</div>`;
         }).join('');
 
-        hours_per_week = 0 + columnCounts['volunteer']*2 + columnCounts['engit']*24 + columnCounts['science']*8
+        accepted_hours_per_week = 0 + projectAcceptedCounts['volunteer']*2 + projectAcceptedCounts['engit']*24 + projectAcceptedCounts['science']*8;
+        offered_hours_per_week = 0 + projectOfferedCounts['volunteer']*2 + projectOfferedCounts['engit']*24 + projectOfferedCounts['science']*8;
+        hours_per_week = 0 + columnCounts['volunteer']*2 + columnCounts['engit']*24 + columnCounts['science']*8;
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Accepted hpw: '+ accepted_hours_per_week+' </div>';
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Offered hpw: '+ offered_hours_per_week+' </div>';
         resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Hours per week: '+hours_per_week+' </div>';
         
     });

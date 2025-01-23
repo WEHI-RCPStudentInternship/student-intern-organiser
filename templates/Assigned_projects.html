@@ -20,6 +20,7 @@
     <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
       <h3 class="column-header"><a href="/share_students/{{ project[0] }}">{{ project[1] }}</a></h3>
       {% for student in students %}
+        {% set classes = '' %}
         {% if project[1] == student[2]  %}
 
             {% if student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %}

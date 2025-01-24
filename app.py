@@ -1637,6 +1637,25 @@ def projects_index():
     projects = get_all_projects()
     return render_template('projects.html', projects=projects)
 
+@app.route('/clean_pronouns', methods=['GET'])
+def clean_pronouns():
+
+    # Connect to the database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute('UPDATE students SET pronouns = "she/her" WHERE pronouns in ("She/Her","She/her","she","She")')
+    conn.commit()
+
+    cursor.execute('UPDATE students SET pronouns = "he/him" WHERE pronouns in ("He/him","He/Him","he","He","Mr")')
+    conn.commit()
+
+    # Close the database connection
+    conn.close()
+
+    return redirect(url_for('index'))
+
+
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
     if request.method == 'POST':

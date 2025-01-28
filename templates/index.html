@@ -48,6 +48,12 @@
         <a id="change_pronouns" href="#">Change pronouns</a>
 
 
+        <select id="phone">
+            <option value="N/A">N/A</option>
+            <option value="International">International</option>
+        </select>
+        <a id="change_phone" href="#">Change phone</a>
+
 
         {% if request.path in ('/outstanding','/new_intake','/new_applications','/to_interview') %}
 
@@ -316,6 +322,44 @@
                   });
             });
 
+            // Change phone button action
+            $('#change_phone').on('click', function() {
+                var phone = $('#phone').val();
+                var student_ids = [];
+
+                var selectedRows = $('.studentCheckbox:checked').each(function() {
+                    text = table.row($(this).closest('tr')).data();
+                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
+                    student_ids.push(id);
+                });
+
+                data = {
+                    student_ids: student_ids,
+                    new_phone: phone
+                };
+
+                url = '/change_phone';
+                // Send the POST request
+                fetch(url, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                  .then(response => {
+                    if (response.ok) {
+                      console.log('Phone changed successfully');
+                    } else {
+                      console.error('An error occurred:', response.statusText);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('An error occurred:', error);
+                  });
+            });
+
+
             // Change pronouns button action
             $('#change_pronouns').on('click', function() {
                 var pronouns = $('#pronouns').val();
@@ -343,7 +387,7 @@
                 })
                   .then(response => {
                     if (response.ok) {
-                      console.log('Ratings changed successfully');
+                      console.log('Pronouns changed successfully');
                     } else {
                       console.error('An error occurred:', response.statusText);
                     }
@@ -381,7 +425,7 @@
                 })
                   .then(response => {
                     if (response.ok) {
-                      console.log('Ratings changed successfully');
+                      console.log('Course changed successfully');
                     } else {
                       console.error('An error occurred:', response.statusText);
                     }

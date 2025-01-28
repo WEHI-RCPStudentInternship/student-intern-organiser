@@ -256,9 +256,9 @@ function updateKanbanColumnCounts(targetClasses) {
         accepted_hours_per_week = 0 + projectAcceptedCounts['volunteer']*2 + projectAcceptedCounts['engit']*24 + projectAcceptedCounts['science']*8;
         offered_hours_per_week = 0 + projectOfferedCounts['volunteer']*2 + projectOfferedCounts['engit']*24 + projectOfferedCounts['science']*8 + accepted_hours_per_week;
         hours_per_week = 0 + columnCounts['volunteer']*2 + columnCounts['engit']*24 + columnCounts['science']*8;
-        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Accepted hpw: '+ accepted_hours_per_week+' </div>';
-        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Offered hpw: '+ offered_hours_per_week+' </div>';
         resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Hours per week: '+hours_per_week+' </div>';
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Offered hpw: '+ offered_hours_per_week+' </div>';
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Accepted hpw: '+ accepted_hours_per_week+' </div>';
         
     });
 

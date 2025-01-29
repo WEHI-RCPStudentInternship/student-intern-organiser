@@ -325,7 +325,7 @@ def quick_review():
 
 @app.route('/have_interviewed')
 def have_interviewed():
-    statuses = [4]
+    statuses = [6]
     title = "New Intake - Have Interviewed" 
     html_to_render = filter_students(statuses,title,"interview")
     return html_to_render
@@ -333,14 +333,14 @@ def have_interviewed():
 
 @app.route('/to_interview')
 def to_interview():
-    statuses = [3]
+    statuses = [5]
     title = "New Intake - Email to Interview" 
     html_to_render = filter_students(statuses,title,"interview")
     return html_to_render
 
 @app.route('/on_waiting_list')
 def on_waiting_list():
-    statuses = [3]
+    statuses = [4]
     title = "New Intake - On Waiting List" 
     html_to_render = filter_students(statuses,title,"waiting_list")
     return html_to_render

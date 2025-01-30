@@ -330,6 +330,14 @@ def have_interviewed():
     html_to_render = filter_students(statuses,title,"interview")
     return html_to_render
 
+@app.route('/offered_accepted')
+def offered_accepted():
+    statuses = [7,8]
+    title = "New Intake - Offered & Accepted" 
+    html_to_render = filter_students(statuses,title,"interview")
+    return html_to_render
+
+
 
 @app.route('/to_interview')
 def to_interview():

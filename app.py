@@ -1638,6 +1638,31 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
     return table_rows
 
+@app.route('/visualisation', methods=['GET'])
+def visualisation():
+    return render_template('visualisation.html')
+
+@app.route('/visualisation/data', methods=['GET'])
+def get_visualisation_data():
+    # Connect to the database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Fetch student count by course
+    query = '''
+        SELECT course, COUNT(*) AS student_count
+        FROM Students
+        GROUP BY course
+    '''
+    cursor.execute(query)
+    data = cursor.fetchall()
+
+    # Close the connection
+    conn.close()
+
+    # Format data as JSON
+    return jsonify([{"course": row[0], "count": row[1]} for row in data])
+
 
 if __name__ == '__main__':
     app.run(debug=True)

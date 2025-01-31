@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Visualisation{% endblock %}
+
+{% block page_title %}Visualisation{% endblock %}
+
+{% block content %}
+<h2>Visualisation</h2>
+<p>This is the visualisation page where you can generate different types of visualisations.</p>
+<!-- Add your visualization content here -->
+<h2>Course Enrollment Visualisation</h2>
+<div style="width: 500px; height: 300px; margin: 20px 0;">
+    <canvas id="courseChart"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fetch data from the server
+        fetch('/visualisation/data')
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.map(item => item.course);
+                const counts = data.map(item => item.count);
+
+                // Create the chart
+                const ctx = document.getElementById('courseChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Student Count by Course',
+                            data: counts,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+    });
+</script>
+{% endblock %}

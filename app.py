@@ -327,7 +327,7 @@ def quick_review():
 def have_interviewed():
     statuses = [6]
     title = "New Intake - Have Interviewed" 
-    html_to_render = filter_students(statuses,title,"interview")
+    html_to_render = filter_students(statuses,title,"waiting_list")
     return html_to_render
 
 @app.route('/offered_accepted')

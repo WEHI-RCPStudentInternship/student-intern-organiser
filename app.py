@@ -332,7 +332,7 @@ def have_interviewed():
 
 @app.route('/offered_accepted')
 def offered_accepted():
-    statuses = [7,8]
+    statuses = [7,8,9]
     title = "New Intake - Offered & Accepted" 
     html_to_render = filter_students(statuses,title,"interview")
     return html_to_render

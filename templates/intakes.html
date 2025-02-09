@@ -41,7 +41,7 @@
                 <a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;
             </td>
             <td>
-                <a href="/students_by_intake/{{ intake[1] }}">All Students</a> <!-- Link to your new route -->
+                <a href="/students_by_intake/{{ intake[1] | urlencode }}">All Students</a>
             </td>
         </tr>
         {% endfor %}

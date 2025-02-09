@@ -5,6 +5,7 @@ import sqlite3
 import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
+from urllib.parse import unquote
 
 from flask import (Flask, jsonify, redirect, render_template, request, Response,
                    send_file, url_for)
@@ -1521,13 +1522,13 @@ def intakes_index():
     return render_template('intakes.html', intakes=intakes, students=students)
 
 
-@app.route('/students_by_intake/<intake_name>')
+
+@app.route('/students_by_intake/<path:intake_name>')  # Use <path:> to allow slashes in the parameter
 def students_by_intake(intake_name):
-    # Connect to the SQLite database
+    intake_name = unquote(intake_name)  # Decode the intake name
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    # Retrieve students for the selected intake
     query = '''
         SELECT intern_id, full_name, email, pronunciation, project, intake, course, status
         FROM Students
@@ -1535,15 +1536,10 @@ def students_by_intake(intake_name):
     '''
     cursor.execute(query, (intake_name,))
     students = cursor.fetchall()
-
-    # Close the database connection
     conn.close()
 
     title_of_page = f"Students in Intake: {intake_name}"
     return render_template('students_by_intake.html', students=students, intake_name=intake_name, title_of_page=title_of_page)
-
-
-
 @app.route('/edit_intake/<int:intake_id>', methods=['GET', 'POST'])
 def edit_intake(intake_id):
     conn = sqlite3.connect(db_path)

@@ -1530,7 +1530,7 @@ def students_by_intake(intake_name):
     cursor = conn.cursor()
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE intake = ?
     '''
@@ -1539,17 +1539,17 @@ def students_by_intake(intake_name):
     conn.close()
 
     title_of_page = f"Students in Intake: {intake_name}"
-    return render_template('students_by_intake.html', students=students, intake_name=intake_name, title_of_page=title_of_page)
+    return render_template('index.html', students=students, intake_name=intake_name, title_of_page=title_of_page)
 
 
-@app.route('/finished_students_by_intake/<intake_name>')
+@app.route('/finished_students_by_intake/<path:intake_name>')
 def finished_students_by_intake(intake_name):
     intake_name = unquote(intake_name)  # Decode the intake name
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE intake = ? AND status = "14 Finished"
     '''
@@ -1558,7 +1558,7 @@ def finished_students_by_intake(intake_name):
     conn.close()
 
     title_of_page = f"Finished Students in Intake: {intake_name}"
-    return render_template('students_by_intake.html', students=students, intake_name=intake_name, title_of_page=title_of_page)
+    return render_template('index.html', students=students, intake_name=intake_name, title_of_page=title_of_page)
 
 
 @app.route('/edit_intake/<int:intake_id>', methods=['GET', 'POST'])

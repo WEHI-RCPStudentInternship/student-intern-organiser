@@ -28,6 +28,7 @@
             <th>Status</th>
             <th>Action</th>
             <th>All Students</th>
+            <th>Finished Students</th>
         </tr>
     </thead>
     <tbody>
@@ -43,6 +44,9 @@
             <td>
                 <a href="/students_by_intake/{{ intake[1] | urlencode }}">All Students</a>
             </td>
+            <td>
+                <a href="/finished_students_by_intake/{{ intake[1]|urlencode }}">Finished Students</a>
+            </td>s
         </tr>
         {% endfor %}
     </tbody>

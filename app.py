@@ -21,6 +21,63 @@ db_path = 'student_intern_data/student_intern_data.db'
 
 import io
 
+def filter_students(status_of_students_to_filter,title,context = None):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    if context == "interview":
+        query = '''
+            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+            FROM Students
+            WHERE intake = ? AND status IN ({}) AND project != 'Unassigned' ORDER BY status ASC
+        '''.format(','.join(['?'] * len(current_statuses_list)))
+    elif context == "waiting_list":
+        query = '''
+            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+            FROM Students
+            WHERE intake = ? AND status IN ({}) AND pre_internship_summary_recommendation_internal != '06 - TS - Recommend no sign up except under specific circumstances. ' AND project = 'Unassigned' ORDER BY status ASC
+        '''.format(','.join(['?'] * len(current_statuses_list)))
+    elif context == "missed_out":
+        query = '''
+            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+            FROM Students
+            WHERE intake = ? AND status IN ({}) AND pre_internship_summary_recommendation_internal = '06 - TS - Recommend no sign up except under specific circumstances. ' AND project = 'Unassigned' ORDER BY status ASC
+        '''.format(','.join(['?'] * len(current_statuses_list)))
+    else:
+        query = '''
+            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+            FROM Students
+            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+        '''.format(','.join(['?'] * len(current_statuses_list)))
+ 
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+
+    # Close the database connection
+    conn.close()
+    title_of_page = title
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+
 def get_empty_users(condition):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -245,6 +302,13 @@ def handle_error(e):
 
 
 
+@app.route('/new_applications')
+def new_applications():
+    statuses = [1]
+    title = "New Intake Applications" 
+    html_to_render = filter_students(statuses,title)
+    return html_to_render
+
 @app.route('/quick_review')
 def quick_review():
     # Connect to the SQLite database
@@ -282,7 +346,19 @@ def quick_review():
     title_of_page = "New Intake Quick Review"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
+@app.route('/have_interviewed')
+def have_interviewed():
+    statuses = [6]
+    title = "New Intake - Have Interviewed" 
+    html_to_render = filter_students(statuses,title,"waiting_list")
+    return html_to_render
 
+@app.route('/offered_accepted')
+def offered_accepted():
+    statuses = [7,8,9]
+    title = "New Intake - Offered & Accepted" 
+    html_to_render = filter_students(statuses,title,"interview")
+    return html_to_render
 
 @app.route('/email_ack')
 def email_ack():
@@ -324,6 +400,27 @@ def email_ack():
     title_of_page = "New Intake Email Acknowledgment"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
+@app.route('/to_interview')
+def to_interview():
+    statuses = [5]
+    title = "New Intake - Email to Interview" 
+    html_to_render = filter_students(statuses,title,"interview")
+    return html_to_render
+
+@app.route('/on_waiting_list')
+def on_waiting_list():
+    statuses = [4]
+    title = "New Intake - On Waiting List" 
+    html_to_render = filter_students(statuses,title,"waiting_list")
+    return html_to_render
+
+
+@app.route('/missed_out')
+def missed_out():
+    statuses = [3]
+    title = "New Intake - Missed Out On Waiting List" 
+    html_to_render = filter_students(statuses,title,"missed_out")
+    return html_to_render
 
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
@@ -1616,6 +1713,30 @@ def add_intake():
 def projects_index():
     projects = get_all_projects()
     return render_template('projects.html', projects=projects)
+
+@app.route('/project_students/<int:id>')
+def project_students(id):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Get project name
+    cursor.execute('SELECT name FROM Projects WHERE id = ?', (id,))
+    name = cursor.fetchone()
+    name = name[0] if name else "Unknown Project"
+
+    # Get students associated with this project
+    query = '''
+        SELECT *
+        FROM Students
+        WHERE project = (SELECT name FROM Projects WHERE id = ?)
+    '''
+    cursor.execute(query, (id,))
+    students = cursor.fetchall()
+    conn.close()
+
+    title_of_page = f"Students in Project: {name}"
+    return render_template('index.html', students=students, name=name, title_of_page=title_of_page)
+
 
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():

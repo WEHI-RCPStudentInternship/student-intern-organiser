@@ -1,47 +1,44 @@
 {% extends 'base.html' %}
 
 {% block title %}Projects Index{% endblock %}
-
 {% block page_title %}Projects{% endblock %}
 
 {% block top_links_menu %}
-    <!-- Your top links menu goes here if needed -->
-        <a href="/add_project">Add Project</a>
+<a href="/add_project">Add Project</a>
 {% endblock %}
 
 {% block content %}
-    <h1>Projects Table</h1>
-    <table id="projectsTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for project in projects %}
-            <tr>
-                <td>{{ project[0] }}</td>
-                <td>{{ project[1] }}</td>
-                <td>{{ project[2] }}</td>
-                <td><a href="/edit_project/{{ project[0] }}">Edit</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h1>Projects Table</h1>
+<table id="projectsTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Action</th>
+            <th>Students</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in projects %}
+        <tr>
+            <td>{{ project[0] }}</td>
+            <td>{{ project[1] }}</td>
+            <td>{{ project[2] }}</td>
+            <td><a href="/edit_project/{{ project[0] }}">Edit</a></td>
+            <td><a href="/project_students/{{ project[0] }}">View Students</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        // Your JavaScript code for DataTables or other functionality goes here
-        $(document).ready(function() {
-            var table = $('#projectsTable').DataTable({
-                "lengthMenu": [10, 25, 50, 100], // Customize the number of entries per page
-                // Other DataTables options and initialization code can go here
-            });
+<script>
+    $(document).ready(function () {
+        $('#projectsTable').DataTable({
+            "lengthMenu": [10, 25, 50, 100]
         });
-    </script>
+    });
+</script>
 {% endblock %}
-

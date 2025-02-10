@@ -13,8 +13,8 @@
 
 <div class="counts kanban-total-counts"> </div>
 <div class="counts kanban-total-assigned-counts"> </div>
-<div class="counts kanban-total-accepted-counts"> </div>
 <div class="counts kanban-total-offered-counts"> </div>
+<div class="counts kanban-total-accepted-counts"> </div>
 <div class="kanban-container">
   {% for project in projects %}
     <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -22,7 +22,6 @@
       {% for student in students %}
         {% if project[1] == student[2]  %}
 
-            {% set classes = '' %}
             {% if student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %}
                 {% set classes = 'male other not-accepted kanban-card' %}
             {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even without a project. ") %}
@@ -39,6 +38,8 @@
                 {% set classes = 'translator kanban-card male' %}
             {% elif student[6] in ("03 - F Technical Skills - Recommend sign up for a specific project. ") %}
                 {% set classes = 'other not-accepted female kanban-card' %}
+            {% else %}
+                {% set classes = 'other kanban-card' %}
             {% endif %}
 
             {% if student[4] in ("08 Accepted contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started") %}
@@ -47,6 +48,23 @@
                 {% set classes = classes + ' offered' %}
             {% endif %}
 
+
+            <!-- this is for projects -->
+            {% if student[2] == 'Unassigned' %}
+                {% set classes = classes + ' unassigned' %}
+            {% else %}
+                {% set classes = classes + ' assigned' %}
+            {% endif %}
+
+
+            <!-- this is for course -->
+            {% if student[7] in ("Engineering and IT") %}
+                {% set classes = classes + ' engit' %}
+            {% elif student[7] in ("Science") %}
+                {% set classes = classes + ' science' %}
+            {% elif student[7] in ("Volunteer") %}
+                {% set classes = classes + ' volunteer' %}
+            {% endif %}
 
             {{ studentKanbanCard(classes, student) }}
 
@@ -59,10 +77,19 @@
 <!-- Drag and Drop Functionnality -->
 
 <script>
+function createOrUpdateDiv(selector, count_type, totalCounts) {
+    let div = document.querySelector(selector);
+    // Update the content of the div
+    div.innerHTML = targetClasses.map(cls => {
+        return `<div>Total ${count_type} ${cls}: ${totalCounts[cls]}</div>`;
+    }).join('');
+
+}
+
 
 // Example usage:
 // Call the function with the classes you want to count
-const targetClasses = ["translator","sysadmin","experienced","other","female","male"];
+const targetClasses = ["translator","sysadmin","experienced","other","volunteer","engit","science","female","male"];
 
   function allowDrop(event) {
     event.preventDefault();
@@ -165,9 +192,19 @@ function updateKanbanColumnCounts(targetClasses) {
     });
 
 
-   // Iterate through each kanban column
+   // Iterate through each kanban column ie. project
     document.querySelectorAll('.kanban-column').forEach(column => {
         const columnCounts = {};
+
+        // Initialize project counts objects
+        const projectAcceptedCounts = {};
+        const projectOfferedCounts = {};
+
+        targetClasses.forEach(cls => {
+            projectAcceptedCounts[cls] = 0;
+            projectOfferedCounts[cls] = 0;
+        });
+
 
         // Initialize counts for each target class
         targetClasses.forEach(cls => {
@@ -186,9 +223,11 @@ function updateKanbanColumnCounts(targetClasses) {
                     if (projectId != 'Unassigned'){
                         totalAssignedCounts[cls]++;
                         if (card.classList.contains('accepted')) {
+                            projectAcceptedCounts[cls]++;
                             totalAcceptedCounts[cls]++;
                         }
                         if (card.classList.contains('offered')) {
+                            projectOfferedCounts[cls]++;
                             totalOfferedCounts[cls]++;
                         }
                     }
@@ -213,88 +252,41 @@ function updateKanbanColumnCounts(targetClasses) {
         resultsDiv.innerHTML = targetClasses.map(cls => {
             return `<div>${cls}: ${columnCounts[cls]}</div>`;
         }).join('');
+
+        accepted_hours_per_week = 0 + projectAcceptedCounts['volunteer']*2 + projectAcceptedCounts['engit']*24 + projectAcceptedCounts['science']*8;
+        offered_hours_per_week = 0 + projectOfferedCounts['volunteer']*2 + projectOfferedCounts['engit']*24 + projectOfferedCounts['science']*8 + accepted_hours_per_week;
+        hours_per_week = 0 + columnCounts['volunteer']*2 + columnCounts['engit']*24 + columnCounts['science']*8;
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Hours per week: '+hours_per_week+' </div>';
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Offered hpw: '+ offered_hours_per_week+' </div>';
+        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Accepted hpw: '+ accepted_hours_per_week+' </div>';
+        
     });
 
-    // Create or update the total counts element
-    let totalDiv = document.querySelector('.kanban-total-counts');
-    if (!totalDiv) {
-        totalDiv = document.createElement('div');
-        totalDiv.className = 'kanban-total-counts';
-        totalDiv.style.marginTop = '10px';
-        totalDiv.style.fontSize = '16px'; // Larger font size for total
-        totalDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalDiv);
-        }
-    }
+    createOrUpdateDiv(
+        '.kanban-total-counts',
+        '',
+        totalCounts
+    ); 
 
-    // Update the content of the total counts element
-    totalDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total ${cls}: ${totalCounts[cls]}</div>`;
-    }).join('');
 
-    // Create or update the total assigned counts element
-    let totalAssignedDiv = document.querySelector('.kanban-total-assigned-counts');
-    if (!totalAssignedDiv) {
-        totalAssignedDiv = document.createElement('div');
-        totalAssignedDiv.className = 'kanban-total-assigned-counts';
-        totalAssignedDiv.style.marginTop = '10px';
-        totalAssignedDiv.style.fontSize = '16px'; // Larger font size for total
-        totalAssignedDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalAssignedDiv);
-        }
-    }
+    createOrUpdateDiv(
+        '.kanban-total-accepted-counts',
+        'Accepted',
+        totalAcceptedCounts
+    ); 
 
-    // Update the content of the total assigned counts element
-    totalAssignedDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total Assigned ${cls}: ${totalAssignedCounts[cls]}</div>`;
-    }).join('');
 
-    // Create or update the total accepted counts element
-    let totalAcceptedDiv = document.querySelector('.kanban-total-accepted-counts');
-    if (!totalAcceptedDiv) {
-        totalAcceptedDiv = document.createElement('div');
-        totalAcceptedDiv.className = 'kanban-total-accepted-counts';
-        totalAcceptedDiv.style.marginTop = '10px';
-        totalAcceptedDiv.style.fontSize = '16px'; // Larger font size for total
-        totalAcceptedDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalAcceptedDiv);
-        }
-    }
+    createOrUpdateDiv(
+        '.kanban-total-offered-counts',
+        'Offered',
+        totalOfferedCounts
+    ); 
 
-    // Update the content of the total accepted counts element
-    totalAcceptedDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total Accepted ${cls}: ${totalAcceptedCounts[cls]}</div>`;
-    }).join('');
-
-    // Create or update the total offered counts element
-    let totalOfferedDiv = document.querySelector('.kanban-total-offered-counts');
-    if (!totalOfferedDiv) {
-        totalOfferedDiv = document.createElement('div');
-        totalOfferedDiv.className = 'kanban-total-offered-counts';
-        totalOfferedDiv.style.marginTop = '10px';
-        totalOfferedDiv.style.fontSize = '16px'; // Larger font size for total
-        totalOfferedDiv.style.fontWeight = 'bold'; // Make it bold for emphasis
-        // Assuming there is a container for kanban columns
-        const kanbanContainer = document.querySelector('.kanban-container');
-        if (kanbanContainer) {
-            kanbanContainer.appendChild(totalOfferedDiv);
-        }
-    }
-
-    // Update the content of the total accepted counts element
-    totalOfferedDiv.innerHTML = targetClasses.map(cls => {
-        return `<div>Total Offered ${cls}: ${totalOfferedCounts[cls]}</div>`;
-    }).join('');
-
+    createOrUpdateDiv(
+        '.kanban-total-assigned-counts',
+        'Assigned',
+        totalAssignedCounts
+    ); 
 
 
 

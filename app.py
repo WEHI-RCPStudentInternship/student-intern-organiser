@@ -1726,7 +1726,9 @@ def project_students(id):
 
     # Get students associated with this project
     query = '''
-        SELECT *
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
+        status, post_internship_summary_rating_internal, pronouns,
+        pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE project = (SELECT name FROM Projects WHERE id = ?)
     '''

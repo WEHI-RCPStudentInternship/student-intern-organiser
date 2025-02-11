@@ -16,7 +16,8 @@
             <th>Name</th>
             <th>Status</th>
             <th>Action</th>
-            <th>Students</th>
+            <th>All Students</th>
+            <th>Finished Students</th>
         </tr>
     </thead>
     <tbody>
@@ -26,7 +27,8 @@
             <td>{{ project[1] }}</td>
             <td>{{ project[2] }}</td>
             <td><a href="/edit_project/{{ project[0] }}">Edit</a></td>
-            <td><a href="/project_students/{{ project[0] }}">View Students</a></td>
+            <td><a href="/project_students/{{ project[0] }}">View All Students</a></td>
+            <td><a href="/project_finished_students/{{ project[0] }}">View Finished Students</a></td>
         </tr>
         {% endfor %}
     </tbody>

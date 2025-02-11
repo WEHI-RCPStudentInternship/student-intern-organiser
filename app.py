@@ -1646,7 +1646,9 @@ def finished_students_by_intake(intake_name):
     cursor = conn.cursor()
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
+        status, post_internship_summary_rating_internal, 
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE intake = ? AND status = "14 Finished"
     '''
@@ -1731,6 +1733,30 @@ def project_students(id):
         pre_internship_summary_recommendation_internal, wehi_email, mobile
         FROM Students
         WHERE project = (SELECT name FROM Projects WHERE id = ?)
+    '''
+    cursor.execute(query, (id,))
+    students = cursor.fetchall()
+    conn.close()
+
+    title_of_page = f"Students in Project: {name}"
+    return render_template('index.html', students=students, name=name, title_of_page=title_of_page)
+
+@app.route('/project_finished_students/<int:id>')
+def project_finished_students(id):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Get project name
+    cursor.execute('SELECT name FROM Projects WHERE id = ?', (id,))
+    name = cursor.fetchone()
+    name = name[0] if name else "Unknown Project"
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, 
+        course, status, post_internship_summary_rating_internal, 
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE project = (SELECT name FROM Projects WHERE id = ?) AND status = "14 Finished"
     '''
     cursor.execute(query, (id,))
     students = cursor.fetchall()

@@ -1627,16 +1627,24 @@ def students_by_intake(intake_name):
     cursor = conn.cursor()
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
         FROM Students
         WHERE intake = ?
     '''
     cursor.execute(query, (intake_name,))
     students = cursor.fetchall()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
     conn.close()
 
     title_of_page = f"Students in Intake: {intake_name}"
-    return render_template('index.html', students=students, intake_name=intake_name, title_of_page=title_of_page)
+    return render_template('index.html', students=students, statuses=statuses, projects=projects, intake_name=intake_name, title_of_page=title_of_page)
 
 
 @app.route('/finished_students_by_intake/<path:intake_name>')
@@ -1648,16 +1656,26 @@ def finished_students_by_intake(intake_name):
     query = '''
         SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
         status, post_internship_summary_rating_internal, 
-        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        
+        
         FROM Students
         WHERE intake = ? AND status = "14 Finished"
     '''
     cursor.execute(query, (intake_name,))
     students = cursor.fetchall()
+
+     # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
     conn.close()
 
     title_of_page = f"Finished Students in Intake: {intake_name}"
-    return render_template('index.html', students=students, intake_name=intake_name, title_of_page=title_of_page)
+    return render_template('index.html', students=students, intake_name=intake_name, statuses=statuses, projects=projects, title_of_page=title_of_page)
 
 
 @app.route('/edit_intake/<int:intake_id>', methods=['GET', 'POST'])
@@ -1736,10 +1754,18 @@ def project_students(id):
     '''
     cursor.execute(query, (id,))
     students = cursor.fetchall()
+
+ # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
     conn.close()
 
     title_of_page = f"Students in Project: {name}"
-    return render_template('index.html', students=students, name=name, title_of_page=title_of_page)
+    return render_template('index.html', students=students, name=name, statuses=statuses, projects=projects, title_of_page=title_of_page)
 
 @app.route('/project_finished_students/<int:id>')
 def project_finished_students(id):
@@ -1760,10 +1786,18 @@ def project_finished_students(id):
     '''
     cursor.execute(query, (id,))
     students = cursor.fetchall()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
     conn.close()
 
     title_of_page = f"Students in Project: {name}"
-    return render_template('index.html', students=students, name=name, title_of_page=title_of_page)
+    return render_template('index.html', students=students, name=name, statuses=statuses, projects=projects, title_of_page=title_of_page)
 
 
 @app.route('/add_project', methods=['GET', 'POST'])

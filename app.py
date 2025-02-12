@@ -1799,6 +1799,38 @@ def project_finished_students(id):
     title_of_page = f"Students in Project: {name}"
     return render_template('index.html', students=students, name=name, statuses=statuses, projects=projects, title_of_page=title_of_page)
 
+@app.route('/project_current_students/<int:id>')
+def project_current_students(id):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Get project name
+    cursor.execute('SELECT name FROM Projects WHERE id = ?', (id,))
+    name = cursor.fetchone()
+    name = name[0] if name else "Unknown Project"
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, 
+        course, status, post_internship_summary_rating_internal, 
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE project = (SELECT name FROM Projects WHERE id = ?) AND status = "13 Internship started"
+    '''
+    cursor.execute(query, (id,))
+    students = cursor.fetchall()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    conn.close()
+
+    title_of_page = f"Students in Project: {name}"
+    return render_template('index.html', students=students, name=name, statuses=statuses, projects=projects, title_of_page=title_of_page)
+
 
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():

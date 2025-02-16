@@ -1381,6 +1381,44 @@ def student(intern_id):
     # Pass matching_files to the template
     return render_template('view.html', student=student, matching_files=matching_files)
 
+
+@app.route('/change_phone', methods=['POST'])
+def change_phone():
+    data = request.get_json()
+    student_ids = data.get('student_ids', [])
+    new_phone = data.get('new_phone', '')
+    # Convert student IDs to integers
+    student_ids = [int(id) for id in student_ids]
+    # Call the change_student_project function
+    change_phone_update(student_ids, new_phone)
+    # Redirect back to the index page
+    return redirect('/')
+
+@app.route('/change_pronouns', methods=['POST'])
+def change_pronouns():
+    data = request.get_json()
+    student_ids = data.get('student_ids', [])
+    new_pronouns = data.get('new_pronouns', '')
+    # Convert student IDs to integers
+    student_ids = [int(id) for id in student_ids]
+    # Call the change_student_project function
+    change_pronouns_update(student_ids, new_pronouns)
+    # Redirect back to the index page
+    return redirect('/')
+
+@app.route('/change_course', methods=['POST'])
+def change_course():
+    data = request.get_json()
+    student_ids = data.get('student_ids', [])
+    new_course = data.get('new_course', '')
+    # Convert student IDs to integers
+    student_ids = [int(id) for id in student_ids]
+    # Call the change_student_project function
+    change_course_update(student_ids, new_course)
+    # Redirect back to the index page
+    return redirect('/')
+
+
 @app.route('/change_post_internship_rating', methods=['POST'])
 def change_post_internship_rating():
 
@@ -1469,7 +1507,61 @@ def change_post_internship_rating(student_ids, new_post_internship_rating):
     conn.commit()
     conn.close()
 
+def change_phone_update(student_ids, new_phone):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+    
+    # Prepare the SQL query
+    query = '''
+        UPDATE Students
+        SET mobile = ?
+        WHERE intern_id IN ({})
+    '''.format(','.join(['?'] * len(student_ids)))
 
+    # Execute the query
+    cursor.execute(query, [new_phone] + student_ids)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+
+
+def change_pronouns_update(student_ids, new_pronouns):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Prepare the SQL query
+    query = '''
+        UPDATE Students
+        SET pronouns = ?
+        WHERE intern_id IN ({})
+    '''.format(','.join(['?'] * len(student_ids)))
+
+    # Execute the query
+    cursor.execute(query, [new_pronouns] + student_ids)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+
+
+def change_course_update(student_ids, new_course):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Prepare the SQL query
+    query = '''
+        UPDATE Students
+        SET course = ?
+        WHERE intern_id IN ({})
+    '''.format(','.join(['?'] * len(student_ids)))
+
+    # Execute the query
+    cursor.execute(query, [new_course] + student_ids)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
 
 
 def change_student_project(student_ids, new_project):

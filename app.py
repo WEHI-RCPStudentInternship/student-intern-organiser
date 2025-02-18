@@ -1502,6 +1502,40 @@ def dashboard(dashboard_type):
                         dashboard_type = dashboard_type)
 
 
+@app.route('/dashboard/<string:dashboard_type>/chart_data', methods=['GET'])
+def dashboard_chart_data(dashboard_type):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Retrieve students by intake and calculate hours per week
+    cursor.execute('''
+        SELECT intake,
+               SUM(CASE 
+                   WHEN course = 'Engineering and IT' THEN 24
+                   WHEN course = 'Engineering' THEN 24
+                   WHEN course = 'Science' THEN 8
+                   ELSE 0  -- Default case if the course doesn't match
+               END) AS total_hours,
+               COUNT(*) AS student_count
+        FROM Students
+        GROUP BY intake
+        ORDER BY intake ASC
+    ''')
+    
+    data = cursor.fetchall()
+    conn.close()
+
+    # Format the response
+    chart_data = {
+        "intakes": [row[0] for row in data], 
+        "total_hours": [row[1] for row in data],
+        "student_count": [row[2] for row in data]
+    }
+
+    return jsonify(chart_data)
+
+
+
 @app.route('/intakes')
 def intakes_index():
     intakes = get_all_intakes()
@@ -1637,31 +1671,6 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
 
     return table_rows
-
-@app.route('/visualisation', methods=['GET'])
-def visualisation():
-    return render_template('visualisation.html')
-
-@app.route('/visualisation/data', methods=['GET'])
-def get_visualisation_data():
-    # Connect to the database
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
-    cursor = conn.cursor()
-
-    # Fetch student count by course
-    query = '''
-        SELECT course, COUNT(*) AS student_count
-        FROM Students
-        GROUP BY course
-    '''
-    cursor.execute(query)
-    data = cursor.fetchall()
-
-    # Close the connection
-    conn.close()
-
-    # Format data as JSON
-    return jsonify([{"course": row[0], "count": row[1]} for row in data])
 
 
 if __name__ == '__main__':

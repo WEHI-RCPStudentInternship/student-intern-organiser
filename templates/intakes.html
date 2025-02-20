@@ -5,43 +5,67 @@
 {% block page_title %}Intakes{% endblock %}
 
 {% block top_links_menu %}
-    <!-- Your top links menu goes here if needed -->
-        <a href="/add_intake" >Add Intake</a>
+<a href="/add_intake">Add Intake</a>
 {% endblock %}
 
 {% block content %}
-    <h1>Intakes Table</h1>
-    <table id="intakesTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for intake in intakes %}
-            <tr>
-                <td>{{ intake[0] }}</td>
-                <td>{{ intake[1] }}</td>
-                <td>{{ intake[2] }}</td>
-                <td><a href="/edit_intake/{{ intake[0] }}">Edit</a>&nbsp;<a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h1>Intakes Table</h1>
+<form id="intakeFilterForm">
+    <label for="intakeSelect">Filter by Intake:</label>
+    <select id="intakeSelect" name="selected_intake">
+        <option value="" selected>Show All Intakes</option>
+        {% for intake in intakes %}
+        <option value="{{ intake[1] }}">{{ intake[1] }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<table id="intakesTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Action</th>
+            <th>Students</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for intake in intakes %}
+        <tr data-intake="{{ intake[1] }}">
+            <td>{{ intake[0] }}</td>
+            <td>{{ intake[1] }}</td>
+            <td>{{ intake[2] }}</td>
+            <td>
+                <a href="/edit_intake/{{ intake[0] }}">Edit</a>&nbsp; |
+                <a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;
+            </td>
+            <td>
+                <a href="/students_by_intake/{{ intake[1] | urlencode }}">All</a> |
+                <a href="/finished_students_by_intake/{{ intake[1]|urlencode }}">Finished</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        // Your JavaScript code for DataTables or other functionality goes here
-        $(document).ready(function() {
-            var table = $('#intakesTable').DataTable({
-                "lengthMenu": [10, 25, 50, 100], // Customize the number of entries per page
-                // Other DataTables options and initialization code can go here
-            });
+<script>
+    $(document).ready(function () {
+        var table = $('#intakesTable').DataTable({
+            "lengthMenu": [10, 25, 50, 100]
         });
-    </script>
-{% endblock %}
 
+        // Filter rows by selected intake
+        $('#intakeSelect').on('change', function () {
+            var selectedIntake = $(this).val();
+            if (selectedIntake === "") {
+                table.search('').draw();  // Show all rows
+            } else {
+                table.search(selectedIntake).draw();  // Filter rows by intake
+            }
+        });
+    });
+</script>
+{% endblock %}

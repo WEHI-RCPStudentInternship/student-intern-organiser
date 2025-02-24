@@ -106,7 +106,7 @@
     }
 
     .table-container {
-        flex: 2;
+        flex: 3;
         display: flex;
         flex-direction: column;
         padding: 10px;
@@ -114,7 +114,7 @@
 
     .button-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         grid-gap: 1rem;
         padding: 5rem;
         padding-top: 10rem;
@@ -122,8 +122,8 @@
     }
 
     .button-grid a {
-        padding: 40px;
-        background-color: #49A942;
+        padding: 20px;
+        background-color: #49A919;
         color: white;
         border: none;
         cursor: pointer;
@@ -132,6 +132,19 @@
         display: block; 
         border-radius: 1rem;
     }
+
+    a.recruit {
+        padding: 20px;
+        background-color: #21890f !important;
+        color: white;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        display: block; 
+        border-radius: 1rem;
+    }
+
 
     .button-grid a:hover {
         background-color: #b3e1af;
@@ -158,14 +171,21 @@
     <div class="button-container">
         <!-- New button grid with links -->
         <div class="button-grid">
+            <a class="recruit" href = "/new_applications">New Applicants</a >
+            <a class="recruit" href = "/email_ack">Applicants ready to review</a >
+            <a class="recruit" href = "/quick_review">Applicants ready to call</a >
+            <a class="recruit" href = "/to_interview">Applicants to Interview</a >
+            <a class="recruit" href = "/on_waiting_list">Applicants on Waiting List</a >
+            <a class="recruit" href = "/missed_out">Applicants who missed out on Waiting List</a >
+            <a class="recruit" href = "/have_interviewed">Applicants that have Interviewed</a >
+            <a class="recruit" href = "/offered_accepted">Offered & Accepted</a >
+            <a class="recruit" href = "/assigned_projects">Allocation</a >
+            <a href = "/assigned_projects/current">Current Allocation</a >
             <a href = "https://wehieduau.sharepoint.com/sites/StudentInternGroupatWEHI/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=H7kduJ&cid=cc199a42%2Daf65%2D44f6%2D92ce%2D662a136c0b0f&FolderCTID=0x0120008FF8F20683AC284798EA496C639CC069&id=%2Fsites%2FStudentInternGroupatWEHI%2FShared%20Documents%2FIntroductions%2F2024S1%20Profile%20Pictures">Add Profile Picture</a >
             <a href = "/github_username">Github Username</a >
             <a href = "/current_student">Empty WEHI Email</a >
-            <a href = "/email_ack">Applicants ready to review</a >
-            <a href = "/quick_review">Applicants ready to call</a >
-            <a href = "/assigned_projects">Allocation</a >
-            <a href = "/assigned_projects/current">Current Allocation</a >
             <a href = "/import_redcap">Import REDCap</a >
+            <a href = "/clean_pronouns">Clean pronouns</a >
 	    
             <a href = "/dashboard/all">Default Dashboard</a >
             <a href = "/dashboard/new_signed_and_accepted">Signed and Accepted Dashboard</a >

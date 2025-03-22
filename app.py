@@ -5,6 +5,7 @@ import sqlite3
 import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
+from urllib.parse import unquote
 
 from flask import (Flask, jsonify, redirect, render_template, request, Response,
                    send_file, url_for)
@@ -1659,6 +1660,62 @@ def intakes_index():
     print(intakes)
     return render_template('intakes.html', intakes=intakes)
 
+@app.route('/students_by_intake/<path:intake_name>')  # Use <path:> to allow slashes in the parameter
+def students_by_intake(intake_name):
+    intake_name = unquote(intake_name)  # Decode the intake name
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        FROM Students
+        WHERE intake = ?
+    '''
+    cursor.execute(query, (intake_name,))
+    students = cursor.fetchall()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    conn.close()
+
+    title_of_page = f"Students in Intake: {intake_name}"
+    return render_template('index.html', students=students, statuses=statuses, projects=projects, intake_name=intake_name, title_of_page=title_of_page)
+
+
+@app.route('/finished_students_by_intake/<path:intake_name>')
+def finished_students_by_intake(intake_name):
+    intake_name = unquote(intake_name)  # Decode the intake name
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
+        status, post_internship_summary_rating_internal, 
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        
+        
+        FROM Students
+        WHERE intake = ? AND status = "14 Finished"
+    '''
+    cursor.execute(query, (intake_name,))
+    students = cursor.fetchall()
+
+     # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    conn.close()
+
+    title_of_page = f"Finished Students in Intake: {intake_name}"
+    return render_template('index.html', students=students, intake_name=intake_name, statuses=statuses, projects=projects, title_of_page=title_of_page)
 
 
 @app.route('/edit_intake/<int:intake_id>', methods=['GET', 'POST'])

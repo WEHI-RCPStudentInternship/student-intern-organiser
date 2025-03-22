@@ -18,6 +18,7 @@
                 <th>Name</th>
                 <th>Status</th>
                 <th>Action</th>
+                <th>Students</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +27,11 @@
                 <td>{{ intake[0] }}</td>
                 <td>{{ intake[1] }}</td>
                 <td>{{ intake[2] }}</td>
-                <td><a href="/edit_intake/{{ intake[0] }}">Edit</a>&nbsp;<a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;</td>
+                <td><a href="/edit_intake/{{ intake[0] }}">Edit</a>&nbsp; <a href="/email_intake/{{ intake[0] }}">Emails</a>&nbsp;</td>
+                <td>
+                    <a href="/students_by_intake/{{ intake[1] | urlencode }}">All</a> |
+                    <a href="/finished_students_by_intake/{{ intake[1]|urlencode }}">Finished</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

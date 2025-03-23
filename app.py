@@ -21,7 +21,7 @@ db_path = 'student_intern_data/student_intern_data.db'
 
 import io
 
-def filter_students(status_of_students_to_filter,title,context = None):
+def filter_students(status_of_students_to_filter, context = None):
     # Connect to the SQLite database
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -42,41 +42,39 @@ def filter_students(status_of_students_to_filter,title,context = None):
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
+    base_query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, 
+               post_internship_summary_rating_internal, pronouns, 
+               pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE status IN ({})
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+    # Add additional filters based on context
     if context == "interview":
-        query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) AND project != 'Unassigned' ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
+        base_query += " AND intake = (SELECT name FROM Intakes WHERE status = 'new') AND project != 'Unassigned'"
     elif context == "waiting_list":
-        query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) AND pre_internship_summary_recommendation_internal != '06 - TS - Recommend no sign up except under specific circumstances. ' AND project = 'Unassigned' ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
+        base_query += " AND intake = (SELECT name FROM Intakes WHERE status = 'new') AND pre_internship_summary_recommendation_internal != '06 - TS - Recommend no sign up except under specific circumstances.' AND project = 'Unassigned'"
     elif context == "missed_out":
-        query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) AND pre_internship_summary_recommendation_internal = '06 - TS - Recommend no sign up except under specific circumstances. ' AND project = 'Unassigned' ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
-    else:
-        query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
- 
+        base_query += " AND intake = (SELECT name FROM Intakes WHERE status = 'new')AND pre_internship_summary_recommendation_internal = '06 - TS - Recommend no sign up except under specific circumstances.' AND project = 'Unassigned'"
+    elif context == "status_only":
+        base_query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, 
+               post_internship_summary_rating_internal, pronouns, 
+               pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE status IN ({})'''.format(','.join(['?'] * len(current_statuses_list)))
+
+    base_query += " ORDER BY status ASC"
 
     # Execute the query with the statuses list
-    cursor.execute(query, [intake_current] + current_statuses_list)
+    cursor.execute(base_query, current_statuses_list)
     students = cursor.fetchall()
 
 
     # Close the database connection
     conn.close()
-    title_of_page = title
-    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
+    return students, statuses, projects
 
 
 def get_empty_users(condition):
@@ -307,36 +305,36 @@ def handle_error(e):
 def new_applications():
     statuses = [1]
     title = "New Intake Applications" 
-    html_to_render = filter_students(statuses,title)
-    return html_to_render
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 @app.route('/email_ack')
 def email_ack():
     statuses = [2]
     title = "New Intake Ready to Review" 
-    html_to_render = filter_students(statuses,title)
-    return html_to_render
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 @app.route('/quick_review')
 def quick_review():
     statuses = [3]
     title = "New Intake Quick Review" 
-    html_to_render = filter_students(statuses,title)
-    return html_to_render
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 @app.route('/have_interviewed')
 def have_interviewed():
     statuses = [6]
     title = "New Intake - Have Interviewed" 
-    html_to_render = filter_students(statuses,title,"waiting_list")
-    return html_to_render
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 @app.route('/offered_accepted')
 def offered_accepted():
     statuses = [7,8,9]
     title = "New Intake - Offered & Accepted" 
-    html_to_render = filter_students(statuses,title,"interview")
-    return html_to_render
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 
 
@@ -344,26 +342,23 @@ def offered_accepted():
 def to_interview():
     statuses = [5]
     title = "New Intake - Email to Interview" 
-    html_to_render = filter_students(statuses,title,"interview")
-    return html_to_render
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 @app.route('/on_waiting_list')
 def on_waiting_list():
     statuses = [4]
     title = "New Intake - On Waiting List" 
-    html_to_render = filter_students(statuses,title,"waiting_list")
-    return html_to_render
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 
 @app.route('/missed_out')
 def missed_out():
     statuses = [3]
     title = "New Intake - Missed Out On Waiting List" 
-    html_to_render = filter_students(statuses,title,"missed_out")
-    return html_to_render
-
-
-
+    students, statuses, projects = filter_students(statuses,title)
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title,projects=projects)
 
 
 
@@ -1690,29 +1685,10 @@ def students_by_intake(intake_name):
 @app.route('/finished_students_by_intake/<path:intake_name>')
 def finished_students_by_intake(intake_name):
     intake_name = unquote(intake_name)  # Decode the intake name
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
-    cursor = conn.cursor()
-
-    query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
-        status, post_internship_summary_rating_internal, 
-        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
-        
-        
-        FROM Students
-        WHERE intake = ? AND status = "14 Finished"
-    '''
-    cursor.execute(query, (intake_name,))
-    students = cursor.fetchall()
-
-     # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Statuses')
-    statuses = cursor.fetchall()
-
-    cursor.execute('SELECT * FROM Projects')
-    projects = cursor.fetchall()
-
-    conn.close()
+    students, statuses, projects = filter_students([14],"status_only")
+    # Filter students by intake
+    # student's 5th attribute selected in filter_student function is intake
+    students = [student for student in students if student[5] == intake_name]  # Assuming intake is at index 5
 
     title_of_page = f"Finished Students in Intake: {intake_name}"
     return render_template('index.html', students=students, intake_name=intake_name, statuses=statuses, projects=projects, title_of_page=title_of_page)

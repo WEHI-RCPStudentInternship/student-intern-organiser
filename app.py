@@ -1660,17 +1660,19 @@ def dashboard_chart_data(dashboard_type):
 
     # Retrieve students by intake and calculate hours per week
     cursor.execute('''
-        SELECT intake,
+        SELECT Students.intake,
                SUM(CASE 
-                   WHEN course = 'Engineering and IT' THEN 24
-                   WHEN course = 'Engineering' THEN 24
-                   WHEN course = 'Science' THEN 8
-                   ELSE 0  -- Default case if the course doesn't match
-               END) AS total_hours,
+                       WHEN Students.course = 'Engineering and IT' THEN 24
+                       WHEN Students.course = 'Engineering' THEN 24
+                       WHEN Students.course = 'Science' THEN 8
+                       ELSE 0  -- Default case if the course doesn't match
+                   END) AS total_hours,
                COUNT(*) AS student_count
         FROM Students
-        GROUP BY intake
-        ORDER BY intake ASC
+        JOIN intakes ON Students.intake = intakes.name  -- Joining Students and Intakes based on intake
+        WHERE Students.status = '14 Finished' AND intakes.status = 'finished'
+        GROUP BY Students.intake
+        ORDER BY intakes.id ASC;  -- Sorting by intakes.id
     ''')
     
     data = cursor.fetchall()

@@ -1653,6 +1653,40 @@ def dashboard(dashboard_type):
                         dashboard_type = dashboard_type)
 
 
+@app.route('/dashboard/<string:dashboard_type>/chart_data', methods=['GET'])
+def dashboard_chart_data(dashboard_type):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Retrieve students by intake and calculate hours per week
+    cursor.execute('''
+        SELECT intake,
+               SUM(CASE 
+                   WHEN course = 'Engineering and IT' THEN 24
+                   WHEN course = 'Engineering' THEN 24
+                   WHEN course = 'Science' THEN 8
+                   ELSE 0  -- Default case if the course doesn't match
+               END) AS total_hours,
+               COUNT(*) AS student_count
+        FROM Students
+        GROUP BY intake
+        ORDER BY intake ASC
+    ''')
+    
+    data = cursor.fetchall()
+    conn.close()
+
+    # Format the response
+    chart_data = {
+        "intakes": [row[0] for row in data], 
+        "total_hours": [row[1] for row in data],
+        "student_count": [row[2] for row in data]
+    }
+
+    return jsonify(chart_data)
+
+
+
 @app.route('/intakes')
 def intakes_index():
     intakes = get_all_intakes()

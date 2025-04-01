@@ -1662,9 +1662,9 @@ def dashboard_chart_data(dashboard_type):
     cursor.execute('''
         SELECT Students.intake,
                SUM(CASE 
-                       WHEN Students.course = 'Engineering and IT' THEN 24
-                       WHEN Students.course = 'Engineering' THEN 24
-                       WHEN Students.course = 'Science' THEN 8
+                       WHEN Students.course = 'Engineering and IT' THEN 300
+                       WHEN Students.course = 'Engineering' THEN 300
+                       WHEN Students.course = 'Science' THEN 100
                        ELSE 0  -- Default case if the course doesn't match
                    END) AS total_hours,
                COUNT(*) AS student_count

@@ -137,6 +137,7 @@
         align-items: center;
         flex-wrap: wrap;
         margin-top: 20px; /* Adds spacing between title and charts */
+        margin-bottom: 80px;
     }
     .chart-box {
         width: 48%;
@@ -245,7 +246,7 @@
                         datasets: [{ 
                             label: 'Total Students (Cumulative)', 
                             data: cumulativeStudents, 
-                            borderColor: 'green', 
+                            borderColor: '#924191', 
                             fill: false 
                         }]
                     },
@@ -259,7 +260,7 @@
                         datasets: [{ 
                             label: 'Total Students (Non-Cumulative)', 
                             data: studentCounts, 
-                            backgroundColor: 'green' 
+                            backgroundColor: '#924191' 
                         }]
                     },
                     options: { responsive: true, maintainAspectRatio: false }

@@ -19,6 +19,25 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
 </div>
 {%- endmacro %}
 
+<!-- Chart Container -->
+<div style="display: flex; justify-content: center; margin: 20px 0">
+  <div style="width: 60%; border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fafafa;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);"">
+    <label for="chartView">View: </label>
+    <select id="chartView" onchange="updateChartView()">
+      <option value="total">Total</option>
+      <option value="assigned">Assigned</option>
+      <option value="offered">Offered</option>
+      <option value="accepted">Accepted</option>
+    </select>
+
+    <canvas id="summaryChart"></canvas>
+  </div>
+</div>
+
 <div class="counts kanban-total-counts"></div>
 <div class="counts kanban-total-assigned-counts"></div>
 <div class="counts kanban-total-offered-counts"></div>
@@ -72,8 +91,88 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
 </div>
 
 <!-- Drag and Drop Functionnality -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartLabels = [
+    "translator",
+    "sysadmin",
+    "experienced",
+    "other",
+    "volunteer",
+    "engit",
+    "science",
+    "female",
+    "male",
+  ];
+
+  const fields = [
+    "translator",
+    "sysadmin",
+    "experienced",
+    "other",
+    "volunteer",
+    "engit",
+    "science",
+    "female",
+    "male",
+  ];
+
+  let summaryChart;
+
+  function createSummaryChart(initialData) {
+    const ctx = document.getElementById("summaryChart").getContext("2d");
+    summaryChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: "Count",
+            data: initialData,
+            backgroundColor: "rgba(54, 162, 235, 0.6)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 2,
+              precision: 0,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function updateChartView() {
+    const view = document.getElementById("chartView").value;
+    summaryChart.data.datasets[0].data = dataSets[view];
+    summaryChart.update();
+  }
+
+  // Initialize chart on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    updateKanbanColumnCounts(targetClasses);
+    createSummaryChart(dataSets.total);
+  });
+</script>
 
 <script>
+  const dataSets = {
+    total: [],
+    assigned: [],
+    offered: [],
+    accepted: [],
+  };
   function createOrUpdateDiv(selector, count_type, totalCounts) {
     let div = document.querySelector(selector);
     // Update the content of the div
@@ -174,58 +273,38 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   });
 
   function updateKanbanColumnCounts(targetClasses) {
-    // Initialize total counts object
     const totalCounts = {};
+    const totalAssignedCounts = {};
+    const totalAcceptedCounts = {};
+    const totalOfferedCounts = {};
+
     targetClasses.forEach((cls) => {
       totalCounts[cls] = 0;
-    });
-
-    // Initialize total assigned counts object
-    const totalAssignedCounts = {};
-    targetClasses.forEach((cls) => {
       totalAssignedCounts[cls] = 0;
-    });
-
-    // Initialize total assigned counts object
-    const totalAcceptedCounts = {};
-    targetClasses.forEach((cls) => {
       totalAcceptedCounts[cls] = 0;
-    });
-
-    // Initialize total offered counts object
-    const totalOfferedCounts = {};
-    targetClasses.forEach((cls) => {
       totalOfferedCounts[cls] = 0;
     });
 
-    // Iterate through each kanban column ie. project
     document.querySelectorAll(".kanban-column").forEach((column) => {
       const columnCounts = {};
-
-      // Initialize project counts objects
       const projectAcceptedCounts = {};
       const projectOfferedCounts = {};
 
       targetClasses.forEach((cls) => {
+        columnCounts[cls] = 0;
         projectAcceptedCounts[cls] = 0;
         projectOfferedCounts[cls] = 0;
       });
 
-      // Initialize counts for each target class
-      targetClasses.forEach((cls) => {
-        columnCounts[cls] = 0;
-      });
-
-      // Count the occurrences of each target class
       column.querySelectorAll(".kanban-card").forEach((card) => {
         targetClasses.forEach((cls) => {
           if (card.classList.contains(cls)) {
             columnCounts[cls]++;
             totalCounts[cls]++;
 
-            // if this isn't unassigned project under data-project-id
-            projectId = card.parentElement.getAttribute("data-project-id");
-            if (projectId != "Unassigned") {
+            const projectId =
+              card.parentElement.getAttribute("data-project-id");
+            if (projectId !== "Unassigned") {
               totalAssignedCounts[cls]++;
               if (card.classList.contains("accepted")) {
                 projectAcceptedCounts[cls]++;
@@ -240,7 +319,6 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
         });
       });
 
-      // Create or update the results element below the header
       let resultsDiv = column.querySelector(".kanban-column-counts");
       if (!resultsDiv) {
         resultsDiv = document.createElement("div");
@@ -253,26 +331,18 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
         }
       }
 
-      // Update the content of the results div
-      resultsDiv.innerHTML = targetClasses
-        .map((cls) => {
-          return `<div>${cls}: ${columnCounts[cls]}</div>`;
-        })
-        .join("");
-
-      accepted_hours_per_week =
-        0 +
+      const accepted_hours_per_week =
         projectAcceptedCounts["volunteer"] * 2 +
         projectAcceptedCounts["engit"] * 24 +
         projectAcceptedCounts["science"] * 8;
-      offered_hours_per_week =
-        0 +
+
+      const offered_hours_per_week =
         projectOfferedCounts["volunteer"] * 2 +
         projectOfferedCounts["engit"] * 24 +
         projectOfferedCounts["science"] * 8 +
         accepted_hours_per_week;
-      hours_per_week =
-        0 +
+
+      const hours_per_week =
         columnCounts["volunteer"] * 2 +
         columnCounts["engit"] * 24 +
         columnCounts["science"] * 8;
@@ -291,52 +361,61 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
         .join("");
 
       resultsDiv.innerHTML = `
-  <div class="kanban-stats-box" style="padding: 8px; border-radius: 6px;">
-    <div class="essential-fields" style="font-size: 15px;">
-      ${essentialHtml}
-      <div>Hours per week: ${hours_per_week}</div>
-      <div>Offered hpw: ${offered_hours_per_week}</div>
-      <div>Accepted hpw: ${accepted_hours_per_week}</div>
-    </div>
-    <div class="extra-fields" style="display: none;font-size: 16px; margin-top: 8px;">
-      ${extraHtml}
-    </div>
-    <button class="toggle-extra-btn" style="
-  margin-top: 4px;
-  background-color: rgba(29, 110, 182, 0.3);
-  border: none;
-  border-radius: 6px;
-  color: #333;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 4px 10px;
-"
->
-      Other fields ▼
-    </button>
-  </div>
-`;
+      <div class="kanban-stats-box" style="padding: 8px; border-radius: 6px;">
+        <div class="essential-fields" style="font-size: 15px;">
+          ${essentialHtml}
+          <div>Hours per week: ${hours_per_week}</div>
+          <div>Offered hpw: ${offered_hours_per_week}</div>
+          <div>Accepted hpw: ${accepted_hours_per_week}</div>
+        </div>
+        <div class="extra-fields" style="display: none;font-size: 16px; margin-top: 8px;">
+          ${extraHtml}
+        </div>
+        <button class="toggle-extra-btn" style="
+          margin-top: 4px;
+          background-color: rgba(29, 110, 182, 0.3);
+          border: none;
+          border-radius: 6px;
+          color: #333;
+          cursor: pointer;
+          font-size: 16px;
+          padding: 4px 10px;">
+          Other fields ▼
+        </button>
+      </div>
+    `;
     });
 
+    // Update top summary boxes
     createOrUpdateDiv(".kanban-total-counts", "", totalCounts);
-
     createOrUpdateDiv(
       ".kanban-total-accepted-counts",
       "Accepted",
       totalAcceptedCounts
     );
-
     createOrUpdateDiv(
       ".kanban-total-offered-counts",
       "Offered",
       totalOfferedCounts
     );
-
     createOrUpdateDiv(
       ".kanban-total-assigned-counts",
       "Assigned",
       totalAssignedCounts
     );
+
+    // Update chart datasets dynamically
+    dataSets.total = fields.map((field) => totalCounts[field] || 0);
+    dataSets.assigned = fields.map((field) => totalAssignedCounts[field] || 0);
+    dataSets.offered = fields.map((field) => totalOfferedCounts[field] || 0);
+    dataSets.accepted = fields.map((field) => totalAcceptedCounts[field] || 0);
+
+    // Refresh chart if already created
+    if (summaryChart) {
+      const currentView = document.getElementById("chartView").value;
+      summaryChart.data.datasets[0].data = dataSets[currentView];
+      summaryChart.update();
+    }
   }
 
   updateKanbanColumnCounts(targetClasses);

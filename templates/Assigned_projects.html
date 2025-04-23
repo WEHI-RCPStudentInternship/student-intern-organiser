@@ -1,306 +1,359 @@
-{% extends 'base.html' %}
-
-{% block title %} Project Students Allocation {% endblock %}
-{% block page_title %}Projects Students Allocation{% endblock %}
-
-{% block content %}
-
-{% macro studentKanbanCard(classes,student) -%}
-<div class="{{ classes }}" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-    {{ student[1] }} ({{ student[7][:3] }})<br />{{ student[8] }}<br />{{ student[6].split(' - ')[1] }} <br /> {{
-    student[3] }} <br /> {{ student[4] }} <br /> {{ student[5] }} <br /><a target="_blank"
-        href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
+{% extends 'base.html' %} {% block title %} Project Students Allocation {%
+endblock %} {% block page_title %}Projects Students Allocation{% endblock %} {%
+block content %} {% macro studentKanbanCard(classes,student) -%}
+<div
+  class="{{ classes }}"
+  data-student-id="{{ student[0] }}"
+  draggable="true"
+  ondragstart="drag(event)"
+>
+  {{ student[1] }} ({{ student[7][:3] }})<br />{{ student[8] }}<br />{{
+  student[6].split(' - ')[1] }} <br />
+  {{ student[3] }} <br />
+  {{ student[4] }} <br />
+  {{ student[5] }} <br /><a
+    target="_blank"
+    href="/pre_int_st_evaluation/{{ student[0] }}"
+    >View</a
+  >
 </div>
 {%- endmacro %}
 
-<div class="counts kanban-total-counts"> </div>
-<div class="counts kanban-total-assigned-counts"> </div>
-<div class="counts kanban-total-offered-counts"> </div>
-<div class="counts kanban-total-accepted-counts"> </div>
+<div class="counts kanban-total-counts"></div>
+<div class="counts kanban-total-assigned-counts"></div>
+<div class="counts kanban-total-offered-counts"></div>
+<div class="counts kanban-total-accepted-counts"></div>
 <div class="kanban-container">
-    {% for project in projects %}
-    <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
-        <h3 class="column-header"><a href="/share_students/{{ project[0] }}">{{ project[1] }}</a></h3>
-        {% for student in students %}
-        {% if project[1] == student[2] %}
+  {% for project in projects %}
+  <div
+    class="kanban-column"
+    data-project-id="{{ project[1] }}"
+    ondrop="drop(event)"
+    ondragover="allowDrop(event)"
+  >
+    <h3 class="column-header">
+      <a href="/share_students/{{ project[0] }}">{{ project[1] }}</a>
+    </h3>
+    {% for student in students %} {% if project[1] == student[2] %} {% if
+    student[6] in ("06 - TS - Recommend no sign up except under specific
+    circumstances. ") %} {% set classes = 'male other not-accepted kanban-card'
+    %} {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even
+    without a project. ") %} {% set classes = 'experienced kanban-card female'
+    %} {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a
+    specific project. ") %} {% set classes = 'experienced kanban-card male' %}
+    {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a
+    project. ") %} {% set classes = 'sysadmin kanban-card female' %} {% elif
+    student[6] in ("04 - Sysadmin - Recommend sign up even without a project. ")
+    %} {% set classes = 'sysadmin kanban-card male' %} {% elif student[6] in
+    ("01 - F Translator - Recommend sign up even without a project. ") %} {% set
+    classes = 'translator kanban-card female' %} {% elif student[6] in ("04 -
+    Translator - Recommend sign up even without a project. ") %} {% set classes
+    = 'translator kanban-card male' %} {% elif student[6] in ("03 - F Technical
+    Skills - Recommend sign up for a specific project. ") %} {% set classes =
+    'other not-accepted female kanban-card' %} {% else %} {% set classes =
+    'other kanban-card' %} {% endif %} {% if student[4] in ("08 Accepted
+    contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added
+    to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started")
+    %} {% set classes = classes + ' accepted' %} {% elif student[4] in ("07
+    Offered contact") %} {% set classes = classes + ' offered' %} {% endif %}
 
-        {% if student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %}
-        {% set classes = 'male other not-accepted kanban-card' %}
-        {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even without a project. ") %}
-        {% set classes = 'experienced kanban-card female' %}
-        {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ") %}
-        {% set classes = 'experienced kanban-card male' %}
-        {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a project. ") %}
-        {% set classes = 'sysadmin kanban-card female' %}
-        {% elif student[6] in ("04 - Sysadmin - Recommend sign up even without a project. ") %}
-        {% set classes = 'sysadmin kanban-card male' %}
-        {% elif student[6] in ("01 - F Translator - Recommend sign up even without a project. ") %}
-        {% set classes = 'translator kanban-card female' %}
-        {% elif student[6] in ("04 - Translator - Recommend sign up even without a project. ") %}
-        {% set classes = 'translator kanban-card male' %}
-        {% elif student[6] in ("03 - F Technical Skills - Recommend sign up for a specific project. ") %}
-        {% set classes = 'other not-accepted female kanban-card' %}
-        {% else %}
-        {% set classes = 'other kanban-card' %}
-        {% endif %}
+    <!-- this is for projects -->
+    {% if student[2] == 'Unassigned' %} {% set classes = classes + ' unassigned'
+    %} {% else %} {% set classes = classes + ' assigned' %} {% endif %}
 
-        {% if student[4] in ("08 Accepted contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added
-        to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started") %}
-        {% set classes = classes + ' accepted' %}
-        {% elif student[4] in ("07 Offered contact") %}
-        {% set classes = classes + ' offered' %}
-        {% endif %}
-
-
-        <!-- this is for projects -->
-        {% if student[2] == 'Unassigned' %}
-        {% set classes = classes + ' unassigned' %}
-        {% else %}
-        {% set classes = classes + ' assigned' %}
-        {% endif %}
-
-
-        <!-- this is for course -->
-        {% if student[7] in ("Engineering and IT") %}
-        {% set classes = classes + ' engit' %}
-        {% elif student[7] in ("Science") %}
-        {% set classes = classes + ' science' %}
-        {% elif student[7] in ("Volunteer") %}
-        {% set classes = classes + ' volunteer' %}
-        {% endif %}
-
-        {{ studentKanbanCard(classes, student) }}
-
-        {% endif %}
-        {% endfor %}
-    </div>
-    {% endfor %}
+    <!-- this is for course -->
+    {% if student[7] in ("Engineering and IT") %} {% set classes = classes + '
+    engit' %} {% elif student[7] in ("Science") %} {% set classes = classes + '
+    science' %} {% elif student[7] in ("Volunteer") %} {% set classes = classes
+    + ' volunteer' %} {% endif %} {{ studentKanbanCard(classes, student) }} {%
+    endif %} {% endfor %}
+  </div>
+  {% endfor %}
 </div>
 
 <!-- Drag and Drop Functionnality -->
 
 <script>
-    function createOrUpdateDiv(selector, count_type, totalCounts) {
-        let div = document.querySelector(selector);
-        // Update the content of the div
-        div.innerHTML = targetClasses.map(cls => {
-            return `<div>Total ${count_type} ${cls}: ${totalCounts[cls]}</div>`;
-        }).join('');
+  function createOrUpdateDiv(selector, count_type, totalCounts) {
+    let div = document.querySelector(selector);
+    // Update the content of the div
+    div.innerHTML = targetClasses
+      .map((cls) => {
+        return `<div>Total ${count_type} ${cls}: ${totalCounts[cls]}</div>`;
+      })
+      .join("");
+  }
 
-    }
+  // Example usage:
+  // Call the function with the classes you want to count
+  const targetClasses = [
+    "translator",
+    "sysadmin",
+    "experienced",
+    "other",
+    "volunteer",
+    "engit",
+    "science",
+    "female",
+    "male",
+  ];
 
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+  function drag(event) {
+    event.dataTransfer.setData("text", event.target.dataset.studentId);
+  }
 
-    // Example usage:
-    // Call the function with the classes you want to count
-    const targetClasses = ["translator", "sysadmin", "experienced", "other", "volunteer", "engit", "science", "female", "male"];
+  function drop(event) {
+    event.preventDefault();
+    const studentId = event.dataTransfer.getData("text");
+    const projectId = event.target.closest(".kanban-column").dataset.projectId;
 
-    function allowDrop(event) {
-        event.preventDefault();
-    }
-    function drag(event) {
-        event.dataTransfer.setData("text", event.target.dataset.studentId);
-    }
+    console.log("Student ID:", studentId);
+    console.log("Project ID:", projectId);
 
-    function drop(event) {
-        event.preventDefault();
-        const studentId = event.dataTransfer.getData("text");
-        const projectId = event.target.closest('.kanban-column').dataset.projectId;
+    // Find the student element and target column
+    const studentElement = document.querySelector(
+      `[data-student-id="${studentId}"]`
+    );
+    const targetColumn = event.target.closest(".kanban-column");
 
-        console.log('Student ID:', studentId);
-        console.log('Project ID:', projectId);
+    // printing in the console for testing if i was catching data  while debugging
+    console.log("Student Element:", studentElement);
+    console.log("Target Column:", targetColumn);
 
-        // Find the student element and target column
-        const studentElement = document.querySelector(`[data-student-id="${studentId}"]`);
-        const targetColumn = event.target.closest('.kanban-column');
+    if (studentElement && targetColumn) {
+      // Move the student to the target column
+      targetColumn.appendChild(studentElement);
 
-        // printing in the console for testing if i was catching data  while debugging
-        console.log('Student Element:', studentElement);
-        console.log('Target Column:', targetColumn);
-
-        if (studentElement && targetColumn) {
-            // Move the student to the target column
-            targetColumn.appendChild(studentElement);
-
-            // Send AJAX request to update the student's project assignment in the database
-            fetch('/update_project_assignment', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ internId: studentId, projectId: projectId })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        console.log('Project assignment updated successfully.');
-                        updateKanbanColumnCounts(targetClasses);
-                    } else {
-                        console.log('Failed to update project assignment.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating the project assignment.');
-                });
-        } else {
-            console.log('Student or target column not found.');
-        }
-    }
-
-    function addDragListeners() {
-        const unassignedStudents = document.querySelectorAll('.unassigned .kanban-card');
-        unassignedStudents.forEach(student => {
-            student.addEventListener('dragstart', drag);
+      // Send AJAX request to update the student's project assignment in the database
+      fetch("/update_project_assignment", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ internId: studentId, projectId: projectId }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            console.log("Project assignment updated successfully.");
+            updateKanbanColumnCounts(targetClasses);
+          } else {
+            console.log("Failed to update project assignment.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred while updating the project assignment.");
         });
-
-        const projectColumns = document.querySelectorAll('.project-column');
-        projectColumns.forEach(column => {
-            column.addEventListener('dragover', allowDrop);
-            column.addEventListener('drop', drop);
-        });
+    } else {
+      console.log("Student or target column not found.");
     }
+  }
 
-    // Initial call to add drag listeners when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-        addDragListeners();
+  function addDragListeners() {
+    const unassignedStudents = document.querySelectorAll(
+      ".unassigned .kanban-card"
+    );
+    unassignedStudents.forEach((student) => {
+      student.addEventListener("dragstart", drag);
     });
 
+    const projectColumns = document.querySelectorAll(".project-column");
+    projectColumns.forEach((column) => {
+      column.addEventListener("dragover", allowDrop);
+      column.addEventListener("drop", drop);
+    });
+  }
 
+  // Initial call to add drag listeners when the page loads
+  document.addEventListener("DOMContentLoaded", () => {
+    addDragListeners();
+  });
 
+  function updateKanbanColumnCounts(targetClasses) {
+    // Initialize total counts object
+    const totalCounts = {};
+    targetClasses.forEach((cls) => {
+      totalCounts[cls] = 0;
+    });
 
-    function updateKanbanColumnCounts(targetClasses) {
+    // Initialize total assigned counts object
+    const totalAssignedCounts = {};
+    targetClasses.forEach((cls) => {
+      totalAssignedCounts[cls] = 0;
+    });
 
-        // Initialize total counts object
-        const totalCounts = {};
-        targetClasses.forEach(cls => {
-            totalCounts[cls] = 0;
-        });
+    // Initialize total assigned counts object
+    const totalAcceptedCounts = {};
+    targetClasses.forEach((cls) => {
+      totalAcceptedCounts[cls] = 0;
+    });
 
-        // Initialize total assigned counts object
-        const totalAssignedCounts = {};
-        targetClasses.forEach(cls => {
-            totalAssignedCounts[cls] = 0;
-        });
+    // Initialize total offered counts object
+    const totalOfferedCounts = {};
+    targetClasses.forEach((cls) => {
+      totalOfferedCounts[cls] = 0;
+    });
 
-        // Initialize total assigned counts object
-        const totalAcceptedCounts = {};
-        targetClasses.forEach(cls => {
-            totalAcceptedCounts[cls] = 0;
-        });
+    // Iterate through each kanban column ie. project
+    document.querySelectorAll(".kanban-column").forEach((column) => {
+      const columnCounts = {};
 
-        // Initialize total offered counts object
-        const totalOfferedCounts = {};
-        targetClasses.forEach(cls => {
-            totalOfferedCounts[cls] = 0;
-        });
+      // Initialize project counts objects
+      const projectAcceptedCounts = {};
+      const projectOfferedCounts = {};
 
+      targetClasses.forEach((cls) => {
+        projectAcceptedCounts[cls] = 0;
+        projectOfferedCounts[cls] = 0;
+      });
 
-        // Iterate through each kanban column ie. project
-        document.querySelectorAll('.kanban-column').forEach(column => {
-            const columnCounts = {};
+      // Initialize counts for each target class
+      targetClasses.forEach((cls) => {
+        columnCounts[cls] = 0;
+      });
 
-            // Initialize project counts objects
-            const projectAcceptedCounts = {};
-            const projectOfferedCounts = {};
+      // Count the occurrences of each target class
+      column.querySelectorAll(".kanban-card").forEach((card) => {
+        targetClasses.forEach((cls) => {
+          if (card.classList.contains(cls)) {
+            columnCounts[cls]++;
+            totalCounts[cls]++;
 
-            targetClasses.forEach(cls => {
-                projectAcceptedCounts[cls] = 0;
-                projectOfferedCounts[cls] = 0;
-            });
-
-
-            // Initialize counts for each target class
-            targetClasses.forEach(cls => {
-                columnCounts[cls] = 0;
-            });
-
-            // Count the occurrences of each target class
-            column.querySelectorAll('.kanban-card').forEach(card => {
-                targetClasses.forEach(cls => {
-                    if (card.classList.contains(cls)) {
-                        columnCounts[cls]++;
-                        totalCounts[cls]++;
-
-                        // if this isn't unassigned project under data-project-id
-                        projectId = card.parentElement.getAttribute('data-project-id');
-                        if (projectId != 'Unassigned') {
-                            totalAssignedCounts[cls]++;
-                            if (card.classList.contains('accepted')) {
-                                projectAcceptedCounts[cls]++;
-                                totalAcceptedCounts[cls]++;
-                            }
-                            if (card.classList.contains('offered')) {
-                                projectOfferedCounts[cls]++;
-                                totalOfferedCounts[cls]++;
-                            }
-                        }
-                    }
-                });
-            });
-
-            // Create or update the results element below the header
-            let resultsDiv = column.querySelector('.kanban-column-counts');
-            if (!resultsDiv) {
-                resultsDiv = document.createElement('div');
-                resultsDiv.className = 'kanban-column-counts';
-                resultsDiv.style.marginTop = '10px';
-                resultsDiv.style.fontSize = '14px';
-                const header = column.querySelector('h3');
-                if (header) {
-                    header.insertAdjacentElement('afterend', resultsDiv);
-                }
+            // if this isn't unassigned project under data-project-id
+            projectId = card.parentElement.getAttribute("data-project-id");
+            if (projectId != "Unassigned") {
+              totalAssignedCounts[cls]++;
+              if (card.classList.contains("accepted")) {
+                projectAcceptedCounts[cls]++;
+                totalAcceptedCounts[cls]++;
+              }
+              if (card.classList.contains("offered")) {
+                projectOfferedCounts[cls]++;
+                totalOfferedCounts[cls]++;
+              }
             }
-
-            // Update the content of the results div
-            resultsDiv.innerHTML = targetClasses.map(cls => {
-                return `<div>${cls}: ${columnCounts[cls]}</div>`;
-            }).join('');
-
-            accepted_hours_per_week = 0 + projectAcceptedCounts['volunteer'] * 2 + projectAcceptedCounts['engit'] * 24 + projectAcceptedCounts['science'] * 8;
-            offered_hours_per_week = 0 + projectOfferedCounts['volunteer'] * 2 + projectOfferedCounts['engit'] * 24 + projectOfferedCounts['science'] * 8 + accepted_hours_per_week;
-            hours_per_week = 0 + columnCounts['volunteer'] * 2 + columnCounts['engit'] * 24 + columnCounts['science'] * 8;
-            resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Hours per week: ' + hours_per_week + ' </div>';
-            resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Offered hpw: ' + offered_hours_per_week + ' </div>';
-            resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Accepted hpw: ' + accepted_hours_per_week + ' </div>';
-
+          }
         });
+      });
 
-        createOrUpdateDiv(
-            '.kanban-total-counts',
-            '',
-            totalCounts
-        );
+      // Create or update the results element below the header
+      let resultsDiv = column.querySelector(".kanban-column-counts");
+      if (!resultsDiv) {
+        resultsDiv = document.createElement("div");
+        resultsDiv.className = "kanban-column-counts";
+        resultsDiv.style.marginTop = "10px";
+        resultsDiv.style.fontSize = "14px";
+        const header = column.querySelector("h3");
+        if (header) {
+          header.insertAdjacentElement("afterend", resultsDiv);
+        }
+      }
 
+      // Update the content of the results div
+      resultsDiv.innerHTML = targetClasses
+        .map((cls) => {
+          return `<div>${cls}: ${columnCounts[cls]}</div>`;
+        })
+        .join("");
 
-        createOrUpdateDiv(
-            '.kanban-total-accepted-counts',
-            'Accepted',
-            totalAcceptedCounts
-        );
+      accepted_hours_per_week =
+        0 +
+        projectAcceptedCounts["volunteer"] * 2 +
+        projectAcceptedCounts["engit"] * 24 +
+        projectAcceptedCounts["science"] * 8;
+      offered_hours_per_week =
+        0 +
+        projectOfferedCounts["volunteer"] * 2 +
+        projectOfferedCounts["engit"] * 24 +
+        projectOfferedCounts["science"] * 8 +
+        accepted_hours_per_week;
+      hours_per_week =
+        0 +
+        columnCounts["volunteer"] * 2 +
+        columnCounts["engit"] * 24 +
+        columnCounts["science"] * 8;
 
+      const essentialFields = ["female", "male"];
+      const extraFields = targetClasses.filter(
+        (cls) => !essentialFields.includes(cls)
+      );
 
-        createOrUpdateDiv(
-            '.kanban-total-offered-counts',
-            'Offered',
-            totalOfferedCounts
-        );
+      const essentialHtml = essentialFields
+        .map((cls) => `<div>${cls}: ${columnCounts[cls]}</div>`)
+        .join("");
 
-        createOrUpdateDiv(
-            '.kanban-total-assigned-counts',
-            'Assigned',
-            totalAssignedCounts
-        );
+      const extraHtml = extraFields
+        .map((cls) => `<div>${cls}: ${columnCounts[cls]}</div>`)
+        .join("");
 
+      resultsDiv.innerHTML = `
+  <div class="kanban-stats-box" style="padding: 8px; border-radius: 6px;">
+    <div class="essential-fields" style="font-size: 15px;">
+      ${essentialHtml}
+      <div>Hours per week: ${hours_per_week}</div>
+      <div>Offered hpw: ${offered_hours_per_week}</div>
+      <div>Accepted hpw: ${accepted_hours_per_week}</div>
+    </div>
+    <div class="extra-fields" style="display: none;font-size: 16px; margin-top: 8px;">
+      ${extraHtml}
+    </div>
+    <button class="toggle-extra-btn" style="
+  margin-top: 4px;
+  background-color: rgba(29, 110, 182, 0.3);
+  border: none;
+  border-radius: 6px;
+  color: #333;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 10px;
+"
+>
+      Other fields ▼
+    </button>
+  </div>
+`;
+    });
 
+    createOrUpdateDiv(".kanban-total-counts", "", totalCounts);
 
+    createOrUpdateDiv(
+      ".kanban-total-accepted-counts",
+      "Accepted",
+      totalAcceptedCounts
+    );
+
+    createOrUpdateDiv(
+      ".kanban-total-offered-counts",
+      "Offered",
+      totalOfferedCounts
+    );
+
+    createOrUpdateDiv(
+      ".kanban-total-assigned-counts",
+      "Assigned",
+      totalAssignedCounts
+    );
+  }
+
+  updateKanbanColumnCounts(targetClasses);
+
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("toggle-extra-btn")) {
+      const btn = e.target;
+      const extraDiv = btn.previousElementSibling;
+
+      const isHidden = extraDiv.style.display === "none";
+
+      extraDiv.style.display = isHidden ? "block" : "none";
+      btn.textContent = isHidden ? "Hide fields ▲" : "Other fields ▼";
     }
-
-    updateKanbanColumnCounts(targetClasses);
-
-    // To call it again, simply reuse the function
-    // updateKanbanColumnCounts(["new-class", "other-class"]);
-
-
+  });
+  // To call it again, simply reuse the function
+  // updateKanbanColumnCounts(["new-class", "other-class"]);
 </script>
 
 {% endblock %}

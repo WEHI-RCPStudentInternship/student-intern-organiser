@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile Picture Reminder{% endblock %}
+{% block page_title %}Profile Picture Reminder{% endblock %}
+
+{% block top_links_menu %}
+  <a href="/menu_page">Menu</a>
+  <button id="sendEmailBtn" class="btn">Send Email</button>
+{% endblock %}
+
+{% block content %}
+  <input type="text" id="searchBox" placeholder="Search…" style="margin-bottom: 10px; width: 30%;" />
+  <table id="reminderTable" class="display">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Project</th>
+        <th>Email</th>
+        <th>Sent?</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr data-intern-id="{{ s['intern_id'] }}">
+        <td>{{ s['full_name'] }}</td>
+        <td>{{ s['project'] }}</td>
+        <td><a href="mailto:{{ s['email'] }}">{{ s['email'] }}</a></td>
+        <td>
+          <input type="checkbox"
+                 class="picCheckbox"
+                 {% if s['profile_pic_sent'] %}checked{% endif %}/>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function(){
+  // Initialize DataTable with default sorting and search integration
+  var table = $('#reminderTable').DataTable({
+    order: [[1, 'asc'], [0, 'asc']],
+    dom: 'lrtip' // hide the built-in search box
+  });
+
+  // Integrate custom search box
+  $('#searchBox').on('keyup', function(){
+    table.search(this.value).draw();
+  });
+
+  // Handle checkbox toggle
+  $('#reminderTable').on('change', '.picCheckbox', function(){
+    var $row = $(this).closest('tr');
+    var internId = $row.data('intern-id');
+    var sent = this.checked;
+    fetch('/update_profile_pic_sent', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({intern_id: internId, profile_pic_sent: sent})
+    });
+  });
+
+  // Send email to all unchecked
+  $('#sendEmailBtn').click(function(){
+    var to = [];
+    table.rows().every(function(){
+      var node = this.node();
+      var $chk = $(node).find('.picCheckbox');
+      if (!$chk.is(':checked')){
+        var mail = $(node).find('a[href^="mailto:"]').attr('href').replace('mailto:','');
+        to.push(mail);
+      }
+    });
+    if(to.length){
+      window.location = 'mailto:' + to.join(',');
+    } else {
+      alert('All done—no one left to remind!');
+    }
+  });
+});
+</script>
+{% endblock %}

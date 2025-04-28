@@ -91,6 +91,40 @@ def get_empty_users(condition):
 def menu_page():
     return render_template('menu_page.html')
 
+# --- PROFILE-PICTURE REMINDER ROUTES ---
+@app.route('/reminder_profile_pic')
+def reminder_profile_pic():
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT intern_id, full_name, project, email, profile_pic_sent
+        FROM Students
+        ORDER BY project COLLATE NOCASE, full_name COLLATE NOCASE
+    """)
+    students = cur.fetchall()
+    conn.close()
+    return render_template('reminder_profile_pic.html', students=students)
+
+@app.route('/update_profile_pic_sent', methods=['PUT'])
+def update_profile_pic_sent():
+    data = request.get_json()
+    intern_id = data.get('intern_id')
+    # checkbox true/false → 1 or 0
+    sent_flag = 1 if data.get('profile_pic_sent') else 0
+
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE Students
+        SET profile_pic_sent = ?
+        WHERE intern_id = ?
+    """, (sent_flag, intern_id))
+    conn.commit()
+    conn.close()
+    return jsonify(status='ok')
+# ---------------------------------------
+
 @app.route('/current_student')
 def current_student():
     # Connect to the SQLite database

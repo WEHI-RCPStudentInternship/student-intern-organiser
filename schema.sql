@@ -43,8 +43,18 @@ CREATE TABLE Students (
         post_internship_ambiguity TEXT,
         post_internship_complexity TEXT,
         post_internship_summary_rating_internal TEXT,
-        post_internship_summary_rating_external TEXT
-    , github_username, extra_notes text, remote_internship TEXT, code_of_conduct TEXT, facilitator_follower TEXT, listener_or_talker TEXT, thinker_brainstormer TEXT, why_applied TEXT, projects_recommended TEXT);
+        post_internship_summary_rating_external TEXT,
+        profile_pic_sent INTEGER DEFAULT 0,
+        github_username TEXT, 
+        extra_notes TEXT, 
+        remote_internship TEXT, 
+        code_of_conduct TEXT, 
+        facilitator_follower TEXT, 
+        listener_or_talker TEXT, 
+        thinker_brainstormer TEXT, 
+        why_applied TEXT, 
+        projects_recommended TEXT
+        );
 CREATE TABLE Statuses (
         id INTEGER PRIMARY KEY,
         name TEXT

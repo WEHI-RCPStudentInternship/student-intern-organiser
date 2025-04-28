@@ -1,6 +1,7 @@
 {% extends 'base.html' %} {% block title %} Project Students Allocation {%
 endblock %} {% block page_title %}Projects Students Allocation{% endblock %} {%
 block content %} {% macro studentKanbanCard(classes,student) -%}
+
 <div
   class="{{ classes }}"
   data-student-id="{{ student[0] }}"
@@ -21,13 +22,24 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
 
 <!-- Chart Container -->
 <div style="display: flex; justify-content: center; margin: 20px 0">
-  <div style="width: 60%; border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #fafafa;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);"">
+  <div
+    style="
+      width: 70%;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 16px;
+      background-color: #fafafa;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      font-weight: bold;
+    "
+  >
     <label for="chartView">View: </label>
-    <select id="chartView" onchange="updateChartView()">
+
+    <select
+      id="chartView"
+      onchange="updateChartView()"
+      style="font-weight: bold; text-align: center"
+    >
       <option value="total">Total</option>
       <option value="assigned">Assigned</option>
       <option value="offered">Offered</option>
@@ -38,21 +50,123 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   </div>
 </div>
 
+<div style="text-align: left; margin: 20px 0">
+  <button
+    id="toggleArchivedBtn"
+    onclick="toggleArchivedProjects()"
+    style="
+      padding: 8px 16px;
+      background-color: rgb(58, 189, 63);
+      color: #1f2320;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    "
+  >
+    View Archived
+  </button>
+
+  <select
+    id="statusSelect"
+    style="
+      text-align: center;
+      margin-left: 12px;
+      padding: 6px 10px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      border: 3px solid #000000;
+    "
+  >
+    <option disabled selected>Statuses</option>
+    <option value="0">0 - Unassigned</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5 - Archived</option>
+  </select>
+
+  <button
+    onclick="changeSelectedProjectStatus()"
+    style="
+      padding: 8px 16px;
+      background-color: rgb(58, 189, 63);
+      color: #1f2320;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    "
+  >
+    Change Status
+  </button>
+</div>
+
+<!-- just hide the counts divs for now, still need to be able to access them for the chart -->
+<style>
+  .counts {
+    display: none;
+  }
+</style>
+
 <div class="counts kanban-total-counts"></div>
 <div class="counts kanban-total-assigned-counts"></div>
 <div class="counts kanban-total-offered-counts"></div>
 <div class="counts kanban-total-accepted-counts"></div>
+
 <div class="kanban-container">
   {% for project in projects %}
   <div
     class="kanban-column"
     data-project-id="{{ project[1] }}"
+    data-status="{{ project[2] }}"
     ondrop="drop(event)"
     ondragover="allowDrop(event)"
   >
-    <h3 class="column-header">
-      <a href="/share_students/{{ project[0] }}">{{ project[1] }}</a>
-    </h3>
+    <div
+      class="project-header"
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 8px;
+      "
+    >
+      <label
+        style="
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          background-color: rgb(58, 189, 63);
+          color: #1f2320;
+          border: none;
+          border-radius: 6px;
+          padding: 6px 10px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: bold;
+          width: 100%;
+          box-sizing: border-box;
+        "
+      >
+        <input
+          type="checkbox"
+          class="project-checkbox"
+          data-project-id="{{ project[1] }}"
+          style="transform: scale(1.5); margin: 0"
+        />
+        <span>Status: {{ project[2] }}</span>
+      </label>
+      <h3 class="column-header" style="margin: 0">
+        <a href="/share_students/{{ project[0] }}">{{ project[1] }}</a>
+      </h3>
+    </div>
+
     {% for student in students %} {% if project[1] == student[2] %} {% if
     student[6] in ("06 - TS - Recommend no sign up except under specific
     circumstances. ") %} {% set classes = 'male other not-accepted kanban-card'
@@ -163,6 +277,13 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   document.addEventListener("DOMContentLoaded", () => {
     updateKanbanColumnCounts(targetClasses);
     createSummaryChart(dataSets.total);
+    // 🔧 Hide archived projects on first load
+    document.querySelectorAll(".kanban-column").forEach((col) => {
+      const status = parseInt(col.getAttribute("data-status"));
+      if (status === 5) {
+        col.style.display = "none";
+      }
+    });
   });
 </script>
 
@@ -361,29 +482,30 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
         .join("");
 
       resultsDiv.innerHTML = `
-      <div class="kanban-stats-box" style="padding: 8px; border-radius: 6px;">
-        <div class="essential-fields" style="font-size: 15px;">
-          ${essentialHtml}
-          <div>Hours per week: ${hours_per_week}</div>
-          <div>Offered hpw: ${offered_hours_per_week}</div>
-          <div>Accepted hpw: ${accepted_hours_per_week}</div>
-        </div>
-        <div class="extra-fields" style="display: none;font-size: 16px; margin-top: 8px;">
-          ${extraHtml}
-        </div>
-        <button class="toggle-extra-btn" style="
-          margin-top: 4px;
-          background-color: rgba(29, 110, 182, 0.3);
-          border: none;
-          border-radius: 6px;
-          color: #333;
-          cursor: pointer;
-          font-size: 16px;
-          padding: 4px 10px;">
-          Other fields ▼
-        </button>
-      </div>
-    `;
+          <div class="kanban-stats-box" style="padding: 8px; border-radius: 6px;">
+            <div class="essential-fields" style="font-size: 15px;">
+              ${essentialHtml}
+              <div>Hours per week: ${hours_per_week}</div>
+              <div>Offered hpw: ${offered_hours_per_week}</div>
+              <div>Accepted hpw: ${accepted_hours_per_week}</div>
+            </div>
+            <div class="extra-fields" style="display: none;font-size: 16px; margin-top: 8px;">
+              ${extraHtml}
+            </div>
+            <button class="toggle-extra-btn" style="
+              margin-top: 4px;
+              background-color: rgb(58, 189, 63);
+              font-weight: bold;
+              border: none;
+              border-radius: 6px;
+              color: #333;
+              cursor: pointer;
+              font-size: 16px;
+              padding: 4px 10px;">
+              Other fields ▼
+            </button>
+          </div>
+        `;
     });
 
     // Update top summary boxes
@@ -435,4 +557,59 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   // updateKanbanColumnCounts(["new-class", "other-class"]);
 </script>
 
+<script>
+  let showingArchived = false;
+
+  function toggleArchivedProjects() {
+    const btn = document.getElementById("toggleArchivedBtn");
+    const allColumns = document.querySelectorAll(".kanban-column");
+
+    showingArchived = !showingArchived;
+
+    allColumns.forEach((col) => {
+      const status = parseInt(col.getAttribute("data-status"));
+      if (showingArchived) {
+        col.style.display = status === 5 ? "block" : "none";
+      } else {
+        col.style.display = status >= 0 && status <= 4 ? "block" : "none";
+      }
+    });
+
+    btn.textContent = showingArchived ? "View Active" : "View Archived";
+  }
+</script>
+
+<script>
+  function changeSelectedProjectStatus() {
+    const selectedStatus = document.getElementById("statusSelect").value;
+    const selectedProjects = Array.from(
+      document.querySelectorAll(".project-checkbox:checked")
+    ).map((checkbox) => checkbox.dataset.projectId);
+
+    if (!selectedStatus || selectedProjects.length === 0) {
+      alert("Please select at least one project and a new status.");
+      return;
+    }
+
+    fetch("/update_project_status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project_ids: selectedProjects,
+        new_status: parseInt(selectedStatus),
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert(data.message);
+        if (data.status === "success") {
+          location.reload();
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to update project status:", err);
+        alert("Something went wrong.");
+      });
+  }
+</script>
 {% endblock %}

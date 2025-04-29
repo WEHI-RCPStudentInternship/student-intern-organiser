@@ -126,4 +126,147 @@
         </table>
     </div>
 </div>
+
+<style>
+    .chart-section {
+        margin-bottom: 50px; /* Adds space below each title */
+    }
+    .chart-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 20px; /* Adds spacing between title and charts */
+        margin-bottom: 80px;
+    }
+    .chart-box {
+        width: 48%;
+        height: 400px;
+        display: flex;
+        flex-direction: column; /* Ensures title and chart do not overlap */
+        align-items: center;
+        justify-content: center;
+    }
+    .chart-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 30px; /* Adds spacing below title */
+    }
+    #students-title {
+        margin-top: 60px; /* ✅ Moves the "Total Students by Intake" title lower */
+    }
+    canvas {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    h1.graph {
+      margin-top: 180px;
+    }
+</style>
+
+<h1 class=graph>Total Hours by Intake (finished interns)</h1>
+<div class="chart-container">
+    <div class="chart-box">
+        <h3>Cumulative Line Chart</h3>
+        <canvas id="hoursLineChart"></canvas>
+    </div>
+    <div class="chart-box">
+        <h3>Non-Cumulative Bar Chart</h3>
+        <canvas id="hoursBarChart"></canvas>
+    </div>
+</div>
+
+<h1 class=graph>Total Students by Intake (finished interns)</h1>
+<div class="chart-container">
+    <div class="chart-box">
+        <h3>Cumulative Line Chart</h3>
+        <canvas id="studentsLineChart"></canvas>
+    </div>
+    <div class="chart-box">
+        <h3>Non-Cumulative Bar Chart</h3>
+        <canvas id="studentsBarChart"></canvas>
+    </div>
+</div>
 {% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/dashboard/{{ dashboard_type }}/chart_data")
+            .then(response => response.json())
+            .then(data => {
+                const labels = data.intakes;
+                const totalHours = data.total_hours;
+                const studentCounts = data.student_count;
+
+                // ✅ Compute cumulative values for line charts
+                let cumulativeHours = [...totalHours];
+                let cumulativeStudents = [...studentCounts];
+
+                for (let i = 1; i < totalHours.length; i++) {
+                    cumulativeHours[i] += cumulativeHours[i - 1];
+                    cumulativeStudents[i] += cumulativeStudents[i - 1];
+                }
+
+                // ✅ Render Total Hours Per Week Charts
+                new Chart(document.getElementById("hoursLineChart"), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{ 
+                            label: 'Total Hours (Cumulative)', 
+                            data: cumulativeHours, 
+                            borderColor: 'blue', 
+                            fill: false 
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                new Chart(document.getElementById("hoursBarChart"), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{ 
+                            label: 'Total Hours (Non-Cumulative)', 
+                            data: totalHours, 
+                            backgroundColor: 'blue' 
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                // ✅ Render Total Students Charts
+                new Chart(document.getElementById("studentsLineChart"), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{ 
+                            label: 'Total Students (Cumulative)', 
+                            data: cumulativeStudents, 
+                            borderColor: '#924191', 
+                            fill: false 
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                new Chart(document.getElementById("studentsBarChart"), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{ 
+                            label: 'Total Students (Non-Cumulative)', 
+                            data: studentCounts, 
+                            backgroundColor: '#924191' 
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            });
+    });
+</script>
+{% endblock %}
+

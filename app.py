@@ -489,7 +489,7 @@ def assigned_projects(intake_type=None):
     try:
         if request.method == 'GET':
             # Fetch the projects from the Projects table
-            cursor.execute('SELECT id, name FROM Projects ORDER BY status ASC, name ASC' )
+            cursor.execute('SELECT id, name, status FROM Projects ORDER BY status ASC, name ASC' )
             projects = cursor.fetchall()
             print(projects)
 
@@ -523,7 +523,7 @@ def assigned_projects(intake_type=None):
             # Close the database connection
             cursor.close()
             conn.close()
-            return render_template('Assigned_projects.html', projects=projects, students=students)
+            return render_template('Assigned_projects.html', projects=projects, students=students, statuses=statuses)
         elif request.method == 'PUT':
             # Handle the AJAX request for updating the student's project assignment
             data = request.get_json()
@@ -857,8 +857,6 @@ def get_all_projects():
     projects = [row for row in cursor.fetchall()]
     conn.close()
     return projects
-
-
 
 def get_projects():
     conn = sqlite3.connect(db_path)
@@ -2034,6 +2032,22 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
     return table_rows
 
+@app.route('/update_project_status', methods=['POST'])
+def update_project_status():
+    data = request.get_json()
+    project_ids = data.get('project_ids', [])
+    new_status = data.get('new_status')
+
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    for name in project_ids:
+        cursor.execute('UPDATE Projects SET status = ? WHERE name = ?', (new_status, name))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({'status': 'success', 'message': 'Project statuses updated.'})
 
 
 

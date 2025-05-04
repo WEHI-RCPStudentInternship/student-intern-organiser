@@ -5,30 +5,40 @@
 
 {% block top_links_menu %}
   <a href="/menu_page">Menu</a>
-  <button id="sendEmailBtn" class="btn">Send Email</button>
+  <a href="#" id="sendEmailBtn">Send Email</a>
 {% endblock %}
 
+
 {% block content %}
-  <input type="text" id="searchBox" placeholder="Search…" style="margin-bottom: 10px; width: 30%;" />
   <table id="reminderTable" class="display">
     <thead>
       <tr>
+        <th style="display:none">ID</th>
         <th>Name</th>
         <th>Project</th>
         <th>Email</th>
-        <th>Sent?</th>
+        <th>
+          <input type="checkbox" id="selectAllCheckbox">
+        </th>
       </tr>
     </thead>
     <tbody>
       {% for s in students %}
-      <tr data-intern-id="{{ s['intern_id'] }}">
+      <tr>
+        <!-- hidden ID cell -->
+        <td style="display:none">{{ s['intern_id'] }}</td>
+    
+        <!-- visible columns -->
         <td>{{ s['full_name'] }}</td>
         <td>{{ s['project'] }}</td>
         <td><a href="mailto:{{ s['email'] }}">{{ s['email'] }}</a></td>
+    
+        <!-- the checkbox -->
         <td>
           <input type="checkbox"
-                 class="picCheckbox"
-                 {% if s['profile_pic_sent'] %}checked{% endif %}/>
+                 class="rowCheckbox"
+                 data-intern-id="{{ s['intern_id'] }}"
+                 {% if s['profile_pic_sent'] %}checked{% endif %} />
         </td>
       </tr>
       {% endfor %}
@@ -38,47 +48,65 @@
 
 {% block scripts %}
 <script>
-$(document).ready(function(){
-  // Initialize DataTable with default sorting and search integration
-  var table = $('#reminderTable').DataTable({
-    order: [[1, 'asc'], [0, 'asc']],
-    dom: 'lrtip' // hide the built-in search box
-  });
-
-  // Integrate custom search box
-  $('#searchBox').on('keyup', function(){
-    table.search(this.value).draw();
-  });
-
-  // Handle checkbox toggle
-  $('#reminderTable').on('change', '.picCheckbox', function(){
-    var $row = $(this).closest('tr');
-    var internId = $row.data('intern-id');
-    var sent = this.checked;
-    fetch('/update_profile_pic_sent', {
-      method: 'PUT',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({intern_id: internId, profile_pic_sent: sent})
+  $(document).ready(function() {
+    var table = $('#reminderTable').DataTable({
+      // hide the first column (ID), move info/search around
+      columnDefs: [{ targets: 0, visible: false }],
+      dom: '<"table-top"<"info-left"i><"filter-right"f>>rt<"bottom"lp><"clear">'
     });
-  });
+  
+    // 1. Bulk‐toggle handler
+    $('#selectAllCheckbox').on('change', function() {
+      var checked = this.checked;
+      table.rows({ search: 'applied' }).nodes()
+           .to$().find('.rowCheckbox').prop('checked', checked);
 
-  // Send email to all unchecked
-  $('#sendEmailBtn').click(function(){
-    var to = [];
-    table.rows().every(function(){
-      var node = this.node();
-      var $chk = $(node).find('.picCheckbox');
-      if (!$chk.is(':checked')){
-        var mail = $(node).find('a[href^="mailto:"]').attr('href').replace('mailto:','');
+      var ids = table.rows({ search: 'applied' }).nodes()
+        .to$().find('.rowCheckbox')
+        .map(function(){ return $(this).data('internId'); })
+        .get();
+
+      $.ajax({
+        url: '/bulk_update_profile_pic_sent',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ intern_ids: ids, profile_pic_sent: checked }),
+        success: function(resp){
+          console.log('Bulk update:', resp);
+        }
+      });
+    });
+  
+    // 2. Individual row‐toggle
+    $('#reminderTable').on('change', '.rowCheckbox', function() {
+      var internId = $(this).data('internId'),
+          flag     = this.checked;
+      $.ajax({
+        url: '/update_profile_pic_sent',
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ intern_id: internId, profile_pic_sent: flag })
+      });
+    });
+
+    // 3. Send Email to all *unchecked* rows
+    $('#sendEmailBtn').on('click', function(e){
+      e.preventDefault();           // stop the “#” jump
+      var to = [];
+      table.rows({ search: 'applied' }).nodes()
+           .to$().find('.rowCheckbox:not(:checked)').each(function(){
+        var mail = $(this).closest('tr')
+                       .find('a[href^="mailto:"]').attr('href')
+                       .replace('mailto:','');
         to.push(mail);
+      });
+    
+      if(to.length){
+        window.location.href = 'mailto:' + to.join(',');
+      } else {
+        alert('All done—no one left to remind!');
       }
     });
-    if(to.length){
-      window.location = 'mailto:' + to.join(',');
-    } else {
-      alert('All done—no one left to remind!');
-    }
   });
-});
 </script>
 {% endblock %}

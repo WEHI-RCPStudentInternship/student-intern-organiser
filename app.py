@@ -100,6 +100,7 @@ def reminder_profile_pic():
     cur.execute("""
         SELECT intern_id, full_name, project, email, profile_pic_sent
         FROM Students
+        WHERE intake = (SELECT name FROM Intakes WHERE status = "current")
         ORDER BY project COLLATE NOCASE, full_name COLLATE NOCASE
     """)
     students = cur.fetchall()
@@ -123,6 +124,26 @@ def update_profile_pic_sent():
     conn.commit()
     conn.close()
     return jsonify(status='ok')
+
+@app.route('/bulk_update_profile_pic_sent', methods=['POST'])
+def bulk_update_profile_pic_sent():
+    data = request.get_json()
+    ids = data.get('intern_ids', [])
+    flag = 1 if data.get('profile_pic_sent') else 0
+
+    if not ids:
+        return jsonify(status='nothing to update'), 400
+
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    # build placeholder string (?, ?, ?, ...)
+    placeholders = ','.join('?' for _ in ids)
+    sql = f"UPDATE Students SET profile_pic_sent = ? WHERE intern_id IN ({placeholders})"
+    cur.execute(sql, [flag] + ids)
+    conn.commit()
+    conn.close()
+
+    return jsonify(status='ok', updated=len(ids))
 # ---------------------------------------
 
 @app.route('/current_student')

@@ -146,6 +146,80 @@ def bulk_update_profile_pic_sent():
     return jsonify(status='ok', updated=len(ids))
 # ---------------------------------------
 
+# —– PROJECT-REPORT REMINDER Routes —–
+
+@app.route('/reminder_project_report')
+def reminder_project_report():
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # ← ADDED: pull the name of the current intake
+    cur.execute('SELECT name FROM Intakes WHERE status = "current"')
+    intake_current = cur.fetchone()[0]
+
+    # fetch only active (non-archived) projects
+    cur.execute("""
+      SELECT id, name, summary_report_sent
+        FROM Projects
+       WHERE status != 'archived'
+       ORDER BY name COLLATE NOCASE
+    """)
+    raw = cur.fetchall()
+
+    projects = []
+    for row in raw:
+        # ← CHANGED: only students in the current intake
+        cur.execute("""
+            SELECT email
+              FROM Students
+             WHERE project = ?
+               AND intake = ?
+               AND email IS NOT NULL
+        """, (row["name"], intake_current))
+        emails = [r[0] for r in cur.fetchall()]
+
+        projects.append({
+            "id":           row["id"],
+            "name":         row["name"],
+            "summary_sent": bool(row["summary_report_sent"]),
+            "emails":       ",".join(emails)
+        })
+
+    conn.close()
+    return render_template("reminder_project_report.html", projects=projects)
+
+
+@app.route('/update_project_summary_sent', methods=['PUT'])
+def update_project_summary_sent():
+    d = request.get_json()
+    pid  = d.get('project_id')
+    val  = 1 if d.get('summary_report_sent') else 0
+    conn = sqlite3.connect(db_path)
+    cur  = conn.cursor()
+    cur.execute("UPDATE Projects SET summary_report_sent = ? WHERE id = ?", (val, pid))
+    conn.commit()
+    conn.close()
+    return jsonify(status='ok')
+
+@app.route('/bulk_update_project_summary', methods=['POST'])
+def bulk_update_project_summary():
+    d   = request.get_json()
+    ids = d.get('project_ids', [])
+    val = 1 if d.get('summary_report_sent') else 0
+    if not ids:
+        return jsonify(status='nothing'), 400
+    conn = sqlite3.connect(db_path)
+    cur  = conn.cursor()
+    placeholders = ",".join("?" for _ in ids)
+    cur.execute(f"UPDATE Projects SET summary_report_sent=? WHERE id IN ({placeholders})",
+                [val] + ids)
+    conn.commit()
+    conn.close()
+    return jsonify(status='ok', updated=len(ids))
+
+
+
 @app.route('/current_student')
 def current_student():
     # Connect to the SQLite database

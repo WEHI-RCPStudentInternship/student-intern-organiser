@@ -65,4 +65,4 @@ CREATE TABLE IF NOT EXISTS "Intakes" (
             status TEXT
         , science_start_date date, engit_start_date date);
 CREATE TABLE Projects
-                  (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, status INT);
+                  (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, status INT, summary_report_sent INTEGER DEFAULT 0);

@@ -1,95 +1,322 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block title %} Project Students Allocation {%
+endblock %} {% block page_title %}Projects Students Allocation{% endblock %} {%
+block content %} {% macro studentKanbanCard(classes,student) -%}
 
-{% block title %} Project Students Allocation {% endblock %}
-{% block page_title %}Projects Students Allocation{% endblock %}
-
-{% block content %}
-
-{% macro studentKanbanCard(classes,student) -%}
-    <div class="{{ classes }}" data-student-id="{{ student[0] }}" draggable="true" ondragstart="drag(event)">
-        {{ student[1] }} ({{ student[7][:3] }})<br/>{{ student[8] }}<br/>{{ student[6].split(' - ')[1] }} <br/> {{ student[3] }} <br/> {{ student[4] }} <br/> {{ student[5] }} <br/><a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">View</a>
-    </div>
+<div
+  class="{{ classes }}"
+  data-student-id="{{ student[0] }}"
+  draggable="true"
+  ondragstart="drag(event)"
+>
+  {{ student[1] }} ({{ student[7][:3] }})<br />{{ student[8] }}<br />{{
+  student[6].split(' - ')[1] }} <br />
+  {{ student[3] }} <br />
+  {{ student[4] }} <br />
+  {{ student[5] }} <br /><a
+    target="_blank"
+    href="/pre_int_st_evaluation/{{ student[0] }}"
+    >View</a
+  >
+</div>
 {%- endmacro %}
 
-<div class="counts kanban-total-counts"> </div>
-<div class="counts kanban-total-assigned-counts"> </div>
-<div class="counts kanban-total-offered-counts"> </div>
-<div class="counts kanban-total-accepted-counts"> </div>
+<!-- Chart Container -->
+<div style="display: flex; justify-content: center; margin: 20px 0">
+  <div
+    style="
+      width: 70%;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 16px;
+      background-color: #fafafa;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      font-weight: bold;
+    "
+  >
+    <label for="chartView">View: </label>
+
+    <select
+      id="chartView"
+      onchange="updateChartView()"
+      style="font-weight: bold; text-align: center"
+    >
+      <option value="total">Total</option>
+      <option value="assigned">Assigned</option>
+      <option value="offered">Offered</option>
+      <option value="accepted">Accepted</option>
+    </select>
+
+    <canvas id="summaryChart"></canvas>
+  </div>
+</div>
+
+<div style="text-align: left; margin: 20px 0">
+  <button
+    id="toggleArchivedBtn"
+    onclick="toggleArchivedProjects()"
+    style="
+      padding: 8px 16px;
+      background-color: rgb(58, 189, 63);
+      color: #1f2320;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    "
+  >
+    View Archived
+  </button>
+
+  <select
+    id="statusSelect"
+    style="
+      text-align: center;
+      margin-left: 12px;
+      padding: 6px 10px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      border: 3px solid #000000;
+    "
+  >
+    <option disabled selected>Statuses</option>
+    <option value="0">0 - Unassigned</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5 - Archived</option>
+  </select>
+
+  <button
+    onclick="changeSelectedProjectStatus()"
+    style="
+      padding: 8px 16px;
+      background-color: rgb(58, 189, 63);
+      color: #1f2320;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    "
+  >
+    Change Status
+  </button>
+</div>
+
+<!-- just hide the counts divs for now, still need to be able to access them for the chart -->
+<style>
+  .counts {
+    display: none;
+  }
+</style>
+
+<div class="counts kanban-total-counts"></div>
+<div class="counts kanban-total-assigned-counts"></div>
+<div class="counts kanban-total-offered-counts"></div>
+<div class="counts kanban-total-accepted-counts"></div>
+
 <div class="kanban-container">
   {% for project in projects %}
-    <div class="kanban-column" data-project-id="{{ project[1] }}" ondrop="drop(event)" ondragover="allowDrop(event)">
-      <h3 class="column-header"><a href="/share_students/{{ project[0] }}">{{ project[1] }}</a></h3>
-      {% for student in students %}
-        {% if project[1] == student[2]  %}
-
-            {% if student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %}
-                {% set classes = 'male other not-accepted kanban-card' %}
-            {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even without a project. ") %}
-                {% set classes = 'experienced kanban-card female' %}
-            {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ") %}
-                {% set classes = 'experienced kanban-card male' %}
-            {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a project. ") %}
-                {% set classes = 'sysadmin kanban-card female' %}
-            {% elif student[6] in ("04 - Sysadmin - Recommend sign up even without a project. ") %}
-                {% set classes = 'sysadmin kanban-card male' %}
-            {% elif student[6] in ("01 - F Translator - Recommend sign up even without a project. ") %}
-                {% set classes = 'translator kanban-card female' %}
-            {% elif student[6] in ("04 - Translator - Recommend sign up even without a project. ") %}
-                {% set classes = 'translator kanban-card male' %}
-            {% elif student[6] in ("03 - F Technical Skills - Recommend sign up for a specific project. ") %}
-                {% set classes = 'other not-accepted female kanban-card' %}
-            {% else %}
-                {% set classes = 'other kanban-card' %}
-            {% endif %}
-
-            {% if student[4] in ("08 Accepted contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started") %}
-                {% set classes = classes + ' accepted' %}
-            {% elif student[4] in ("07 Offered contact") %}
-                {% set classes = classes + ' offered' %}
-            {% endif %}
-
-
-            <!-- this is for projects -->
-            {% if student[2] == 'Unassigned' %}
-                {% set classes = classes + ' unassigned' %}
-            {% else %}
-                {% set classes = classes + ' assigned' %}
-            {% endif %}
-
-
-            <!-- this is for course -->
-            {% if student[7] in ("Engineering and IT") %}
-                {% set classes = classes + ' engit' %}
-            {% elif student[7] in ("Science") %}
-                {% set classes = classes + ' science' %}
-            {% elif student[7] in ("Volunteer") %}
-                {% set classes = classes + ' volunteer' %}
-            {% endif %}
-
-            {{ studentKanbanCard(classes, student) }}
-
-        {% endif %}
-      {% endfor %}
+  <div
+    class="kanban-column"
+    data-project-id="{{ project[1] }}"
+    data-status="{{ project[2] }}"
+    ondrop="drop(event)"
+    ondragover="allowDrop(event)"
+  >
+    <div
+      class="project-header"
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 8px;
+      "
+    >
+      <label
+        style="
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          background-color: rgb(58, 189, 63);
+          color: #1f2320;
+          border: none;
+          border-radius: 6px;
+          padding: 6px 10px;
+          cursor: pointer;
+          font-size: 16px;
+          font-weight: bold;
+          width: 100%;
+          box-sizing: border-box;
+        "
+      >
+        <input
+          type="checkbox"
+          class="project-checkbox"
+          data-project-id="{{ project[1] }}"
+          style="transform: scale(1.5); margin: 0"
+        />
+        <span>Status: {{ project[2] }}</span>
+      </label>
+      <h3 class="column-header" style="margin: 0">
+        <a href="/share_students/{{ project[0] }}">{{ project[1] }}</a>
+      </h3>
     </div>
+
+    {% for student in students %} {% if project[1] == student[2] %} {% if
+    student[6] in ("06 - TS - Recommend no sign up except under specific
+    circumstances. ") %} {% set classes = 'male other not-accepted kanban-card'
+    %} {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even
+    without a project. ") %} {% set classes = 'experienced kanban-card female'
+    %} {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a
+    specific project. ") %} {% set classes = 'experienced kanban-card male' %}
+    {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a
+    project. ") %} {% set classes = 'sysadmin kanban-card female' %} {% elif
+    student[6] in ("04 - Sysadmin - Recommend sign up even without a project. ")
+    %} {% set classes = 'sysadmin kanban-card male' %} {% elif student[6] in
+    ("01 - F Translator - Recommend sign up even without a project. ") %} {% set
+    classes = 'translator kanban-card female' %} {% elif student[6] in ("04 -
+    Translator - Recommend sign up even without a project. ") %} {% set classes
+    = 'translator kanban-card male' %} {% elif student[6] in ("03 - F Technical
+    Skills - Recommend sign up for a specific project. ") %} {% set classes =
+    'other not-accepted female kanban-card' %} {% else %} {% set classes =
+    'other kanban-card' %} {% endif %} {% if student[4] in ("08 Accepted
+    contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added
+    to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started")
+    %} {% set classes = classes + ' accepted' %} {% elif student[4] in ("07
+    Offered contact") %} {% set classes = classes + ' offered' %} {% endif %}
+
+    <!-- this is for projects -->
+    {% if student[2] == 'Unassigned' %} {% set classes = classes + ' unassigned'
+    %} {% else %} {% set classes = classes + ' assigned' %} {% endif %}
+
+    <!-- this is for course -->
+    {% if student[7] in ("Engineering and IT") %} {% set classes = classes + '
+    engit' %} {% elif student[7] in ("Science") %} {% set classes = classes + '
+    science' %} {% elif student[7] in ("Volunteer") %} {% set classes = classes
+    + ' volunteer' %} {% endif %} {{ studentKanbanCard(classes, student) }} {%
+    endif %} {% endfor %}
+  </div>
   {% endfor %}
 </div>
 
 <!-- Drag and Drop Functionnality -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartLabels = [
+    "translator",
+    "sysadmin",
+    "experienced",
+    "other",
+    "volunteer",
+    "engit",
+    "science",
+    "female",
+    "male",
+  ];
+
+  const fields = [
+    "translator",
+    "sysadmin",
+    "experienced",
+    "other",
+    "volunteer",
+    "engit",
+    "science",
+    "female",
+    "male",
+  ];
+
+  let summaryChart;
+
+  function createSummaryChart(initialData) {
+    const ctx = document.getElementById("summaryChart").getContext("2d");
+    summaryChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: "Count",
+            data: initialData,
+            backgroundColor: "rgba(54, 162, 235, 0.6)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 2,
+              precision: 0,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function updateChartView() {
+    const view = document.getElementById("chartView").value;
+    summaryChart.data.datasets[0].data = dataSets[view];
+    summaryChart.update();
+  }
+
+  // Initialize chart on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    updateKanbanColumnCounts(targetClasses);
+    createSummaryChart(dataSets.total);
+    // 🔧 Hide archived projects on first load
+    document.querySelectorAll(".kanban-column").forEach((col) => {
+      const status = parseInt(col.getAttribute("data-status"));
+      if (status === 5) {
+        col.style.display = "none";
+      }
+    });
+  });
+</script>
 
 <script>
-function createOrUpdateDiv(selector, count_type, totalCounts) {
+  const dataSets = {
+    total: [],
+    assigned: [],
+    offered: [],
+    accepted: [],
+  };
+  function createOrUpdateDiv(selector, count_type, totalCounts) {
     let div = document.querySelector(selector);
     // Update the content of the div
-    div.innerHTML = targetClasses.map(cls => {
+    div.innerHTML = targetClasses
+      .map((cls) => {
         return `<div>Total ${count_type} ${cls}: ${totalCounts[cls]}</div>`;
-    }).join('');
+      })
+      .join("");
+  }
 
-}
-
-
-// Example usage:
-// Call the function with the classes you want to count
-const targetClasses = ["translator","sysadmin","experienced","other","volunteer","engit","science","female","male"];
+  // Example usage:
+  // Call the function with the classes you want to count
+  const targetClasses = [
+    "translator",
+    "sysadmin",
+    "experienced",
+    "other",
+    "volunteer",
+    "engit",
+    "science",
+    "female",
+    "male",
+  ];
 
   function allowDrop(event) {
     event.preventDefault();
@@ -101,203 +328,288 @@ const targetClasses = ["translator","sysadmin","experienced","other","volunteer"
   function drop(event) {
     event.preventDefault();
     const studentId = event.dataTransfer.getData("text");
-    const projectId = event.target.closest('.kanban-column').dataset.projectId;
+    const projectId = event.target.closest(".kanban-column").dataset.projectId;
 
-    console.log('Student ID:', studentId);
-    console.log('Project ID:', projectId);
+    console.log("Student ID:", studentId);
+    console.log("Project ID:", projectId);
 
     // Find the student element and target column
-    const studentElement = document.querySelector(`[data-student-id="${studentId}"]`);
-    const targetColumn = event.target.closest('.kanban-column');
+    const studentElement = document.querySelector(
+      `[data-student-id="${studentId}"]`
+    );
+    const targetColumn = event.target.closest(".kanban-column");
 
     // printing in the console for testing if i was catching data  while debugging
-    console.log('Student Element:', studentElement);
-    console.log('Target Column:', targetColumn);
+    console.log("Student Element:", studentElement);
+    console.log("Target Column:", targetColumn);
 
     if (studentElement && targetColumn) {
       // Move the student to the target column
       targetColumn.appendChild(studentElement);
 
       // Send AJAX request to update the student's project assignment in the database
-      fetch('/update_project_assignment', {
-        method: 'PUT',
+      fetch("/update_project_assignment", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ internId: studentId, projectId: projectId })
+        body: JSON.stringify({ internId: studentId, projectId: projectId }),
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          console.log('Project assignment updated successfully.');
-          updateKanbanColumnCounts(targetClasses);
-        } else {
-          console.log('Failed to update project assignment.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while updating the project assignment.');
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            console.log("Project assignment updated successfully.");
+            updateKanbanColumnCounts(targetClasses);
+          } else {
+            console.log("Failed to update project assignment.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred while updating the project assignment.");
+        });
     } else {
-      console.log('Student or target column not found.');
+      console.log("Student or target column not found.");
     }
   }
 
   function addDragListeners() {
-    const unassignedStudents = document.querySelectorAll('.unassigned .kanban-card');
-    unassignedStudents.forEach(student => {
-      student.addEventListener('dragstart', drag);
+    const unassignedStudents = document.querySelectorAll(
+      ".unassigned .kanban-card"
+    );
+    unassignedStudents.forEach((student) => {
+      student.addEventListener("dragstart", drag);
     });
 
-    const projectColumns = document.querySelectorAll('.project-column');
-    projectColumns.forEach(column => {
-      column.addEventListener('dragover', allowDrop);
-      column.addEventListener('drop', drop);
+    const projectColumns = document.querySelectorAll(".project-column");
+    projectColumns.forEach((column) => {
+      column.addEventListener("dragover", allowDrop);
+      column.addEventListener("drop", drop);
     });
   }
 
   // Initial call to add drag listeners when the page loads
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     addDragListeners();
   });
 
-
-
-
-function updateKanbanColumnCounts(targetClasses) {
-
-    // Initialize total counts object
+  function updateKanbanColumnCounts(targetClasses) {
     const totalCounts = {};
-    targetClasses.forEach(cls => {
-        totalCounts[cls] = 0;
-    });
-
-    // Initialize total assigned counts object
     const totalAssignedCounts = {};
-    targetClasses.forEach(cls => {
-        totalAssignedCounts[cls] = 0;
-    });
-
-    // Initialize total assigned counts object
     const totalAcceptedCounts = {};
-    targetClasses.forEach(cls => {
-        totalAcceptedCounts[cls] = 0;
-    });
-
-    // Initialize total offered counts object
     const totalOfferedCounts = {};
-    targetClasses.forEach(cls => {
-        totalOfferedCounts[cls] = 0;
+
+    targetClasses.forEach((cls) => {
+      totalCounts[cls] = 0;
+      totalAssignedCounts[cls] = 0;
+      totalAcceptedCounts[cls] = 0;
+      totalOfferedCounts[cls] = 0;
     });
 
+    document.querySelectorAll(".kanban-column").forEach((column) => {
+      const columnCounts = {};
+      const projectAcceptedCounts = {};
+      const projectOfferedCounts = {};
 
-   // Iterate through each kanban column ie. project
-    document.querySelectorAll('.kanban-column').forEach(column => {
-        const columnCounts = {};
+      targetClasses.forEach((cls) => {
+        columnCounts[cls] = 0;
+        projectAcceptedCounts[cls] = 0;
+        projectOfferedCounts[cls] = 0;
+      });
 
-        // Initialize project counts objects
-        const projectAcceptedCounts = {};
-        const projectOfferedCounts = {};
+      column.querySelectorAll(".kanban-card").forEach((card) => {
+        targetClasses.forEach((cls) => {
+          if (card.classList.contains(cls)) {
+            columnCounts[cls]++;
+            totalCounts[cls]++;
 
-        targetClasses.forEach(cls => {
-            projectAcceptedCounts[cls] = 0;
-            projectOfferedCounts[cls] = 0;
-        });
-
-
-        // Initialize counts for each target class
-        targetClasses.forEach(cls => {
-            columnCounts[cls] = 0;
-        });
-
-        // Count the occurrences of each target class
-        column.querySelectorAll('.kanban-card').forEach(card => {
-            targetClasses.forEach(cls => {
-                if (card.classList.contains(cls)) {
-                    columnCounts[cls]++;
-                    totalCounts[cls]++;
-
-                    // if this isn't unassigned project under data-project-id
-                    projectId = card.parentElement.getAttribute('data-project-id');
-                    if (projectId != 'Unassigned'){
-                        totalAssignedCounts[cls]++;
-                        if (card.classList.contains('accepted')) {
-                            projectAcceptedCounts[cls]++;
-                            totalAcceptedCounts[cls]++;
-                        }
-                        if (card.classList.contains('offered')) {
-                            projectOfferedCounts[cls]++;
-                            totalOfferedCounts[cls]++;
-                        }
-                    }
-                }
-            });
-        });
-
-        // Create or update the results element below the header
-        let resultsDiv = column.querySelector('.kanban-column-counts');
-        if (!resultsDiv) {
-            resultsDiv = document.createElement('div');
-            resultsDiv.className = 'kanban-column-counts';
-            resultsDiv.style.marginTop = '10px';
-            resultsDiv.style.fontSize = '14px';
-            const header = column.querySelector('h3');
-            if (header) {
-                header.insertAdjacentElement('afterend', resultsDiv);
+            const projectId =
+              card.parentElement.getAttribute("data-project-id");
+            if (projectId !== "Unassigned") {
+              totalAssignedCounts[cls]++;
+              if (card.classList.contains("accepted")) {
+                projectAcceptedCounts[cls]++;
+                totalAcceptedCounts[cls]++;
+              }
+              if (card.classList.contains("offered")) {
+                projectOfferedCounts[cls]++;
+                totalOfferedCounts[cls]++;
+              }
             }
+          }
+        });
+      });
+
+      let resultsDiv = column.querySelector(".kanban-column-counts");
+      if (!resultsDiv) {
+        resultsDiv = document.createElement("div");
+        resultsDiv.className = "kanban-column-counts";
+        resultsDiv.style.marginTop = "10px";
+        resultsDiv.style.fontSize = "14px";
+        const header = column.querySelector("h3");
+        if (header) {
+          header.insertAdjacentElement("afterend", resultsDiv);
         }
+      }
 
-        // Update the content of the results div
-        resultsDiv.innerHTML = targetClasses.map(cls => {
-            return `<div>${cls}: ${columnCounts[cls]}</div>`;
-        }).join('');
+      const accepted_hours_per_week =
+        projectAcceptedCounts["volunteer"] * 2 +
+        projectAcceptedCounts["engit"] * 24 +
+        projectAcceptedCounts["science"] * 8;
 
-        accepted_hours_per_week = 0 + projectAcceptedCounts['volunteer']*2 + projectAcceptedCounts['engit']*24 + projectAcceptedCounts['science']*8;
-        offered_hours_per_week = 0 + projectOfferedCounts['volunteer']*2 + projectOfferedCounts['engit']*24 + projectOfferedCounts['science']*8 + accepted_hours_per_week;
-        hours_per_week = 0 + columnCounts['volunteer']*2 + columnCounts['engit']*24 + columnCounts['science']*8;
-        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Hours per week: '+hours_per_week+' </div>';
-        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Offered hpw: '+ offered_hours_per_week+' </div>';
-        resultsDiv.innerHTML = resultsDiv.innerHTML + '<div>Accepted hpw: '+ accepted_hours_per_week+' </div>';
-        
+      const offered_hours_per_week =
+        projectOfferedCounts["volunteer"] * 2 +
+        projectOfferedCounts["engit"] * 24 +
+        projectOfferedCounts["science"] * 8 +
+        accepted_hours_per_week;
+
+      const hours_per_week =
+        columnCounts["volunteer"] * 2 +
+        columnCounts["engit"] * 24 +
+        columnCounts["science"] * 8;
+
+      const essentialFields = ["female", "male"];
+      const extraFields = targetClasses.filter(
+        (cls) => !essentialFields.includes(cls)
+      );
+
+      const essentialHtml = essentialFields
+        .map((cls) => `<div>${cls}: ${columnCounts[cls]}</div>`)
+        .join("");
+
+      const extraHtml = extraFields
+        .map((cls) => `<div>${cls}: ${columnCounts[cls]}</div>`)
+        .join("");
+
+      resultsDiv.innerHTML = `
+          <div class="kanban-stats-box" style="padding: 8px; border-radius: 6px;">
+            <div class="essential-fields" style="font-size: 15px;">
+              ${essentialHtml}
+              <div>Hours per week: ${hours_per_week}</div>
+              <div>Offered hpw: ${offered_hours_per_week}</div>
+              <div>Accepted hpw: ${accepted_hours_per_week}</div>
+            </div>
+            <div class="extra-fields" style="display: none;font-size: 16px; margin-top: 8px;">
+              ${extraHtml}
+            </div>
+            <button class="toggle-extra-btn" style="
+              margin-top: 4px;
+              background-color: rgb(58, 189, 63);
+              font-weight: bold;
+              border: none;
+              border-radius: 6px;
+              color: #333;
+              cursor: pointer;
+              font-size: 16px;
+              padding: 4px 10px;">
+              Other fields ▼
+            </button>
+          </div>
+        `;
     });
 
+    // Update top summary boxes
+    createOrUpdateDiv(".kanban-total-counts", "", totalCounts);
     createOrUpdateDiv(
-        '.kanban-total-counts',
-        '',
-        totalCounts
-    ); 
-
-
+      ".kanban-total-accepted-counts",
+      "Accepted",
+      totalAcceptedCounts
+    );
     createOrUpdateDiv(
-        '.kanban-total-accepted-counts',
-        'Accepted',
-        totalAcceptedCounts
-    ); 
-
-
+      ".kanban-total-offered-counts",
+      "Offered",
+      totalOfferedCounts
+    );
     createOrUpdateDiv(
-        '.kanban-total-offered-counts',
-        'Offered',
-        totalOfferedCounts
-    ); 
+      ".kanban-total-assigned-counts",
+      "Assigned",
+      totalAssignedCounts
+    );
 
-    createOrUpdateDiv(
-        '.kanban-total-assigned-counts',
-        'Assigned',
-        totalAssignedCounts
-    ); 
+    // Update chart datasets dynamically
+    dataSets.total = fields.map((field) => totalCounts[field] || 0);
+    dataSets.assigned = fields.map((field) => totalAssignedCounts[field] || 0);
+    dataSets.offered = fields.map((field) => totalOfferedCounts[field] || 0);
+    dataSets.accepted = fields.map((field) => totalAcceptedCounts[field] || 0);
 
+    // Refresh chart if already created
+    if (summaryChart) {
+      const currentView = document.getElementById("chartView").value;
+      summaryChart.data.datasets[0].data = dataSets[currentView];
+      summaryChart.update();
+    }
+  }
 
+  updateKanbanColumnCounts(targetClasses);
 
-}
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("toggle-extra-btn")) {
+      const btn = e.target;
+      const extraDiv = btn.previousElementSibling;
 
-updateKanbanColumnCounts(targetClasses);
+      const isHidden = extraDiv.style.display === "none";
 
-// To call it again, simply reuse the function
-// updateKanbanColumnCounts(["new-class", "other-class"]);
-
-
+      extraDiv.style.display = isHidden ? "block" : "none";
+      btn.textContent = isHidden ? "Hide fields ▲" : "Other fields ▼";
+    }
+  });
+  // To call it again, simply reuse the function
+  // updateKanbanColumnCounts(["new-class", "other-class"]);
 </script>
 
+<script>
+  let showingArchived = false;
+
+  function toggleArchivedProjects() {
+    const btn = document.getElementById("toggleArchivedBtn");
+    const allColumns = document.querySelectorAll(".kanban-column");
+
+    showingArchived = !showingArchived;
+
+    allColumns.forEach((col) => {
+      const status = parseInt(col.getAttribute("data-status"));
+      if (showingArchived) {
+        col.style.display = status === 5 ? "block" : "none";
+      } else {
+        col.style.display = status >= 0 && status <= 4 ? "block" : "none";
+      }
+    });
+
+    btn.textContent = showingArchived ? "View Active" : "View Archived";
+  }
+</script>
+
+<script>
+  function changeSelectedProjectStatus() {
+    const selectedStatus = document.getElementById("statusSelect").value;
+    const selectedProjects = Array.from(
+      document.querySelectorAll(".project-checkbox:checked")
+    ).map((checkbox) => checkbox.dataset.projectId);
+
+    if (!selectedStatus || selectedProjects.length === 0) {
+      alert("Please select at least one project and a new status.");
+      return;
+    }
+
+    fetch("/update_project_status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project_ids: selectedProjects,
+        new_status: parseInt(selectedStatus),
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert(data.message);
+        if (data.status === "success") {
+          location.reload();
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to update project status:", err);
+        alert("Something went wrong.");
+      });
+  }
+</script>
 {% endblock %}

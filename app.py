@@ -5,6 +5,7 @@ import sqlite3
 import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
+from urllib.parse import unquote
 
 from flask import (Flask, jsonify, redirect, render_template, request, Response,
                    send_file, url_for)
@@ -76,7 +77,6 @@ def filter_students(status_of_students_to_filter,title,context = None):
     conn.close()
     title_of_page = title
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
-
 
 def get_empty_users(condition):
     conn = sqlite3.connect(db_path)
@@ -429,7 +429,7 @@ def handle_error(e):
     error_message = str(e) or "Unknown error occurred"
     return render_template('error_page.html', error_message=error_message), 500
 
-    
+
 
 @app.route('/new_applications')
 def new_applications():
@@ -438,19 +438,42 @@ def new_applications():
     html_to_render = filter_students(statuses,title)
     return html_to_render
 
-@app.route('/email_ack')
-def email_ack():
-    statuses = [2]
-    title = "New Intake Ready to Review" 
-    html_to_render = filter_students(statuses,title)
-    return html_to_render
-
 @app.route('/quick_review')
 def quick_review():
-    statuses = [3]
-    title = "New Intake Quick Review" 
-    html_to_render = filter_students(statuses,title)
-    return html_to_render
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    status_of_students_to_filter = [3]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+    title_of_page = "New Intake Quick Review"
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 @app.route('/have_interviewed')
 def have_interviewed():
@@ -466,7 +489,45 @@ def offered_accepted():
     html_to_render = filter_students(statuses,title,"interview")
     return html_to_render
 
+@app.route('/email_ack')
+def email_ack():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
 
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "new"')
+    intake_current = cursor.fetchall()[0][0]
+
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    status_of_students_to_filter = [2]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+
+    # Retrieve student data from the database
+    # Prepare the SQL query with a placeholder for the statuses filter
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+
+
+    # Close the database connection
+    conn.close()
+    title_of_page = "New Intake Email Acknowledgment"
+    return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
 @app.route('/to_interview')
 def to_interview():
@@ -489,12 +550,6 @@ def missed_out():
     title = "New Intake - Missed Out On Waiting List" 
     html_to_render = filter_students(statuses,title,"missed_out")
     return html_to_render
-
-
-
-
-
-
 
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
@@ -563,7 +618,7 @@ def assigned_projects(intake_type=None):
     try:
         if request.method == 'GET':
             # Fetch the projects from the Projects table
-            cursor.execute('SELECT id, name FROM Projects ORDER BY status ASC, name ASC' )
+            cursor.execute('SELECT id, name, status FROM Projects ORDER BY status ASC, name ASC' )
             projects = cursor.fetchall()
             print(projects)
 
@@ -597,7 +652,7 @@ def assigned_projects(intake_type=None):
             # Close the database connection
             cursor.close()
             conn.close()
-            return render_template('Assigned_projects.html', projects=projects, students=students)
+            return render_template('Assigned_projects.html', projects=projects, students=students, statuses=statuses)
         elif request.method == 'PUT':
             # Handle the AJAX request for updating the student's project assignment
             data = request.get_json()
@@ -931,8 +986,6 @@ def get_all_projects():
     projects = [row for row in cursor.fetchall()]
     conn.close()
     return projects
-
-
 
 def get_projects():
     conn = sqlite3.connect(db_path)
@@ -1455,53 +1508,40 @@ def student(intern_id):
     # Pass matching_files to the template
     return render_template('view.html', student=student, matching_files=matching_files)
 
+
 @app.route('/change_phone', methods=['POST'])
 def change_phone():
-
     data = request.get_json()
     student_ids = data.get('student_ids', [])
     new_phone = data.get('new_phone', '')
-
     # Convert student IDs to integers
     student_ids = [int(id) for id in student_ids]
-
     # Call the change_student_project function
     change_phone_update(student_ids, new_phone)
-
     # Redirect back to the index page
     return redirect('/')
-
 
 @app.route('/change_pronouns', methods=['POST'])
 def change_pronouns():
-
     data = request.get_json()
     student_ids = data.get('student_ids', [])
     new_pronouns = data.get('new_pronouns', '')
-
     # Convert student IDs to integers
     student_ids = [int(id) for id in student_ids]
-
     # Call the change_student_project function
     change_pronouns_update(student_ids, new_pronouns)
-
     # Redirect back to the index page
     return redirect('/')
 
-
 @app.route('/change_course', methods=['POST'])
 def change_course():
-
     data = request.get_json()
     student_ids = data.get('student_ids', [])
     new_course = data.get('new_course', '')
-
     # Convert student IDs to integers
     student_ids = [int(id) for id in student_ids]
-
     # Call the change_student_project function
     change_course_update(student_ids, new_course)
-
     # Redirect back to the index page
     return redirect('/')
 
@@ -1597,7 +1637,7 @@ def change_post_internship_rating(student_ids, new_post_internship_rating):
 def change_phone_update(student_ids, new_phone):
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
-
+    
     # Prepare the SQL query
     query = '''
         UPDATE Students
@@ -1611,7 +1651,6 @@ def change_phone_update(student_ids, new_phone):
     # Commit the changes and close the connection
     conn.commit()
     conn.close()
-
 
 
 def change_pronouns_update(student_ids, new_pronouns):
@@ -1633,7 +1672,6 @@ def change_pronouns_update(student_ids, new_pronouns):
     conn.close()
 
 
-
 def change_course_update(student_ids, new_course):
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
@@ -1651,7 +1689,6 @@ def change_course_update(student_ids, new_course):
     # Commit the changes and close the connection
     conn.commit()
     conn.close()
-
 
 
 def change_student_project(student_ids, new_project):
@@ -1782,12 +1819,120 @@ def dashboard(dashboard_type):
                         dashboard_type = dashboard_type)
 
 
+@app.route('/dashboard/<string:dashboard_type>/chart_data', methods=['GET'])
+def dashboard_chart_data(dashboard_type):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # Retrieve students by intake and calculate hours per week
+    cursor.execute('''
+        SELECT Students.intake,
+               SUM(CASE 
+                       WHEN Students.course = 'Engineering and IT' THEN 300
+                       WHEN Students.course = 'Engineering' THEN 300
+                       WHEN Students.course = 'Science Full Year' THEN 200
+                       WHEN Students.course = 'Science' THEN 100
+                       WHEN Students.course = 'Volunter' THEN 100
+                       ELSE 100  -- Default case if the course doesn't match
+                   END) AS total_hours,
+               COUNT(*) AS student_count
+        FROM Students
+        JOIN intakes ON Students.intake = intakes.name  -- Joining Students and Intakes based on intake
+        WHERE Students.status = '14 Finished' AND intakes.status = 'finished'
+        GROUP BY Students.intake
+        ORDER BY intakes.id ASC;  -- Sorting by intakes.id
+    ''')
+    
+    data = cursor.fetchall()
+    conn.close()
+
+    # Format the response
+    chart_data = {
+        "intakes": [row[0] for row in data], 
+        "total_hours": [row[1] for row in data],
+        "student_count": [row[2] for row in data]
+    }
+
+    return jsonify(chart_data)
+
+
+
 @app.route('/intakes')
 def intakes_index():
-    intakes = get_all_intakes()
-    print(intakes)
-    return render_template('intakes.html', intakes=intakes)
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
 
+    # Retrieve all intakes and students
+    cursor.execute('SELECT * FROM Intakes')
+    intakes = cursor.fetchall()
+
+    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status FROM Students')
+    students = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    return render_template('intakes.html', intakes=intakes, students=students)
+
+
+
+@app.route('/students_by_intake/<path:intake_name>')  # Use <path:> to allow slashes in the parameter
+def students_by_intake(intake_name):
+    intake_name = unquote(intake_name)  # Decode the intake name
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        FROM Students
+        WHERE intake = ?
+    '''
+    cursor.execute(query, (intake_name,))
+    students = cursor.fetchall()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    conn.close()
+
+    title_of_page = f"Students in Intake: {intake_name}"
+    return render_template('index.html', students=students, statuses=statuses, projects=projects, intake_name=intake_name, title_of_page=title_of_page)
+
+
+@app.route('/finished_students_by_intake/<path:intake_name>')
+def finished_students_by_intake(intake_name):
+    intake_name = unquote(intake_name)  # Decode the intake name
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
+        status, post_internship_summary_rating_internal, 
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        
+        
+        FROM Students
+        WHERE intake = ? AND status = "14 Finished"
+    '''
+    cursor.execute(query, (intake_name,))
+    students = cursor.fetchall()
+
+     # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    conn.close()
+
+    title_of_page = f"Finished Students in Intake: {intake_name}"
+    return render_template('index.html', students=students, intake_name=intake_name, statuses=statuses, projects=projects, title_of_page=title_of_page)
 
 
 @app.route('/edit_intake/<int:intake_id>', methods=['GET', 'POST'])
@@ -1846,23 +1991,102 @@ def projects_index():
     projects = get_all_projects()
     return render_template('projects.html', projects=projects)
 
-@app.route('/clean_pronouns', methods=['GET'])
-def clean_pronouns():
-
-    # Connect to the database
-    conn = sqlite3.connect(db_path)
+@app.route('/project_students/<int:id>')
+def project_students(id):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    cursor.execute('UPDATE students SET pronouns = "she/her" WHERE pronouns in ("She/Her","She/her","she","She")')
-    conn.commit()
+    # Get project name
+    cursor.execute('SELECT name FROM Projects WHERE id = ?', (id,))
+    name = cursor.fetchone()
+    name = name[0] if name else "Unknown Project"
 
-    cursor.execute('UPDATE students SET pronouns = "he/him" WHERE pronouns in ("He/him","He/Him","he","He","Mr")')
-    conn.commit()
+    # Get students associated with this project
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
+        status, post_internship_summary_rating_internal, pronouns,
+        pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE project = (SELECT name FROM Projects WHERE id = ?)
+    '''
+    cursor.execute(query, (id,))
+    students = cursor.fetchall()
 
-    # Close the database connection
+ # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
     conn.close()
 
-    return redirect(url_for('index'))
+    title_of_page = f"Students in Project: {name}"
+    return render_template('index.html', students=students, name=name, statuses=statuses, projects=projects, title_of_page=title_of_page)
+
+@app.route('/project_finished_students/<int:id>')
+def project_finished_students(id):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Get project name
+    cursor.execute('SELECT name FROM Projects WHERE id = ?', (id,))
+    name = cursor.fetchone()
+    name = name[0] if name else "Unknown Project"
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, 
+        course, status, post_internship_summary_rating_internal, 
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE project = (SELECT name FROM Projects WHERE id = ?) AND status = "14 Finished"
+    '''
+    cursor.execute(query, (id,))
+    students = cursor.fetchall()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    conn.close()
+
+    title_of_page = f"Students in Project: {name}"
+    return render_template('index.html', students=students, name=name, statuses=statuses, projects=projects, title_of_page=title_of_page)
+
+@app.route('/project_current_students/<int:id>')
+def project_current_students(id):
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Get project name
+    cursor.execute('SELECT name FROM Projects WHERE id = ?', (id,))
+    name = cursor.fetchone()
+    name = name[0] if name else "Unknown Project"
+
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, 
+        course, status, post_internship_summary_rating_internal, 
+        pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
+        FROM Students
+        WHERE project = (SELECT name FROM Projects WHERE id = ?) AND status = "13 Internship started"
+    '''
+    cursor.execute(query, (id,))
+    students = cursor.fetchall()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    conn.close()
+
+    title_of_page = f"Students in Project: {name}"
+    return render_template('index.html', students=students, name=name, statuses=statuses, projects=projects, title_of_page=title_of_page)
 
 
 @app.route('/add_project', methods=['GET', 'POST'])
@@ -1936,6 +2160,24 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
 
 
     return table_rows
+
+@app.route('/update_project_status', methods=['POST'])
+def update_project_status():
+    data = request.get_json()
+    project_ids = data.get('project_ids', [])
+    new_status = data.get('new_status')
+
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    for name in project_ids:
+        cursor.execute('UPDATE Projects SET status = ? WHERE name = ?', (new_status, name))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({'status': 'success', 'message': 'Project statuses updated.'})
+
 
 
 if __name__ == '__main__':

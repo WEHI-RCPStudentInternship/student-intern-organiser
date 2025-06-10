@@ -91,19 +91,39 @@ def get_empty_users(condition):
 def menu_page():
     return render_template('menu_page.html')
 
-# --- PROFILE-PICTURE REMINDER ROUTES ---
 @app.route('/reminder_profile_pic')
 def reminder_profile_pic():
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute("""
-        SELECT intern_id, full_name, project, email, profile_pic_sent
-        FROM Students
-        WHERE intake = (SELECT name FROM Intakes WHERE status = "current")
-        ORDER BY project COLLATE NOCASE, full_name COLLATE NOCASE
-    """)
+    
+    # Get current intake name
+    cur.execute('SELECT name FROM Intakes WHERE status = "current"')
+    intake_current = cur.fetchone()[0]
+    
+    # Get all statuses to map IDs to names
+    cur.execute('SELECT * FROM Statuses')
+    statuses = cur.fetchall()
+    
+    # Define current student status IDs (10, 11, 12, 13)
+    status_of_students_current = [10, 11, 12, 13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
+    
+    # Create placeholder for the IN clause
+    placeholder = ','.join(['?'] * len(current_statuses_list))
+    
+    # Updated query to filter by status names instead of status ID
+    query = '''
+    SELECT intern_id, full_name, project, email, profile_pic_sent
+    FROM Students
+    WHERE intake = ? AND status IN ({})
+    ORDER BY project COLLATE NOCASE, full_name COLLATE NOCASE
+    '''.format(placeholder)
+    
+    # Execute the query with intake and status names
+    cur.execute(query, [intake_current] + current_statuses_list)
     students = cur.fetchall()
+    
     conn.close()
     return render_template('reminder_profile_pic.html', students=students)
 
@@ -146,30 +166,30 @@ def bulk_update_profile_pic_sent():
     return jsonify(status='ok', updated=len(ids))
 # ---------------------------------------
 
-# —– PROJECT-REPORT REMINDER Routes —–
-
 @app.route('/reminder_project_report')
 def reminder_project_report():
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
-    # ← ADDED: pull the name of the current intake
+    # Get the name of the current intake
     cur.execute('SELECT name FROM Intakes WHERE status = "current"')
     intake_current = cur.fetchone()[0]
 
-    # fetch only active (non-archived) projects
+    # Fetch only active (non-archived) projects that have students in the current intake
     cur.execute("""
-      SELECT id, name, summary_report_sent
-        FROM Projects
-       WHERE status != 'archived'
-       ORDER BY name COLLATE NOCASE
-    """)
+      SELECT DISTINCT p.id, p.name, p.summary_report_sent
+        FROM Projects p
+        INNER JOIN Students s ON p.name = s.project
+       WHERE p.status != 'archived'
+         AND s.intake = ?
+       ORDER BY p.name COLLATE NOCASE
+    """, (intake_current,))
     raw = cur.fetchall()
 
     projects = []
     for row in raw:
-        # ← CHANGED: only students in the current intake
+        # Get emails for students in this project and current intake
         cur.execute("""
             SELECT email
               FROM Students

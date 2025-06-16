@@ -166,33 +166,37 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
         <a href="/share_students/{{ project[0] }}">{{ project[1] }}</a>
       </h3>
     </div>
+    {% for student in students %} 
+    {% if project[1] == student[2] %} 
+        {% if student[6] in ("06 - TS - Recommend no sign up except under specific circumstances. ") %} 
+            {% set classes = 'male other not-accepted kanban-card' %} 
+        {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even without a project. ") %} 
+            {% set classes = 'experienced kanban-card female' %} 
+        {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a specific project. ") %} 
+            {% set classes = 'experienced kanban-card male' %}
+        {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a project. ") %} {% set classes = 'sysadmin kanban-card female' %} 
+        {% elif student[6] in ("04 - Sysadmin - Recommend sign up even without a project. ") %} 
+            {% set classes = 'sysadmin kanban-card male' %} 
+        {% elif student[6] in ("01 - F Translator - Recommend sign up even without a project. ") %} 
+            {% set classes = 'translator kanban-card female' %} 
+        {% elif student[6] in ("04 - Translator - Recommend sign up even without a project. ") %} 
+            {% set classes = 'translator kanban-card male' %} 
+        {% elif student[6] in ("03 - F Technical Skills - Recommend sign up for a specific project. ") %} 
+            {% set classes = 'other not-accepted female kanban-card' %} 
+        {% else %} 
+            {% set classes = 'other kanban-card' %} 
+        {% endif %} 
 
-    {% for student in students %} {% if project[1] == student[2] %} {% if
-    student[6] in ("06 - TS - Recommend no sign up except under specific
-    circumstances. ") %} {% set classes = 'male other not-accepted kanban-card'
-    %} {% elif student[6] in ("02 - F ETS/Fast Learner - Recommend sign up even
-    without a project. ") %} {% set classes = 'experienced kanban-card female'
-    %} {% elif student[6] in ("05 - ETS/Fast Learner - Recommend sign up for a
-    specific project. ") %} {% set classes = 'experienced kanban-card male' %}
-    {% elif student[6] in ("01 - F Sysadmin - Recommend sign up even without a
-    project. ") %} {% set classes = 'sysadmin kanban-card female' %} {% elif
-    student[6] in ("04 - Sysadmin - Recommend sign up even without a project. ")
-    %} {% set classes = 'sysadmin kanban-card male' %} {% elif student[6] in
-    ("01 - F Translator - Recommend sign up even without a project. ") %} {% set
-    classes = 'translator kanban-card female' %} {% elif student[6] in ("04 -
-    Translator - Recommend sign up even without a project. ") %} {% set classes
-    = 'translator kanban-card male' %} {% elif student[6] in ("03 - F Technical
-    Skills - Recommend sign up for a specific project. ") %} {% set classes =
-    'other not-accepted female kanban-card' %} {% else %} {% set classes =
-    'other kanban-card' %} {% endif %} {% if student[4] in ("08 Accepted
-    contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added
-    to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started")
-    %} {% set classes = classes + ' accepted' %} {% elif student[4] in ("07
-    Offered contact") %} {% set classes = classes + ' offered' %} {% endif %}
+        {% if student[4] in ("08 Accepted contract", "09 Signed contract", "10 Sent to be added to Workday", "11 Added to WEHI-wide Teams Group", "12 WEHI email created", "13 Internship started") %} 
+            {% set classes = classes + ' accepted' %} {% elif student[4] in ("07 Offered contact") %} {% set classes = classes + ' offered' %} 
+        {% endif %}
 
     <!-- this is for projects -->
-    {% if student[2] == 'Unassigned' %} {% set classes = classes + ' unassigned'
-    %} {% else %} {% set classes = classes + ' assigned' %} {% endif %}
+    {% if student[2] == 'Unassigned' %} 
+        {% set classes = classes + ' unassigned' %} 
+    {% else %} 
+        {% set classes = classes + ' assigned' %} 
+    {% endif %}
 
     <!-- this is for course -->
     {% if student[7] in ("Engineering and IT") %} {% set classes = classes + '

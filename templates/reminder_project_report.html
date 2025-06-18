@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Project Report Reminder{% endblock %}
+{% block page_title %}Project Report Reminder{% endblock %}
+
+{% block top_links_menu %}
+  <a href="/menu_page">Menu</a>
+  <a href="#" id="sendEmailBtn">Send Email</a>
+{% endblock %}
+
+
+{% block content %}
+  <table id="reminderTable" class="display">
+    <thead>
+      <tr>
+        <th style="display:none">ID</th>
+        <th>Project</th>
+        <th>
+          <input type="checkbox" id="selectAllCheckbox">
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in projects %}
+      <tr>
+        <td style="display:none">{{ p.id }}</td>
+        <td>{{ p.name }}</td>
+        <td>
+          <input type="checkbox"
+                 class="rowCheckbox"
+                 data-project-id="{{ p.id }}"
+                 data-emails="{{ p.emails }}"
+                 {% if p.summary_sent %}checked{% endif %} />
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+$(function(){
+  // init DataTable, hide first column
+  var table = $('#reminderTable').DataTable({
+    columnDefs: [{ targets: 0, visible: false }],
+    dom: '<"table-top"<"info-left"i><"filter-right"f>>'
+         + 'rt<"bottom"lp><"clear">'
+  });
+
+  // Bulk‐toggle handler
+  $('#selectAllCheckbox').on('change', function(){
+    var checkAll = this.checked;
+    // check/uncheck all visible
+    table.rows({ search: 'applied' }).nodes().to$()
+         .find('.rowCheckbox')
+         .prop('checked', checkAll)
+         .trigger('change');  // let individual handler sync DB
+  });
+
+  // Individual row‐toggle → persist to server
+  $('#reminderTable').on('change', '.rowCheckbox', function(){
+    var pid = $(this).data('projectId'),
+        flag = this.checked;
+    $.ajax({
+      url: '/update_project_summary_sent',
+      method: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({ project_id: pid, summary_report_sent: flag })
+    });
+  });
+
+  // Send mailtos for all *unchecked* rows
+  $('#sendEmailBtn').on('click', function(e){
+    e.preventDefault();
+    var to = [];
+
+    table.rows({ search: 'applied' }).nodes().to$()
+         .find('.rowCheckbox:not(:checked)')
+         .each(function(){
+      var list = $(this).data('emails');
+      if(list){
+        // split CSV of addresses, append
+        to = to.concat( list.split(',') );
+      }
+    });
+
+    if(!to.length){
+      return alert('All projects marked done—no one left to remind!');
+    }
+
+    // dedupe just in case
+    to = Array.from(new Set(to));
+    window.location.href = 'mailto:' + to.join(',');
+  });
+});
+</script>
+{% endblock %}

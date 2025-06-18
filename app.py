@@ -91,6 +91,155 @@ def get_empty_users(condition):
 def menu_page():
     return render_template('menu_page.html')
 
+@app.route('/reminder_profile_pic')
+def reminder_profile_pic():
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    
+    # Get current intake name
+    cur.execute('SELECT name FROM Intakes WHERE status = "current"')
+    intake_current = cur.fetchone()[0]
+    
+    # Get all statuses to map IDs to names
+    cur.execute('SELECT * FROM Statuses')
+    statuses = cur.fetchall()
+    
+    # Define current student status IDs (10, 11, 12, 13)
+    status_of_students_current = [10, 11, 12, 13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
+    
+    # Create placeholder for the IN clause
+    placeholder = ','.join(['?'] * len(current_statuses_list))
+    
+    # Updated query to filter by status names instead of status ID
+    query = '''
+    SELECT intern_id, full_name, project, email, profile_pic_sent
+    FROM Students
+    WHERE intake = ? AND status IN ({})
+    ORDER BY project COLLATE NOCASE, full_name COLLATE NOCASE
+    '''.format(placeholder)
+    
+    # Execute the query with intake and status names
+    cur.execute(query, [intake_current] + current_statuses_list)
+    students = cur.fetchall()
+    
+    conn.close()
+    return render_template('reminder_profile_pic.html', students=students)
+
+@app.route('/update_profile_pic_sent', methods=['PUT'])
+def update_profile_pic_sent():
+    data = request.get_json()
+    intern_id = data.get('intern_id')
+    # checkbox true/false → 1 or 0
+    sent_flag = 1 if data.get('profile_pic_sent') else 0
+
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE Students
+        SET profile_pic_sent = ?
+        WHERE intern_id = ?
+    """, (sent_flag, intern_id))
+    conn.commit()
+    conn.close()
+    return jsonify(status='ok')
+
+@app.route('/bulk_update_profile_pic_sent', methods=['POST'])
+def bulk_update_profile_pic_sent():
+    data = request.get_json()
+    ids = data.get('intern_ids', [])
+    flag = 1 if data.get('profile_pic_sent') else 0
+
+    if not ids:
+        return jsonify(status='nothing to update'), 400
+
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    # build placeholder string (?, ?, ?, ...)
+    placeholders = ','.join('?' for _ in ids)
+    sql = f"UPDATE Students SET profile_pic_sent = ? WHERE intern_id IN ({placeholders})"
+    cur.execute(sql, [flag] + ids)
+    conn.commit()
+    conn.close()
+
+    return jsonify(status='ok', updated=len(ids))
+# ---------------------------------------
+
+@app.route('/reminder_project_report')
+def reminder_project_report():
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # Get the name of the current intake
+    cur.execute('SELECT name FROM Intakes WHERE status = "current"')
+    intake_current = cur.fetchone()[0]
+
+    # Fetch only active (non-archived) projects that have students in the current intake
+    cur.execute("""
+      SELECT DISTINCT p.id, p.name, p.summary_report_sent
+        FROM Projects p
+        INNER JOIN Students s ON p.name = s.project
+       WHERE p.status != 'archived'
+         AND s.intake = ?
+       ORDER BY p.name COLLATE NOCASE
+    """, (intake_current,))
+    raw = cur.fetchall()
+
+    projects = []
+    for row in raw:
+        # Get emails for students in this project and current intake
+        cur.execute("""
+            SELECT email
+              FROM Students
+             WHERE project = ?
+               AND intake = ?
+               AND email IS NOT NULL
+        """, (row["name"], intake_current))
+        emails = [r[0] for r in cur.fetchall()]
+
+        projects.append({
+            "id":           row["id"],
+            "name":         row["name"],
+            "summary_sent": bool(row["summary_report_sent"]),
+            "emails":       ",".join(emails)
+        })
+
+    conn.close()
+    return render_template("reminder_project_report.html", projects=projects)
+
+
+@app.route('/update_project_summary_sent', methods=['PUT'])
+def update_project_summary_sent():
+    d = request.get_json()
+    pid  = d.get('project_id')
+    val  = 1 if d.get('summary_report_sent') else 0
+    conn = sqlite3.connect(db_path)
+    cur  = conn.cursor()
+    cur.execute("UPDATE Projects SET summary_report_sent = ? WHERE id = ?", (val, pid))
+    conn.commit()
+    conn.close()
+    return jsonify(status='ok')
+
+@app.route('/bulk_update_project_summary', methods=['POST'])
+def bulk_update_project_summary():
+    d   = request.get_json()
+    ids = d.get('project_ids', [])
+    val = 1 if d.get('summary_report_sent') else 0
+    if not ids:
+        return jsonify(status='nothing'), 400
+    conn = sqlite3.connect(db_path)
+    cur  = conn.cursor()
+    placeholders = ",".join("?" for _ in ids)
+    cur.execute(f"UPDATE Projects SET summary_report_sent=? WHERE id IN ({placeholders})",
+                [val] + ids)
+    conn.commit()
+    conn.close()
+    return jsonify(status='ok', updated=len(ids))
+
+
+
 @app.route('/current_student')
 def current_student():
     # Connect to the SQLite database

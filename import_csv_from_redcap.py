@@ -62,27 +62,27 @@ def read_csv_file(file_path,zip_file_path):
 
             if redcap_id not in redcap_ids:
 
-                full_name = row[9]
-                pronouns = row[10]
-                email_address = row[11]
-                mobile_number = row[12]
-                faculty_info = row[13]
-                course_name = row[14]
+                full_name = row[10]
+                pronouns = row[11]
+                email_address = row[12]
+                mobile_number = row[13]
+                faculty_info = row[14]
+                course_name = row[15]
                 
 
                 summary_interest_in_projects = ''
-                if row[15] == 'Checked':
-                    summary_interest_in_projects += 'Data Analytics,'
                 if row[16] == 'Checked':
-                    summary_interest_in_projects += 'Data Engineering,'
+                    summary_interest_in_projects += 'Data Analytics,'
                 if row[17] == 'Checked':
-                    summary_interest_in_projects += 'Software Engineering,'
+                    summary_interest_in_projects += 'Data Engineering,'
                 if row[18] == 'Checked':
+                    summary_interest_in_projects += 'Software Engineering,'
+                if row[19] == 'Checked':
                     summary_interest_in_projects += 'Web Development'
                 summary_interest_in_projects = summary_interest_in_projects.rstrip(',')
 
                 status = '01 Received application'
-                github_username = row[19]
+                github_username = row[20]
                 project = 'Unassigned'
                 
                 data = (

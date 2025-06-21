@@ -32,11 +32,17 @@
         background-color: #f2f2f2;
     }
 </style>
+        <h2>Upload Application</h2>
+        <form action="{{ url_for('upload_application', intern_id=student[0], full_name=student[1]) }}" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".pdf" required>
+            <button type="submit">Upload Application</button>
+        </form>
+
 
         <h2>Upload Signed Contract</h2>
         <form action="{{ url_for('upload_signed_contract', intern_id=student[0], full_name=student[1]) }}" method="POST" enctype="multipart/form-data">
             <input type="file" name="file" accept=".pdf" required>
-            <button type="submit">Upload</button>
+            <button type="submit">Upload Signed Contract</button>
         </form>
 
         <table>

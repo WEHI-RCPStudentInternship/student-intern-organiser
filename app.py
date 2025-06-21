@@ -1150,6 +1150,27 @@ def import_redcap():
     return render_template('import_redcap.html')
 
 
+@app.route('/upload_application/<int:intern_id>/<string:full_name>', methods=['GET', 'POST'])
+def upload_application(intern_id, full_name):
+
+    attachments_dir = 'student_intern_data/attachments'
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            # Save the file to the attachments directory with the desired filename
+            filename = str(intern_id)+"_"+full_name.replace(" ", "_").title()+"_application.pdf"
+
+            file.save(os.path.join(attachments_dir, filename))
+            # Get the referrer URL
+            referrer = request.referrer
+
+            # Redirect back to the previous page
+            return redirect(referrer)
+
+
+    return render_template('upload_application.html', intern_id=intern_id, full_name=full_name)
+
+
 
 @app.route('/upload_signed_contract/<int:intern_id>/<string:full_name>', methods=['GET', 'POST'])
 def upload_signed_contract(intern_id, full_name):

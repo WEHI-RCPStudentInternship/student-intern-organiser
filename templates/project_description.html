@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Description{% endblock %}
+
+{% block page_title %}Project Description{% endblock %}
+
+{% block top_links_menu %}
+<a href="/projects">Back to Projects</a>
+{% endblock %}
+
+{% block content %}
+<h1>Project Description - {{ project[1] }}</h1>
+<form method="POST" action="/project_description/{{ project[0] }}">
+    <div class="form-group">
+        <label for="organization_description">About the Organization:</label>
+        <textarea class="form-control" id="organization_description" name="organization_description" rows="5" placeholder="Describe the organization...">{{ project[3] if project[3] else '' }}</textarea>
+        <small class="form-text text-muted">Word count: <span id="org_word_count">0</span></small>
+    </div>
+    
+    <div class="form-group">
+        <label for="project_description">Project Description:</label>
+        <textarea class="form-control" id="project_description" name="project_description" rows="5" placeholder="Describe the project...">{{ project[4] if project[4] else '' }}</textarea>
+        <small class="form-text text-muted">Word count: <span id="proj_word_count">0</span></small>
+    </div>
+    
+    <div class="form-group">
+        <label for="skill_requirements">Skill Requirements:</label>
+        <textarea class="form-control" id="skill_requirements" name="skill_requirements" rows="5" placeholder="List the required skills...">{{ project[5] if project[5] else '' }}</textarea>
+        <small class="form-text text-muted">Word count: <span id="skill_word_count">0</span></small>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Save Description</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function countWords(text) {
+        return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    }
+    
+    function updateWordCount(textareaId, counterId) {
+        const textarea = document.getElementById(textareaId);
+        const counter = document.getElementById(counterId);
+        
+        function update() {
+            const wordCount = countWords(textarea.value);
+            counter.textContent = wordCount;
+        }
+        
+        // Update on input
+        textarea.addEventListener('input', update);
+        
+        // Initial count
+        update();
+    }
+    
+    $(document).ready(function() {
+        updateWordCount('organization_description', 'org_word_count');
+        updateWordCount('project_description', 'proj_word_count');
+        updateWordCount('skill_requirements', 'skill_word_count');
+    });
+</script>
+{% endblock %}

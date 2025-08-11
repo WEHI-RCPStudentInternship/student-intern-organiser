@@ -2070,6 +2070,35 @@ def update_project_status():
 
     return jsonify({'status': 'success', 'message': 'Project statuses updated.'})
 
+@app.route('/project_description/<int:project_id>', methods=['GET', 'POST'])
+def project_description(project_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        # Handle form submission and update the project description fields
+        organization_description = request.form.get('organization_description')
+        project_description = request.form.get('project_description') 
+        skill_requirements = request.form.get('skill_requirements')
+
+        # Update the project record in the database
+        cursor.execute('''UPDATE Projects 
+                         SET organization_description = ?, 
+                             project_description = ?, 
+                             skill_requirements = ? 
+                         WHERE id = ?''', 
+                      (organization_description, project_description, skill_requirements, project_id))
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('projects_index'))
+
+    # If it's a GET request, fetch the project data and render the template
+    cursor.execute('SELECT * FROM Projects WHERE id = ?', (project_id,))
+    project_data = cursor.fetchone()
+    conn.close()
+
+    return render_template('project_description.html', project=project_data)
 
 
 if __name__ == '__main__':

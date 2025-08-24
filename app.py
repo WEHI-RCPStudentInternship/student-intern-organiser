@@ -2076,20 +2076,68 @@ def project_description(project_id):
     cursor = conn.cursor()
 
     if request.method == 'POST':
-        # Handle form submission and update the project description fields
-        organization_description = request.form.get('organization_description')
-        project_description = request.form.get('project_description') 
+        # Handle form submission and update all the project description fields
+        about_organisation = request.form.get('about_organisation')
+        duties_placement = request.form.get('duties_placement')
+        skills_prerequisites = request.form.get('skills_prerequisites')
+        benefits_students = request.form.get('benefits_students')
+        position_title = request.form.get('position_title')
+        position_description = request.form.get('position_description')
         skill_requirements = request.form.get('skill_requirements')
+        about_org_word_limit = request.form.get('about_org_word_limit', 70)
+        position_desc_word_min = request.form.get('position_desc_word_min', 400)
+        position_desc_word_max = request.form.get('position_desc_word_max', 500)
+        skills_word_min = request.form.get('skills_word_min', 50)
+        skills_word_max = request.form.get('skills_word_max', 70)
 
-        # Update the project record in the database
-        cursor.execute('''UPDATE Projects 
-                         SET organization_description = ?, 
-                             project_description = ?, 
-                             skill_requirements = ? 
-                         WHERE id = ?''', 
-                      (organization_description, project_description, skill_requirements, project_id))
-        conn.commit()
-        conn.close()
+        # Get current date for last edit
+        from datetime import datetime
+        current_date = datetime.now().strftime('%d/%m/%Y')
+
+        try:
+            # Update the project record in the database
+            cursor.execute('''UPDATE Projects 
+                             SET organization_description = ?, 
+                                 project_description = ?, 
+                                 skill_requirements = ?,
+                                 duties_placement = ?,
+                                 skills_prerequisites = ?,
+                                 benefits_students = ?,
+                                 about_organisation = ?,
+                                 position_title = ?,
+                                 position_description = ?,
+                                 key_skills_development = ?,
+                                 about_org_word_limit = ?,
+                                 about_org_last_edit_date = ?,
+                                 position_desc_word_min = ?,
+                                 position_desc_word_max = ?,
+                                 position_desc_last_edit_date = ?,
+                                 skills_word_min = ?,
+                                 skills_last_edit_date = ?,
+                                 skills_word_max = ?
+                             WHERE id = ?''', 
+                          (about_organisation, position_description, skill_requirements, 
+                           duties_placement, skills_prerequisites, benefits_students,
+                           about_organisation, position_title, position_description, 
+                           skill_requirements, about_org_word_limit, current_date,
+                           position_desc_word_min, position_desc_word_max, current_date,
+                           skills_word_min, current_date, skills_word_max, project_id))
+            
+            rows_affected = cursor.rowcount
+            print(f"DEBUG: Rows affected: {rows_affected}")
+            print(f"DEBUG: Project ID: {project_id}")
+            print(f"DEBUG: Data being saved - about_organisation: {about_organisation}")
+            print(f"DEBUG: position_description: {position_description}")
+            print(f"DEBUG: skill_requirements: {skill_requirements}")
+            
+            conn.commit()
+            print("DEBUG: Database commit successful")
+            
+        except Exception as e:
+            print(f"DEBUG: Database error: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
         
         return redirect(url_for('projects_index'))
 
@@ -2098,7 +2146,11 @@ def project_description(project_id):
     project_data = cursor.fetchone()
     conn.close()
 
-    return render_template('project_description.html', project=project_data)
+    # Get current date
+    from datetime import datetime
+    current_date = datetime.now().strftime('%d/%m/%Y')
+
+    return render_template('project_description.html', project=project_data, current_date=current_date)
 
 
 if __name__ == '__main__':

@@ -437,7 +437,6 @@ def email_intake(intake_id):
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-
     status_of_students_to_filter = [10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
 
@@ -452,28 +451,115 @@ def email_intake(intake_id):
     # Execute the query with the statuses list
     cursor.execute(query, [intake_name] + current_statuses_list )
     students = cursor.fetchall()
-    student_emails = {'science':[],'engit':[]}
+    
+    # Collect all student emails in one list (no separation by course)
+    all_student_emails = []
     for student in students:
         email = student[2]
-        course = student[3]
-        if course == 'Science':
-            student_emails['science'].append(email)
-        if course == 'Engineering and IT':
-            student_emails['engit'].append(email)
+        if email:  # Only add if email exists
+            all_student_emails.append(email)
 
+    # Join all emails into one comma-separated string
+    student_emails_combined = ",".join(all_student_emails)
 
+    # Get the intake start date and calculate Monday of that week
+    # Use science_start_date as the main start date (since it's the same for all)
+    intake_start_date_object = datetime.strptime(intake_science_start_date, '%Y-%m-%d').date()
+    
+    # Find the Monday of the week containing the start date
+    days_since_monday = intake_start_date_object.weekday()  # Monday is 0, Sunday is 6
+    start_monday = intake_start_date_object - timedelta(days=days_since_monday)
 
-    science_student_emails = ",".join(x for x in student_emails['science'])
-    engit_student_emails = ",".join(x for x in student_emails['engit'])
+    # Get email schedule from database and calculate dates dynamically - ordered by week progression
+    cursor.execute('SELECT id, intake_id, week_number, week_offset_days, subject, body FROM EmailSchedule WHERE intake_id = ? ORDER BY week_offset_days ASC', (intake_id,))
+    table_rows = cursor.fetchall()
+    
+    # Convert to dict format for template with calculated dates
+    email_schedule = []
+    for row in table_rows:
+        week_offset_days = row[3] if row[3] is not None else 0  # Get week_offset_days column
+        calculated_date = start_monday + timedelta(days=week_offset_days)
+        
+        email_schedule.append({
+            'id': row[0],           # id
+            'intake_id': row[1],    # intake_id
+            'week_number': row[2],  # week_number
+            'date_for_interns': calculated_date.strftime('%Y-%m-%d'),
+            'subject': row[4] if row[4] is not None else f'Week {row[2]} email',  # subject
+            'body': row[5] if row[5] is not None else f'Email content for {row[2]}'  # body
+        })
 
-    science_start_date_object = datetime.strptime(intake_science_start_date, '%Y-%m-%d').date()
-    engit_start_date_object = datetime.strptime(intake_engit_start_date, '%Y-%m-%d').date()
+    conn.close()
 
-    table_rows = create_email_intake_table_rows(science_start_date_object,engit_start_date_object)
+    return render_template('email_intake.html', intake=intake, intake_id=intake_id, student_emails=student_emails_combined, table_rows=email_schedule)
 
-    print(table_rows)
-
-    return render_template('email_intake.html', intake=intake, science_student_emails=science_student_emails, engit_student_emails=engit_student_emails, table_rows= table_rows)
+@app.route('/edit_email_template/<int:email_id>', methods=['GET', 'POST'])
+def edit_email_template(email_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        # Handle form submission to update email template
+        subject = request.form.get('subject')
+        body = request.form.get('body')
+        new_intake_start_date = request.form.get('intake_start_date')
+        
+        # Get current email data to check which week this is
+        cursor.execute('SELECT id, intake_id, week_number, week_offset_days FROM EmailSchedule WHERE id = ?', (email_id,))
+        email_data = cursor.fetchone()
+        intake_id = email_data[1]
+        
+        # Update the email template
+        cursor.execute('''UPDATE EmailSchedule 
+                         SET subject = ?, body = ?, last_modified = CURRENT_DATE
+                         WHERE id = ?''', (subject, body, email_id))
+        
+        # If intake start date is provided and this is week 1, update the intake start date
+        if new_intake_start_date and email_data[2] == '1 - First week':
+            cursor.execute('''UPDATE Intakes 
+                             SET science_start_date = ?, engit_start_date = ?
+                             WHERE id = ?''', (new_intake_start_date, new_intake_start_date, intake_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('email_intake', intake_id=intake_id))
+    
+    # GET request - show the edit form
+    cursor.execute('SELECT id, intake_id, week_number, week_offset_days, subject, body FROM EmailSchedule WHERE id = ?', (email_id,))
+    email_data = cursor.fetchone()
+    
+    if not email_data:
+        conn.close()
+        return "Email template not found", 404
+    
+    # Get intake start date to calculate the display date
+    cursor.execute('SELECT science_start_date FROM Intakes WHERE id = ?', (email_data[1],))
+    intake_start_date = cursor.fetchone()[0]
+    conn.close()
+    
+    # Calculate the date dynamically
+    science_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
+    days_since_monday = science_start_date_object.weekday()
+    start_monday = science_start_date_object - timedelta(days=days_since_monday)
+    week_offset_days = email_data[3] if email_data[3] is not None else 0
+    calculated_date = start_monday + timedelta(days=week_offset_days)
+    
+    # Check if this is the first week (allow editing intake start date)
+    is_first_week = email_data[2] == '1 - First week'
+    
+    email_template = {
+        'id': email_data[0],           # id
+        'intake_id': email_data[1],    # intake_id
+        'week_number': email_data[2],  # week_number
+        'date_for_interns': calculated_date.strftime('%Y-%m-%d'),  # calculated date
+        'intake_start_date': intake_start_date,  # original intake start date
+        'is_first_week': is_first_week,  # whether this is first week
+        'subject': email_data[4] if email_data[4] is not None else f'Week {email_data[2]} email',  # subject
+        'body': email_data[5] if email_data[5] is not None else f'Email content for {email_data[2]}'  # body
+    }
+    
+    return render_template('edit_email_template.html', email_template=email_template)
 
 @app.route('/links/', methods=['GET'])
 def links():
@@ -1370,6 +1456,10 @@ def index():
     title_of_page = "All Students"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204  # Return empty response with "No Content" status
+
 # Route to serve the file from a different directory
 @app.route('/view_docs/<path:filename>')
 def view_docs(filename):
@@ -1860,13 +1950,29 @@ def add_intake():
     if request.method == 'POST':
         new_name = request.form.get('name')
         new_status = request.form.get('status')
+        intake_date = request.form.get('intake_date')
 
         # Connect to the database
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Insert the new intake record into the database
-        cursor.execute('INSERT INTO Intakes (name, status) VALUES (?, ?)', (new_name, new_status))
+        # Insert the new intake record into the database using the same date for both science and engineering
+        cursor.execute('INSERT INTO Intakes (name, status, science_start_date, engit_start_date) VALUES (?, ?, ?, ?)', 
+                      (new_name, new_status, intake_date, intake_date))
+        
+        # Get the newly created intake ID
+        intake_id = cursor.lastrowid
+        
+        # Create default email schedule for this intake
+        cursor.execute('''INSERT INTO EmailSchedule (intake_id, week_number, week_offset_days, subject, body) VALUES 
+                         (?, '0 - 1 week before', -7, '1 week before WEHI internship', 'Hi All, This is your email to start your internship preparation...'),
+                         (?, '1 - First week', 0, 'First week of WEHI internship', 'Hi All, Welcome to your first week of internship...'),
+                         (?, '2 - Second week', 7, 'Second week of WEHI internship', 'Hi All, This is your second week of internship...'),
+                         (?, '4 - Fourth week', 21, 'Fourth week of WEHI internship', 'Hi All, This is your email to start week 4 of your internship...'),
+                         (?, '10 - Tenth week', 63, 'Tenth week of WEHI internship', 'Hi All, This is your email to start week 10 of your internship...'),
+                         (?, '13 - End of internship', 84, 'End of WEHI internship', 'Hi All, I would like to thank you all for being a part of this intake...')''',
+                      (intake_id, intake_id, intake_id, intake_id, intake_id, intake_id))
+        
         conn.commit()
 
         # Close the database connection
@@ -1876,6 +1982,46 @@ def add_intake():
 
     # If it's a GET request, render the add_intake.html template
     return render_template('add_intake.html')
+
+
+@app.route('/add_weekly_email/<int:intake_id>', methods=['GET', 'POST'])
+def add_weekly_email(intake_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get intake information
+    cursor.execute('SELECT id, name, science_start_date FROM Intakes WHERE id = ?', (intake_id,))
+    intake = cursor.fetchone()
+    
+    if not intake:
+        return redirect(url_for('intakes_index'))
+    
+    if request.method == 'POST':
+        week_number = request.form.get('week_number')
+        week_description = request.form.get('week_description')
+        subject = request.form.get('subject')
+        body = request.form.get('body')
+        
+        # Calculate week_offset_days based on week number
+        # Week 0 = -7 days (1 week before), Week 1 = 0 days (start week), Week 2 = 7 days, etc.
+        week_offset_days = (int(week_number) - 1) * 7
+        
+        # Create formatted week number string
+        week_number_formatted = f"{week_number} - {week_description}"
+        
+        # Insert the new weekly email into the database
+        cursor.execute('''INSERT INTO EmailSchedule (intake_id, week_number, week_offset_days, subject, body, last_modified) 
+                         VALUES (?, ?, ?, ?, ?, CURRENT_DATE)''', 
+                      (intake_id, week_number_formatted, week_offset_days, subject, body))
+        
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('email_intake', intake_id=intake_id))
+    
+    # GET request - show the form
+    conn.close()
+    return render_template('add_weekly_email.html', intake_id=intake_id, intake_name=intake[1])
 
 
 @app.route('/projects')

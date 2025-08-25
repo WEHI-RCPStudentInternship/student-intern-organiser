@@ -7,50 +7,38 @@
 {% block top_links_menu %}
     <!-- Your top links menu goes here if needed -->
         <a href="/add_intake" >Add Intake</a>
+        <a href="/add_weekly_email/{{ intake_id }}" >Add Weekly Email</a>
 {% endblock %}
 
 {% block content %}
 
 
     <h1>Email {{ intake[1] }} Intake Table</h1>
-    <table id="intakesTable" style="width:600px">
+    
+    <table id="emailScheduleTable" class="display" style="width:600px">
         <thead>
             <tr>
                 <th>Week #</th>
-                <th>Science</th>
-                <th>Engineering</th>
+                <th>Date for interns</th>
             </tr>
         </thead>
         <tbody>
             {% for table_row in table_rows %}
             <tr>
                 <td>{{ table_row["week_number"] }}</td>
-
-                <td>{{ table_row["science"] }}
-                    <a target="_blank" href="mailto:{{ science_student_emails }}?subject=[Science] {{ table_row["subject"]   }}&body={{ table_row["body"] }}">Email Science</a> &nbsp;
+                <td>
+                    <div style="margin-bottom: 5px;"><strong>{{ table_row["date_for_interns"] }}</strong></div>
+                    <a target="_blank" href="mailto:{{ student_emails }}?subject={{ table_row["subject"] }}&body={{ table_row["body"] }}" class="btn btn-primary btn-sm">Email</a>
+                    <a href="/edit_email_template/{{ table_row['id'] }}" class="btn btn-secondary btn-sm">Edit</a>
                 </td>
-                <td>{{ table_row["engit"] }} &nbsp;
-                    <a target="_blank" href="mailto:{{ engit_student_emails }}?subject=[EngIT] {{ table_row["subject"]   }}&body={{ table_row["body"] }}">Email EngIT</a> &nbsp;
-
-                </td>
-                  
             </tr>
             {% endfor %}
-            
-
         </tbody>
     </table>
 {% endblock %}
 
-{% block scripts %}
-    <script>
-        // Your JavaScript code for DataTables or other functionality goes here
-        $(document).ready(function() {
-            var table = $('#intakesTable').DataTable({
-                "lengthMenu": [10, 25, 50, 100], // Customize the number of entries per page
-                // Other DataTables options and initialization code can go here
-            });
-        });
-    </script>
+{% block jQuery_scripts %}
+    // Disable DataTables for this table to preserve chronological order
+    console.log('Email intake table loaded without DataTables');
 {% endblock %}
 

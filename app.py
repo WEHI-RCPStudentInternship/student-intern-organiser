@@ -2095,7 +2095,7 @@ def project_description(project_id):
         current_date = datetime.now().strftime('%d/%m/%Y')
 
         try:
-            # Update the project record in the database
+            # Update the project record for the current project
             cursor.execute('''UPDATE Projects 
                              SET organization_description = ?, 
                                  project_description = ?, 
@@ -2122,17 +2122,15 @@ def project_description(project_id):
                            skill_requirements, about_org_word_limit, current_date,
                            position_desc_word_min, position_desc_word_max, current_date,
                            skills_word_min, current_date, skills_word_max, project_id))
-            
-            rows_affected = cursor.rowcount
-            print(f"DEBUG: Rows affected: {rows_affected}")
-            print(f"DEBUG: Project ID: {project_id}")
-            print(f"DEBUG: Data being saved - about_organisation: {about_organisation}")
-            print(f"DEBUG: position_description: {position_description}")
-            print(f"DEBUG: skill_requirements: {skill_requirements}")
-            
+
+            # Update all word limits for all projects
+            cursor.execute('''UPDATE Projects SET about_org_word_limit = ?, about_org_last_edit_date = ?''', (about_org_word_limit, current_date))
+            cursor.execute('''UPDATE Projects SET position_desc_word_min = ?, position_desc_word_max = ?, position_desc_last_edit_date = ?''', (position_desc_word_min, position_desc_word_max, current_date))
+            cursor.execute('''UPDATE Projects SET skills_word_min = ?, skills_word_max = ?, skills_last_edit_date = ?''', (skills_word_min, skills_word_max, current_date))
+
             conn.commit()
             print("DEBUG: Database commit successful")
-            
+
         except Exception as e:
             print(f"DEBUG: Database error: {e}")
             conn.rollback()

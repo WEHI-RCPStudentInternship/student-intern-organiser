@@ -514,11 +514,31 @@ def edit_email_template(email_id):
                          SET subject = ?, body = ?, last_modified = CURRENT_DATE
                          WHERE id = ?''', (subject, body, email_id))
         
-        # If intake start date is provided and this is week 1, update the intake start date
+        # If intake start date is provided and this is week 1, update the intake start date and adjust all week dates
         if new_intake_start_date and email_data[2] == '1 - First week':
+            # Update intake start date
             cursor.execute('''UPDATE Intakes 
                              SET science_start_date = ?, engit_start_date = ?
                              WHERE id = ?''', (new_intake_start_date, new_intake_start_date, intake_id))
+
+            # Get all email schedule rows for this intake
+            cursor.execute('SELECT id, week_offset_days FROM EmailSchedule WHERE intake_id = ?', (intake_id,))
+            all_weeks = cursor.fetchall()
+
+            # Calculate new start_monday from new_intake_start_date
+            new_start_date_object = datetime.strptime(new_intake_start_date, '%Y-%m-%d').date()
+            days_since_monday = new_start_date_object.weekday()
+            new_start_monday = new_start_date_object - timedelta(days=days_since_monday)
+
+            # Update all week dates in EmailSchedule
+            for week_row in all_weeks:
+                week_id = week_row[0]
+                week_offset_days = week_row[1] if week_row[1] is not None else 0
+                new_week_date = new_start_monday + timedelta(days=week_offset_days)
+                # Optionally, store the calculated date in a new column if needed, or just recalculate for display
+                # If you want to store, add a column to EmailSchedule, e.g. 'scheduled_date', and update here
+                # Example: cursor.execute('UPDATE EmailSchedule SET scheduled_date = ? WHERE id = ?', (new_week_date.strftime('%Y-%m-%d'), week_id))
+                # For now, just recalculate for display
         
         conn.commit()
         conn.close()

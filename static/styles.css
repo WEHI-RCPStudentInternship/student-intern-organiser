@@ -146,13 +146,13 @@ Kanban boards styles
     background-color: #3a8533;
 }
 
-.project-description-page h1, 
-.project-description-page h2 {
+.project-job-description-page h1, 
+.project-job-description-page h2 {
     color: #333;
     margin-bottom: 20px;
 }
 
-.project-description-page h2 {
+.project-job-description-page h2 {
     margin-top: 30px;
     border-top: 2px solid #eee;
     padding-top: 20px;

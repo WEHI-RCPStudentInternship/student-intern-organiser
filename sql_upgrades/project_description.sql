@@ -1,6 +1,6 @@
--- Add all required columns for project description editing and word limits
+-- Add all required columns for project job description editing and word limits
 ALTER TABLE Projects ADD COLUMN organization_description TEXT;
-ALTER TABLE Projects ADD COLUMN project_description TEXT;
+ALTER TABLE Projects ADD COLUMN project_job_description TEXT;
 ALTER TABLE Projects ADD COLUMN skill_requirements TEXT;
 ALTER TABLE Projects ADD COLUMN duties_placement TEXT;
 ALTER TABLE Projects ADD COLUMN skills_prerequisites TEXT;

@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Project Description{% endblock %}
+{% block title %}Project Job Description{% endblock %}
 
-{% block page_title %}Project Description{% endblock %}
+{% block page_title %}Project Job Description{% endblock %}
 
 {% block top_links_menu %}
 <a href="/projects">Back to Projects</a>
 {% endblock %}
 
 {% block content %}
-<div class="project-description-page">
-    <h1>Project Description - {{ project[1] }}</h1>
+<div class="project-job-description-page">
+    <h1>Project Job Description - {{ project[1] }}</h1>
     
-    <form method="POST" action="/project_description/{{ project[0] }}">
+    <form method="POST" action="/project_job_description/{{ project[0] }}">
         <h2>Position Details</h2>
         
         <div class="form-group">

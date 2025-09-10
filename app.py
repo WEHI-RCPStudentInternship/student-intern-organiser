@@ -2078,9 +2078,6 @@ def project_job_description(project_id):
     if request.method == 'POST':
         # Handle form submission and update all the Project Job Description fields
         about_organisation = request.form.get('about_organisation')
-        duties_placement = request.form.get('duties_placement')
-        skills_prerequisites = request.form.get('skills_prerequisites')
-        benefits_students = request.form.get('benefits_students')
         position_title = request.form.get('position_title')
         position_description = request.form.get('position_description')
         skill_requirements = request.form.get('skill_requirements')
@@ -2093,38 +2090,40 @@ def project_job_description(project_id):
         # Get current date for last edit
         current_date = datetime.now().strftime('%d/%m/%Y')
 
+        # Fetch old record
+        cursor.execute("SELECT about_organisation, position_description, skill_requirements FROM Projects WHERE id = ?", (project_id,))
+        old_about_org, old_position_desc, old_skills = cursor.fetchone()
+        
+        # Decide which dates to update
+        about_org_last_edit_date = current_date if old_about_org != about_organisation else None
+        position_desc_last_edit_date = current_date if old_position_desc != position_description else None
+        skills_last_edit_date = current_date if old_skills != skill_requirements else None
+
         try:
             # Update the project record for the current project
             cursor.execute('''UPDATE Projects 
-                            SET organization_description = ?, 
-                                project_job_description = ?, 
-                                skill_requirements = ?,
-                                duties_placement = ?,
-                                skills_prerequisites = ?,
-                                benefits_students = ?,
+                            SET skill_requirements = ?,
                                 about_organisation = ?,
                                 position_title = ?,
                                 position_description = ?,
-                                key_skills_development = ?
+                                about_org_last_edit_date = COALESCE(?, about_org_last_edit_date),
+                                position_desc_last_edit_date = COALESCE(?, position_desc_last_edit_date),
+                                skills_last_edit_date = COALESCE(?, skills_last_edit_date)
                             WHERE id = ?
-                        ''', (about_organisation, position_description, skill_requirements, 
-                            duties_placement, skills_prerequisites, benefits_students,
-                            about_organisation, position_title, position_description, 
-                            skill_requirements, project_id))
+                        ''', (skill_requirements, 
+                            about_organisation, position_title, position_description,
+                            about_org_last_edit_date, position_desc_last_edit_date, skills_last_edit_date))
             
             # Update global word limits for ALL projects in one go
-            cursor.execute('''UPDATE Projects
+            cursor.execute('''UPDATE Job_Description_Word_Count
                             SET about_org_word_limit = ?,
-                                about_org_last_edit_date = ?,
                                 position_desc_word_min = ?,
                                 position_desc_word_max = ?,
-                                position_desc_last_edit_date = ?,
                                 skills_word_min = ?,
-                                skills_word_max = ?,
-                                skills_last_edit_date = ?
-                        ''', (about_org_word_limit, current_date,
-                            position_desc_word_min, position_desc_word_max, current_date,
-                            skills_word_min, skills_word_max, current_date))
+                                skills_word_max = ?
+                        ''', (about_org_word_limit,
+                            position_desc_word_min, position_desc_word_max,
+                            skills_word_min, skills_word_max))
 
             conn.commit()
             print("DEBUG: Database commit successful")
@@ -2137,16 +2136,24 @@ def project_job_description(project_id):
         
         return redirect(url_for('projects_index'))
 
-    # If it's a GET request, fetch the project data and render the template
+    # If it's a GET request, fetch the project data and word count settings
     cursor.execute('SELECT * FROM Projects WHERE id = ?', (project_id,))
     project_data = cursor.fetchone()
+
+    cursor.execute('SELECT * FROM Job_Description_Word_Count')
+    wordcount_data = cursor.fetchone()
+
     conn.close()
 
     # Get current date
     current_date = datetime.now().strftime('%d/%m/%Y')
 
-    return render_template('project_job_description.html', project=project_data, current_date=current_date)
-
+    return render_template(
+        'project_job_description.html',
+        project=project_data,
+        wordcount=wordcount_data,
+        current_date=current_date  
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

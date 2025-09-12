@@ -2081,23 +2081,12 @@ def project_job_description(project_id):
         position_title = request.form.get('position_title')
         position_description = request.form.get('position_description')
         skill_requirements = request.form.get('skill_requirements')
-        about_org_word_limit = request.form.get('about_org_word_limit', 70)
-        position_desc_word_min = request.form.get('position_desc_word_min', 400)
-        position_desc_word_max = request.form.get('position_desc_word_max', 500)
-        skills_word_min = request.form.get('skills_word_min', 50)
-        skills_word_max = request.form.get('skills_word_max', 70)
-
-        # Get current date for last edit
-        current_date = datetime.now().strftime('%d/%m/%Y')
-
-        # Fetch old record
-        cursor.execute("SELECT about_organisation, position_description, skill_requirements FROM Projects WHERE id = ?", (project_id,))
-        old_about_org, old_position_desc, old_skills = cursor.fetchone()
-        
-        # Decide which dates to update
-        about_org_last_edit_date = current_date if old_about_org != about_organisation else None
-        position_desc_last_edit_date = current_date if old_position_desc != position_description else None
-        skills_last_edit_date = current_date if old_skills != skill_requirements else None
+        about_org_word_min = int(request.form.get('about_org_word_min', 1))
+        about_org_word_max = int(request.form.get('about_org_word_max', 70))
+        position_desc_word_min = int(request.form.get('position_desc_word_min', 400))
+        position_desc_word_max = int(request.form.get('position_desc_word_max', 500))
+        skills_word_min = int(request.form.get('skills_word_min', 50))
+        skills_word_max = int(request.form.get('skills_word_max', 70))
 
         try:
             # Update the project record for the current project
@@ -2105,23 +2094,20 @@ def project_job_description(project_id):
                             SET skill_requirements = ?,
                                 about_organisation = ?,
                                 position_title = ?,
-                                position_description = ?,
-                                about_org_last_edit_date = COALESCE(?, about_org_last_edit_date),
-                                position_desc_last_edit_date = COALESCE(?, position_desc_last_edit_date),
-                                skills_last_edit_date = COALESCE(?, skills_last_edit_date)
-                            WHERE id = ?
-                        ''', (skill_requirements, 
-                            about_organisation, position_title, position_description,
-                            about_org_last_edit_date, position_desc_last_edit_date, skills_last_edit_date))
+                                position_description = ?
+                            WHERE id = ?''',
+                            (skill_requirements, about_organisation, position_title, position_description, project_id))
+
             
             # Update global word limits for ALL projects in one go
             cursor.execute('''UPDATE Job_Description_Word_Count
-                            SET about_org_word_limit = ?,
+                            SET about_org_word_min = ?,
+                                about_org_word_max = ?,
                                 position_desc_word_min = ?,
                                 position_desc_word_max = ?,
                                 skills_word_min = ?,
-                                skills_word_max = ?
-                        ''', (about_org_word_limit,
+                                skills_word_max = ?''',
+                            (about_org_word_min, about_org_word_max,
                             position_desc_word_min, position_desc_word_max,
                             skills_word_min, skills_word_max))
 
@@ -2145,14 +2131,10 @@ def project_job_description(project_id):
 
     conn.close()
 
-    # Get current date
-    current_date = datetime.now().strftime('%d/%m/%Y')
-
     return render_template(
         'project_job_description.html',
         project=project_data,
         wordcount=wordcount_data,
-        current_date=current_date  
     )
 
 if __name__ == '__main__':

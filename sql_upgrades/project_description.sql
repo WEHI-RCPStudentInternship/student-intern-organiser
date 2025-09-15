@@ -1,10 +1,10 @@
 CREATE TABLE Job_Description_Word_Count (
-    about_org_word_min INTEGER DEFAULT 1,
-    about_org_word_max INTEGER DEFAULT 70,
-    position_desc_word_min INTEGER DEFAULT 400,
-    position_desc_word_max INTEGER DEFAULT 500,
-    skills_word_min INTEGER DEFAULT 50,
-    skills_word_max INTEGER DEFAULT 70
+    about_org_word_min INTEGER,
+    about_org_word_max INTEGER,
+    position_desc_word_min INTEGER,
+    position_desc_word_max INTEGER,
+    skills_word_min INTEGER,
+    skills_word_max INTEGER
 );
 
 -- Add new columns to Projects table

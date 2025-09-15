@@ -1,68 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}Project Description{% endblock %}
+{% block title %}Project Job Description{% endblock %}
 
-{% block page_title %}Project Description{% endblock %}
+{% block page_title %}Project Job Description{% endblock %}
 
 {% block top_links_menu %}
 <a href="/projects">Back to Projects</a>
 {% endblock %}
 
 {% block content %}
-<div class="project-description-page">
-    <h1>Project Description - {{ project[1] }}</h1>
+<div class="project-job-description-page">
+    <h1>Project Job Description - {{ project[1] }}</h1>
     
-    <form method="POST" action="/project_description/{{ project[0] }}">
+    <form method="POST" action="/project_job_description/{{ project[0] }}">
         <h2>Position Details</h2>
         
         <div class="form-group">
             <label for="about_organisation">
-                About the organisation - Max 
-                <input type="number" id="about_org_word_limit" name="about_org_word_limit" 
-                       value="{{ project[13] if project[13] else 70 }}" 
-                       min="1" style="width: 60px; display: inline-block; padding: 2px;">
-                words 
-                {% if project[14] %}
-                    ({{ project[14] }})
-                {% else %}
-                    ({{ current_date }})
-                {% endif %}
+                About the organisation 
+                (<input type="number" id="about_org_word_min" name="about_org_word_min" 
+                        value="{{ wordcount[0] if wordcount[0] else 1 }}" 
+                        min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
+                word minimum to 
+                <input type="number" id="about_org_word_max" name="about_org_word_max" 
+                       value="{{ wordcount[1] if wordcount[1] else 70 }}" 
+                       min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
+                word maximum) 
                 <a href="#" onclick="window.open('https://feit-vocational-placement.app.unimelb.edu.au/index.php?r=request/createInternship&id=0m', '_blank')" title="External link">Link*</a>
             </label>
-            <textarea class="form-control" id="about_organisation" name="about_organisation" rows="5" placeholder="Describe the organization...">{{ project[9] if project[9] else '' }}</textarea>
+            <textarea class="form-control" id="about_organisation" name="about_organisation" rows="5" placeholder="Describe the organization...">{{ project[4] if project[4] else '' }}</textarea>
             <small class="form-text text-muted">
-                Word count: <span id="org_word_count">0</span>/<span id="org_word_limit_display">{{ project[13] if project[13] else 70 }}</span>
-                <span id="org_word_warning" style="color: red; display: none;">Word limit exceeded!</span>
+                Word count: <span id="org_word_count">0</span> 
+                (Min: <span id="org_min_display">{{ wordcount[0] if wordcount[0] else 1 }}</span>, 
+                Max: <span id="org_max_display">{{ wordcount[1] if wordcount[1] else 70 }}</span>)
+                <span id="org_word_warning" style="color: red; display: none;">Word count outside range!</span>
             </small>
         </div>
         
         <div class="form-group">
             <label for="position_title">Position Title</label>
-            <input type="text" class="form-control" id="position_title" name="position_title" placeholder="Enter the position title..." value="{{ project[10] if project[10] else '' }}">
+            <input type="text" class="form-control" id="position_title" name="position_title" placeholder="Enter the position title..." value="{{ project[5] if project[5] else '' }}">
         </div>
 
         <div class="form-group">
             <label for="position_description">
                 Position Description - Duties and Responsibilities 
                 (<input type="number" id="position_desc_word_min" name="position_desc_word_min" 
-                        value="{{ project[15] if project[15] else 400 }}" 
+                        value="{{ wordcount[2] if wordcount[2] else 400 }}" 
                         min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
                 word minimum to 
                 <input type="number" id="position_desc_word_max" name="position_desc_word_max" 
-                       value="{{ project[16] if project[16] else 500 }}" 
+                       value="{{ wordcount[3] if wordcount[3] else 500 }}" 
                        min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
                 word maximum) 
-                {% if project[17] %}
-                    ({{ project[17] }}) 
-                {% else %}
-                    ({{ current_date }}) 
-                {% endif %}*
             </label>
-            <textarea class="form-control" id="position_description" name="position_description" rows="5" placeholder="Describe the position duties and responsibilities...">{{ project[11] if project[11] else '' }}</textarea>
+            <textarea class="form-control" id="position_description" name="position_description" rows="5" placeholder="Describe the position duties and responsibilities...">{{ project[6] if project[6] else '' }}</textarea>
             <small class="form-text text-muted">
                 Word count: <span id="position_word_count">0</span> 
-                (Min: <span id="position_min_display">{{ project[15] if project[15] else 400 }}</span>, 
-                Max: <span id="position_max_display">{{ project[16] if project[16] else 500 }}</span>)
+                (Min: <span id="position_min_display">{{ wordcount[2] if wordcount[2] else 400 }}</span>, 
+                Max: <span id="position_max_display">{{ wordcount[3] if wordcount[3] else 500 }}</span>)
                 <span id="position_word_warning" style="color: red; display: none;">Word count outside range!</span>
             </small>
         </div>
@@ -71,24 +67,19 @@
             <label for="skill_requirements">
                 What are the key skills you anticipate students will develop whilst undertaking the internship? 
                 (<input type="number" id="skills_word_min" name="skills_word_min" 
-                        value="{{ project[18] if project[18] else 50 }}" 
+                        value="{{ wordcount[4] if wordcount[4] else 50 }}" 
                         min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
                 word minimum to 
                 <input type="number" id="skills_word_max" name="skills_word_max" 
-                       value="{{ project[20] if project[20] else 70 }}" 
+                       value="{{ wordcount[5] if wordcount[5] else 70 }}" 
                        min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
                 word maximum) 
-                {% if project[19] %}
-                    ({{ project[19] }})
-                {% else %}
-                    ({{ current_date }})
-                {% endif %}
             </label>
-            <textarea class="form-control" id="skill_requirements" name="skill_requirements" rows="5" placeholder="List the key skills students will develop...">{{ project[12] if project[12] else '' }}</textarea>
+            <textarea class="form-control" id="skill_requirements" name="skill_requirements" rows="5" placeholder="List the key skills students will develop...">{{ project[3] if project[3] else '' }}</textarea>
             <small class="form-text text-muted">
                 Word count: <span id="skill_word_count">0</span> 
-                (Min: <span id="skills_min_display">{{ project[18] if project[18] else 50 }}</span>, 
-                Max: <span id="skills_max_display">{{ project[20] if project[20] else 70 }}</span>)
+                (Min: <span id="skills_min_display">{{ wordcount[4] if wordcount[4] else 50 }}</span>, 
+                Max: <span id="skills_max_display">{{ wordcount[5] if wordcount[5] else 70 }}</span>)
                 <span id="skills_word_warning" style="color: red; display: none;">Word count outside range!</span>
             </small>
         </div>
@@ -239,7 +230,7 @@
     
     $(document).ready(function() {
         // About Organisation - with dynamic word limit AND warning
-        updateDynamicWordCount('about_organisation', 'org_word_count', 'about_org_word_limit', 'org_word_limit_display', 'org_word_warning');
+        updateDynamicWordCountRange('about_organisation', 'org_word_count', 'about_org_word_min', 'about_org_word_max', 'org_min_display', 'org_max_display', 'org_word_warning');
         
         // Position Description - with min/max range
         updateDynamicWordCountRange('position_description', 'position_word_count', 'position_desc_word_min', 'position_desc_word_max', 'position_min_display', 'position_max_display', 'position_word_warning');

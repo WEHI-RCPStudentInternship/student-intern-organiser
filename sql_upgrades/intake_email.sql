@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS EmailSchedule (
     FOREIGN KEY (intake_id) REFERENCES Intakes(id)
 );
 
+ALTER TABLE Intakes ADD COLUMN intake_start_date DATE;
+
+
 -- Insert default email schedule data with proper week offsets
 -- Week 0 (1 week before): -7 days (Monday before start)
 -- Week 1 (First week): 0 days (Monday of start week)

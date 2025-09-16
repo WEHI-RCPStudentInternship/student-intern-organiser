@@ -438,7 +438,7 @@ def email_intake(intake_id):
     intake = cursor.fetchall()[0]
 
     intake_name = intake[1]
-    intake_start_date = intake[3]
+    reg_intake_start_date = intake[3]
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -470,7 +470,7 @@ def email_intake(intake_id):
     student_emails_combined = ",".join(all_student_emails)
 
     # Get the intake start date and calculate Monday of that week
-    intake_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
+    intake_start_date_object = datetime.strptime(reg_intake_start_date, '%Y-%m-%d').date()
     
     # Find the Monday of the week containing the start date
     days_since_monday = intake_start_date_object.weekday()  # Monday is 0, Sunday is 6
@@ -509,7 +509,8 @@ def edit_email_template(email_id):
         subject = request.form.get('subject')
         body = request.form.get('body')
         new_intake_start_date = request.form.get('intake_start_date')
-        
+
+
         # Get current email data to check which week this is
         cursor.execute('SELECT id, intake_id, week_number, week_offset_days FROM EmailSchedule WHERE id = ?', (email_id,))
         email_data = cursor.fetchone()

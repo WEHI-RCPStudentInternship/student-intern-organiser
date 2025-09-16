@@ -524,7 +524,7 @@ def edit_email_template(email_id):
         if new_intake_start_date and email_data[2] == '1 - First week':
             # Update intake start date
             cursor.execute('''UPDATE Intakes 
-                             SET intake_start_date = ?,
+                             SET intake_start_date = ?
                              WHERE id = ?''', (new_intake_start_date, intake_id))
 
             # Get all email schedule rows for this intake
@@ -1981,7 +1981,7 @@ def add_intake():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Insert the new intake record into the database using the same date for both science and engineering
+        # Insert the new intake record into the database using intake_start_date
         cursor.execute('INSERT INTO Intakes (name, status, intake_start_date, engit_start_date) VALUES (?, ?, ?, ?)', 
                       (new_name, new_status, intake_date, intake_date))
         
@@ -2214,7 +2214,7 @@ def create_email_intake_table_rows(intake_start_date_object,engit_start_date_obj
 
     table_rows = [
             { "week_number": "0 - 1 week before", "science": intake_start_date_object - timedelta(days=7), "engit": engit_start_date_object - timedelta(days=7), "subject": "1 week before WEHI internship", "body":body_before},
-            { "week_number": "1 - First week", "science": intake_start_date_object, "engit": engit_start_date_object, "subject": "First week of WEHI internship", "body":body_first},
+            { "week_number": "1 - First week", "science": intake_start_date_object - timedelta(days=7), "engit": engit_start_date_object, "subject": "First week of WEHI internship", "body":body_first},
             { "week_number": "2 - Second week", "science": intake_start_date_object + timedelta(days=7), "engit": engit_start_date_object + timedelta(days=7), "subject": "Second week of WEHI internship", "body":body_second},
             { "week_number": "3 - Fourth week", "science": intake_start_date_object + timedelta(days=21), "engit": engit_start_date_object + timedelta(days=21), "subject": "Fourth week of WEHI internship", "body":body_fourth},
             { "week_number": "4 - Tenth week", "science": intake_start_date_object + timedelta(days=63), "engit": engit_start_date_object + timedelta(days=63), "subject": "Tenth week of WEHI internship", "body":body_tenth},
@@ -2246,3 +2246,4 @@ def update_project_status():
 if __name__ == '__main__':
     debug_db()
     app.run(debug=True)
+

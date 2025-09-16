@@ -14,6 +14,11 @@ CREATE TABLE IF NOT EXISTS EmailSchedule (
 
 ALTER TABLE Intakes ADD COLUMN intake_start_date DATE;
 
+UPDATE Intakes
+SET intake_start_date = COALESCE(science_start_date, engit_start_date)
+WHERE intake_start_date IS NULL;
+
+
 
 -- Insert default email schedule data with proper week offsets
 -- Week 0 (1 week before): -7 days (Monday before start)

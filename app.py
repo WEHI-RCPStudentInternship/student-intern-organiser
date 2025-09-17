@@ -433,12 +433,13 @@ def debug_db():
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
     conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row 
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Intakes WHERE id = ?',(intake_id,))
+    
     intake = cursor.fetchall()[0]
-
-    intake_name = intake[1]
-    reg_intake_start_date = intake[3]
+    intake_name = intake['name']
+    intake_start_date = intake['intake_start_date']
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -470,7 +471,7 @@ def email_intake(intake_id):
     student_emails_combined = ",".join(all_student_emails)
 
     # Get the intake start date and calculate Monday of that week
-    intake_start_date_object = datetime.strptime(reg_intake_start_date, '%Y-%m-%d').date()
+    intake_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
     
     # Find the Monday of the week containing the start date
     days_since_monday = intake_start_date_object.weekday()  # Monday is 0, Sunday is 6
@@ -574,7 +575,7 @@ def edit_email_template(email_id):
     
     # Check if this is the first week (allow editing intake start date)
     is_first_week = email_data[2] == '1 - First week'
-    
+
     email_template = {
         'id': email_data[0],           # id
         'intake_id': email_data[1],    # intake_id

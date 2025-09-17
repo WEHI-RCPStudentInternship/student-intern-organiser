@@ -425,7 +425,6 @@ def missed_out():
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
     conn = sqlite3.connect(db_path)
-    # conn.row_factory = sqlite3.Row 
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Intakes WHERE id = ?',(intake_id,))
     

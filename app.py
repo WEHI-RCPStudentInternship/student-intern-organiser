@@ -463,7 +463,7 @@ def email_intake(intake_id):
 
     # Get the intake start date and calculate Monday of that week
     intake_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
-    
+
     # Find the Monday of the week containing the start date
     days_since_monday = intake_start_date_object.weekday()  # Monday is 0, Sunday is 6
     start_monday = intake_start_date_object - timedelta(days=days_since_monday)
@@ -1968,14 +1968,14 @@ def add_intake():
     if request.method == 'POST':
         new_name = request.form.get('name')
         new_status = request.form.get('status')
-        intake_date = request.form.get('intake_date')
+        intake_date = request.form.get('intake_start_date')
 
         # Connect to the database
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         # Insert the new intake record into the database using intake_start_date
-        cursor.execute('INSERT INTO Intakes (name, status, intake_start_date) VALUES (?, ?, ?, ?)', 
+        cursor.execute('INSERT INTO Intakes (name, status, intake_start_date) VALUES (?, ?, ?)', 
                       (new_name, new_status, intake_date))
         
         # Get the newly created intake ID

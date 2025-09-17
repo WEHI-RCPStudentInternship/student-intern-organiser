@@ -427,11 +427,10 @@ def email_intake(intake_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Intakes WHERE id = ?',(intake_id,))
+    
     intake = cursor.fetchall()[0]
-
     intake_name = intake[1]
-    intake_science_start_date = intake[3]
-    intake_engit_start_date = intake[4]
+    intake_start_date = intake[5]
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -463,9 +462,8 @@ def email_intake(intake_id):
     student_emails_combined = ",".join(all_student_emails)
 
     # Get the intake start date and calculate Monday of that week
-    # Use science_start_date as the main start date (since it's the same for all)
-    intake_start_date_object = datetime.strptime(intake_science_start_date, '%Y-%m-%d').date()
-    
+    intake_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
+
     # Find the Monday of the week containing the start date
     days_since_monday = intake_start_date_object.weekday()  # Monday is 0, Sunday is 6
     start_monday = intake_start_date_object - timedelta(days=days_since_monday)
@@ -503,7 +501,8 @@ def edit_email_template(email_id):
         subject = request.form.get('subject')
         body = request.form.get('body')
         new_intake_start_date = request.form.get('intake_start_date')
-        
+
+
         # Get current email data to check which week this is
         cursor.execute('SELECT id, intake_id, week_number, week_offset_days FROM EmailSchedule WHERE id = ?', (email_id,))
         email_data = cursor.fetchone()
@@ -518,8 +517,8 @@ def edit_email_template(email_id):
         if new_intake_start_date and email_data[2] == '1 - First week':
             # Update intake start date
             cursor.execute('''UPDATE Intakes 
-                             SET science_start_date = ?, engit_start_date = ?
-                             WHERE id = ?''', (new_intake_start_date, new_intake_start_date, intake_id))
+                             SET intake_start_date = ?
+                             WHERE id = ?''', (new_intake_start_date, intake_id))
 
             # Get all email schedule rows for this intake
             cursor.execute('SELECT id, week_offset_days FROM EmailSchedule WHERE intake_id = ?', (intake_id,))
@@ -554,20 +553,20 @@ def edit_email_template(email_id):
         return "Email template not found", 404
     
     # Get intake start date to calculate the display date
-    cursor.execute('SELECT science_start_date FROM Intakes WHERE id = ?', (email_data[1],))
+    cursor.execute('SELECT intake_start_date FROM Intakes WHERE id = ?', (email_data[1],))
     intake_start_date = cursor.fetchone()[0]
     conn.close()
     
     # Calculate the date dynamically
-    science_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
-    days_since_monday = science_start_date_object.weekday()
-    start_monday = science_start_date_object - timedelta(days=days_since_monday)
+    intern_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
+    days_since_monday = intern_start_date_object.weekday()
+    start_monday = intern_start_date_object - timedelta(days=days_since_monday)
     week_offset_days = email_data[3] if email_data[3] is not None else 0
     calculated_date = start_monday + timedelta(days=week_offset_days)
     
     # Check if this is the first week (allow editing intake start date)
     is_first_week = email_data[2] == '1 - First week'
-    
+
     email_template = {
         'id': email_data[0],           # id
         'intake_id': email_data[1],    # intake_id
@@ -926,7 +925,6 @@ def download_key_attributes():
             # Retrieve student data from the database
             # Write the student data to the CSV file
             csv_writer.writerow(student)
-
 
 
     return send_file(csv_path, as_attachment=True)
@@ -1970,15 +1968,15 @@ def add_intake():
     if request.method == 'POST':
         new_name = request.form.get('name')
         new_status = request.form.get('status')
-        intake_date = request.form.get('intake_date')
+        intake_date = request.form.get('intake_start_date')
 
         # Connect to the database
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Insert the new intake record into the database using the same date for both science and engineering
-        cursor.execute('INSERT INTO Intakes (name, status, science_start_date, engit_start_date) VALUES (?, ?, ?, ?)', 
-                      (new_name, new_status, intake_date, intake_date))
+        # Insert the new intake record into the database using intake_start_date
+        cursor.execute('INSERT INTO Intakes (name, status, intake_start_date) VALUES (?, ?, ?)', 
+                      (new_name, new_status, intake_date))
         
         # Get the newly created intake ID
         intake_id = cursor.lastrowid
@@ -2010,7 +2008,7 @@ def add_weekly_email(intake_id):
     cursor = conn.cursor()
     
     # Get intake information
-    cursor.execute('SELECT id, name, science_start_date FROM Intakes WHERE id = ?', (intake_id,))
+    cursor.execute('SELECT id, name, intake_start_date FROM Intakes WHERE id = ?', (intake_id,))
     intake = cursor.fetchone()
     
     if not intake:
@@ -2196,7 +2194,7 @@ def edit_project(project_id):
 
     return render_template('edit_project.html', project=project_data)
 
-def create_email_intake_table_rows(science_start_date_object,engit_start_date_object):
+def create_email_intake_table_rows(intake_start_date_object):
 
     body_before = """Hi All, %0D%0A%0D%0AWelcome to the RCP Student Internship Program at WEHI. We are excited to have you join our team and provide you with valuable learning opportunities throughout your internship. %0D%0A%0D%0APlease read through the onboarding document https://doi.org/10.6084/m9.figshare.23280815 as this will help you ease your way into WEHI. %0D%0A%0D%0AI will be adding your student email to the WEHI system so you can gain access to our Sharepoint. This is temporary as you will be given a WEHI email address via Workday. %0D%0A%0D%0AWorkday is the Human Resources software tool at WEHI. You will receive an email from Workday and will need to fill in all the forms before you start. You may not receive the Workday email before your start date. This is OK, you will just need to wait and use your student email for the time being. Please also note that there is a Workday FAQ you can find in the FAQ below.%0D%0A%0D%0AHere are a few things you can do before you start: %0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes%0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq%0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis%0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me after you have looked through these documents. We are here to assist you and provide any necessary support. %0D%0A%0D%0AWe are looking forward to working with you and wish you a rewarding and successful internship experience."""
 
@@ -2208,12 +2206,12 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
     body_end="""Hi All,%0D%0A%0D%0AI would like to thank you all for being a part of this intake at WEHI, and for all your efforts. I hope that you were able to benefit from this internship.%0D%0A%0D%0ATo help us improve, please provide anonymous feedback on the student internship https://forms.office.com/r/XLTukQ9stB %0D%0A%0D%0AWe hope you will keep in touch with your teammates and supervisors. One way of doing this is to reach out via LinkedIn.%0D%0A%0D%0AAnother way to continue sharing your work from the internship. With the permission of your supervisor, consider uploading your presentation to a platform like Figshare or Zenodo. By doing so, you can make your findings and insights accessible to a wider audience.%0D%0A%0D%0AWhen sharing your work on Figshare or a similar platform, remember to acknowledge your team mates as a co-author or contributor. Including them as an author ensures that credit is appropriately attributed to all individuals involved in the project.%0D%0A%0D%0AI hope the experience of this internship helps you in your future career and gives you more understanding of what you want out of a work environment. """
 
     table_rows = [
-            { "week_number": "0 - 1 week before", "science": science_start_date_object - timedelta(days=7), "engit": engit_start_date_object - timedelta(days=7), "subject": "1 week before WEHI internship", "body":body_before},
-            { "week_number": "1 - First week", "science": science_start_date_object, "engit": engit_start_date_object, "subject": "First week of WEHI internship", "body":body_first},
-            { "week_number": "2 - Second week", "science": science_start_date_object + timedelta(days=7), "engit": engit_start_date_object + timedelta(days=7), "subject": "Second week of WEHI internship", "body":body_second},
-            { "week_number": "3 - Fourth week", "science": science_start_date_object + timedelta(days=21), "engit": engit_start_date_object + timedelta(days=21), "subject": "Fourth week of WEHI internship", "body":body_fourth},
-            { "week_number": "4 - Tenth week", "science": science_start_date_object + timedelta(days=63), "engit": engit_start_date_object + timedelta(days=63), "subject": "Tenth week of WEHI internship", "body":body_tenth},
-            { "week_number": "5 - End of internship", "science": science_start_date_object + timedelta(days=91), "engit": engit_start_date_object + timedelta(days=91), "subject": "End of WEHI internship", "body":body_end}
+            { "week_number": "0 - 1 week before",  "date": intake_start_date_object - timedelta(days=7), "subject": "1 week before WEHI internship", "body":body_before},
+            { "week_number": "1 - First week", "date": intake_start_date_object - timedelta(days=7), "subject": "First week of WEHI internship", "body":body_first},
+            { "week_number": "2 - Second week", "date": intake_start_date_object + timedelta(days=7), "subject": "Second week of WEHI internship", "body":body_second},
+            { "week_number": "3 - Fourth week", "date": intake_start_date_object + timedelta(days=21), "subject": "Fourth week of WEHI internship", "body":body_fourth},
+            { "week_number": "4 - Tenth week", "date": intake_start_date_object + timedelta(days=63), "subject": "Tenth week of WEHI internship", "body":body_tenth},
+            { "week_number": "5 - End of internship", "date": intake_start_date_object + timedelta(days=91), "subject": "End of WEHI internship", "body":body_end}
            ]
 
 
@@ -2240,3 +2238,4 @@ def update_project_status():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

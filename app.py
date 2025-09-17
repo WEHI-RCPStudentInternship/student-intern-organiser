@@ -422,24 +422,16 @@ def missed_out():
     html_to_render = filter_students(statuses,title,"missed_out")
     return html_to_render
 
-def debug_db():
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-    print("DB ABS PATH:", os.path.abspath(db_path))
-    cur.execute("PRAGMA table_info(Intakes);")
-    print("Intakes columns:", [r[1] for r in cur.fetchall()])
-    conn.close()
-
 @app.route('/email_intake/<int:intake_id>', methods=['GET'])
 def email_intake(intake_id):
     conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row 
+    # conn.row_factory = sqlite3.Row 
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Intakes WHERE id = ?',(intake_id,))
     
     intake = cursor.fetchall()[0]
-    intake_name = intake['name']
-    intake_start_date = intake['intake_start_date']
+    intake_name = intake[1]
+    intake_start_date = intake[5]
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
@@ -1984,8 +1976,8 @@ def add_intake():
         cursor = conn.cursor()
 
         # Insert the new intake record into the database using intake_start_date
-        cursor.execute('INSERT INTO Intakes (name, status, intake_start_date, engit_start_date) VALUES (?, ?, ?, ?)', 
-                      (new_name, new_status, intake_date, intake_date))
+        cursor.execute('INSERT INTO Intakes (name, status, intake_start_date) VALUES (?, ?, ?, ?)', 
+                      (new_name, new_status, intake_date))
         
         # Get the newly created intake ID
         intake_id = cursor.lastrowid
@@ -2203,7 +2195,7 @@ def edit_project(project_id):
 
     return render_template('edit_project.html', project=project_data)
 
-def create_email_intake_table_rows(intake_start_date_object,engit_start_date_object):
+def create_email_intake_table_rows(intake_start_date_object):
 
     body_before = """Hi All, %0D%0A%0D%0AWelcome to the RCP Student Internship Program at WEHI. We are excited to have you join our team and provide you with valuable learning opportunities throughout your internship. %0D%0A%0D%0APlease read through the onboarding document https://doi.org/10.6084/m9.figshare.23280815 as this will help you ease your way into WEHI. %0D%0A%0D%0AI will be adding your student email to the WEHI system so you can gain access to our Sharepoint. This is temporary as you will be given a WEHI email address via Workday. %0D%0A%0D%0AWorkday is the Human Resources software tool at WEHI. You will receive an email from Workday and will need to fill in all the forms before you start. You may not receive the Workday email before your start date. This is OK, you will just need to wait and use your student email for the time being. Please also note that there is a Workday FAQ you can find in the FAQ below.%0D%0A%0D%0AHere are a few things you can do before you start: %0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes%0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq%0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis%0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me after you have looked through these documents. We are here to assist you and provide any necessary support. %0D%0A%0D%0AWe are looking forward to working with you and wish you a rewarding and successful internship experience."""
 
@@ -2215,12 +2207,12 @@ def create_email_intake_table_rows(intake_start_date_object,engit_start_date_obj
     body_end="""Hi All,%0D%0A%0D%0AI would like to thank you all for being a part of this intake at WEHI, and for all your efforts. I hope that you were able to benefit from this internship.%0D%0A%0D%0ATo help us improve, please provide anonymous feedback on the student internship https://forms.office.com/r/XLTukQ9stB %0D%0A%0D%0AWe hope you will keep in touch with your teammates and supervisors. One way of doing this is to reach out via LinkedIn.%0D%0A%0D%0AAnother way to continue sharing your work from the internship. With the permission of your supervisor, consider uploading your presentation to a platform like Figshare or Zenodo. By doing so, you can make your findings and insights accessible to a wider audience.%0D%0A%0D%0AWhen sharing your work on Figshare or a similar platform, remember to acknowledge your team mates as a co-author or contributor. Including them as an author ensures that credit is appropriately attributed to all individuals involved in the project.%0D%0A%0D%0AI hope the experience of this internship helps you in your future career and gives you more understanding of what you want out of a work environment. """
 
     table_rows = [
-            { "week_number": "0 - 1 week before", "science": intake_start_date_object - timedelta(days=7), "engit": engit_start_date_object - timedelta(days=7), "subject": "1 week before WEHI internship", "body":body_before},
-            { "week_number": "1 - First week", "science": intake_start_date_object - timedelta(days=7), "engit": engit_start_date_object, "subject": "First week of WEHI internship", "body":body_first},
-            { "week_number": "2 - Second week", "science": intake_start_date_object + timedelta(days=7), "engit": engit_start_date_object + timedelta(days=7), "subject": "Second week of WEHI internship", "body":body_second},
-            { "week_number": "3 - Fourth week", "science": intake_start_date_object + timedelta(days=21), "engit": engit_start_date_object + timedelta(days=21), "subject": "Fourth week of WEHI internship", "body":body_fourth},
-            { "week_number": "4 - Tenth week", "science": intake_start_date_object + timedelta(days=63), "engit": engit_start_date_object + timedelta(days=63), "subject": "Tenth week of WEHI internship", "body":body_tenth},
-            { "week_number": "5 - End of internship", "science": intake_start_date_object + timedelta(days=91), "engit": engit_start_date_object + timedelta(days=91), "subject": "End of WEHI internship", "body":body_end}
+            { "week_number": "0 - 1 week before",  "date": intake_start_date_object - timedelta(days=7), "subject": "1 week before WEHI internship", "body":body_before},
+            { "week_number": "1 - First week", "date": intake_start_date_object - timedelta(days=7), "subject": "First week of WEHI internship", "body":body_first},
+            { "week_number": "2 - Second week", "date": intake_start_date_object + timedelta(days=7), "subject": "Second week of WEHI internship", "body":body_second},
+            { "week_number": "3 - Fourth week", "date": intake_start_date_object + timedelta(days=21), "subject": "Fourth week of WEHI internship", "body":body_fourth},
+            { "week_number": "4 - Tenth week", "date": intake_start_date_object + timedelta(days=63), "subject": "Tenth week of WEHI internship", "body":body_tenth},
+            { "week_number": "5 - End of internship", "date": intake_start_date_object + timedelta(days=91), "subject": "End of WEHI internship", "body":body_end}
            ]
 
 
@@ -2246,6 +2238,5 @@ def update_project_status():
 
 
 if __name__ == '__main__':
-    debug_db()
     app.run(debug=True)
 

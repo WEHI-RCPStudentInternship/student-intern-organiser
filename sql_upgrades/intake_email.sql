@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS EmailSchedule (
 
 ALTER TABLE Intakes ADD COLUMN intake_start_date DATE;
 
+UPDATE Intakes
+SET intake_start_date = COALESCE(science_start_date, engit_start_date);
+
 
 
 

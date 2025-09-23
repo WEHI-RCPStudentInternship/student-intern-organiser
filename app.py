@@ -2070,7 +2070,72 @@ def update_project_status():
 
     return jsonify({'status': 'success', 'message': 'Project statuses updated.'})
 
+@app.route('/project_job_description/<int:project_id>', methods=['GET', 'POST'])
+def project_job_description(project_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
 
+    if request.method == 'POST':
+        # Handle form submission and update all the Project Job Description fields
+        about_organisation = request.form.get('about_organisation')
+        position_title = request.form.get('position_title')
+        position_description = request.form.get('position_description')
+        skill_requirements = request.form.get('skill_requirements')
+        about_org_word_min = int(request.form.get('about_org_word_min', 1))
+        about_org_word_max = int(request.form.get('about_org_word_max', 70))
+        position_desc_word_min = int(request.form.get('position_desc_word_min', 400))
+        position_desc_word_max = int(request.form.get('position_desc_word_max', 500))
+        skills_word_min = int(request.form.get('skills_word_min', 50))
+        skills_word_max = int(request.form.get('skills_word_max', 70))
+
+        try:
+            # Update the project record for the current project
+            cursor.execute('''UPDATE Projects 
+                            SET skill_requirements = ?,
+                                about_organisation = ?,
+                                position_title = ?,
+                                position_description = ?
+                            WHERE id = ?''',
+                            (skill_requirements, about_organisation, position_title, position_description, project_id))
+
+            
+            # Update global word limits for ALL projects in one go
+            cursor.execute('''UPDATE Job_Description_Word_Count
+                            SET about_org_word_min = ?,
+                                about_org_word_max = ?,
+                                position_desc_word_min = ?,
+                                position_desc_word_max = ?,
+                                skills_word_min = ?,
+                                skills_word_max = ?''',
+                            (about_org_word_min, about_org_word_max,
+                            position_desc_word_min, position_desc_word_max,
+                            skills_word_min, skills_word_max))
+
+            conn.commit()
+            print("DEBUG: Database commit successful")
+
+        except Exception as e:
+            print(f"DEBUG: Database error: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
+        
+        return redirect(url_for('projects_index'))
+
+    # If it's a GET request, fetch the project data and word count settings
+    cursor.execute('SELECT * FROM Projects WHERE id = ?', (project_id,))
+    project_data = cursor.fetchone()
+
+    cursor.execute('SELECT * FROM Job_Description_Word_Count')
+    wordcount_data = cursor.fetchone()
+
+    conn.close()
+
+    return render_template(
+        'project_job_description.html',
+        project=project_data,
+        wordcount=wordcount_data,
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Email Template{% endblock %}
+
+{% block page_title %}Edit Email Template{% endblock %}
+
+{% block top_links_menu %}
+<a href="/email_intake/{{ email_template['intake_id'] }}">Back to Email Intake</a>
+{% endblock %}
+
+{% block content %}
+<div class="edit-email-template-page">
+    <h1>Edit Email Template - {{ email_template['week_number'] }}</h1>
+    
+    <form method="POST" action="/edit_email_template/{{ email_template['id'] }}">
+        <div class="form-group">
+            <label for="week_number">Week Number (Read Only)</label>
+            <input type="text" class="form-control" id="week_number" value="{{ email_template['week_number'] }}" readonly>
+        </div>
+        
+        {% if email_template['is_first_week'] %}
+        <div class="form-group">
+            <label for="intake_start_date">Intake Start Date (Edit to recalculate all dates)</label>
+            <input type="date" class="form-control" id="intake_start_date" name="intake_start_date" value="{{ email_template['intake_start_date'] }}" required>
+            <small class="form-text text-muted">Changing this date will recalculate all email dates for this intake.</small>
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="date_for_interns">Date for Interns (Calculated Automatically)</label>
+            <input type="date" class="form-control" id="date_for_interns" name="date_for_interns" value="{{ email_template['date_for_interns'] }}" readonly>
+            <small class="form-text text-muted">This date is automatically calculated based on the intake start date and week offset.</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="subject">Email Subject</label>
+            <input type="text" class="form-control" id="subject" name="subject" value="{{ email_template['subject'] }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="body">Email Body</label>
+            <textarea class="form-control" id="body" name="body" rows="15" required>{{ email_template['body'] }}</textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Email Template</button>
+        <a href="/email_intake/{{ email_template['intake_id'] }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-resize textarea based on content
+    $(document).ready(function() {
+        $('textarea').each(function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+</script>
+{% endblock %}

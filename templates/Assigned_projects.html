@@ -44,7 +44,6 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
       <option value="assigned">Assigned</option>
       <option value="offered">Offered</option>
       <option value="accepted">Accepted</option>
-      <option value="offered&accepted">Offered & Accepted</option>
     </select>
 
     <canvas id="summaryChart"></canvas>
@@ -298,7 +297,6 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
     assigned: [],
     offered: [],
     accepted: [],
-    "offered&accepted": [], // Add the combined dataset
   };
   function createOrUpdateDiv(selector, count_type, totalCounts) {
     let div = document.querySelector(selector);

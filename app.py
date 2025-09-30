@@ -2287,7 +2287,10 @@ def project_job_description(project_id):
         return redirect(url_for('projects_index'))
 
     # If it's a GET request, fetch the project data and word count settings
-    cursor.execute('SELECT * FROM Projects WHERE id = ?', (project_id,))
+    cursor.execute('''SELECT about_organisation, position_title, position_description, skill_requirements
+                        FROM Projects
+                        WHERE id = ?''',
+                    (project_id,))
     project_data = cursor.fetchone()
 
     cursor.execute('SELECT * FROM Job_Description_Word_Count')
@@ -2299,6 +2302,7 @@ def project_job_description(project_id):
         'project_job_description.html',
         project=project_data,
         wordcount=wordcount_data,
+        project_id=project_id
     )
 
 if __name__ == '__main__':

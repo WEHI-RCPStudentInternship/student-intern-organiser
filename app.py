@@ -46,7 +46,7 @@ def filter_students(status_of_students_to_filter,title,context = None):
         query = '''
             SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
             FROM Students
-            WHERE intake = ? AND status IN ({}) AND project != 'Unassigned' ORDER BY status ASC
+            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
         '''.format(','.join(['?'] * len(current_statuses_list)))
     elif context == "waiting_list":
         query = '''

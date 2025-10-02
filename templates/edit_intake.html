@@ -24,6 +24,10 @@
                 <option value="future" {% if intake[2] == "future" %}selected{% endif %}>Future</option>
             </select>
         </div>
+        <div class="form-group">
+            <label for="intake_start_date">Intake Start Date:</label>
+            <input type="date" class="form-control" id="intake_start_date" name="intake_start_date" value="{{ intake[5] }}" required>
+        </div>
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
 {% endblock %}

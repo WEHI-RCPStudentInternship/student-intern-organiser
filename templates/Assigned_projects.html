@@ -42,8 +42,9 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
     >
       <option value="total">Total</option>
       <option value="assigned">Assigned</option>
-      <option value="offered">Offered</option>
-      <option value="accepted">Accepted</option>
+  <option value="offered">Offered</option>
+  <option value="accepted">Accepted</option>
+  <option value="offered_accepted">Offered & Accepted</option>
     </select>
 
     <canvas id="summaryChart"></canvas>
@@ -297,6 +298,7 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
     assigned: [],
     offered: [],
     accepted: [],
+    offered_accepted: [],
   };
   function createOrUpdateDiv(selector, count_type, totalCounts) {
     let div = document.querySelector(selector);
@@ -531,10 +533,11 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
     );
 
     // Update chart datasets dynamically
-    dataSets.total = fields.map((field) => totalCounts[field] || 0);
-    dataSets.assigned = fields.map((field) => totalAssignedCounts[field] || 0);
-    dataSets.offered = fields.map((field) => totalOfferedCounts[field] || 0);
-    dataSets.accepted = fields.map((field) => totalAcceptedCounts[field] || 0);
+  dataSets.total = fields.map((field) => totalCounts[field] || 0);
+  dataSets.assigned = fields.map((field) => totalAssignedCounts[field] || 0);
+  dataSets.offered = fields.map((field) => totalOfferedCounts[field] || 0);
+  dataSets.accepted = fields.map((field) => totalAcceptedCounts[field] || 0);
+  dataSets.offered_accepted = fields.map((field) => (totalOfferedCounts[field] || 0) + (totalAcceptedCounts[field] || 0));
 
     // Refresh chart if already created
     if (summaryChart) {

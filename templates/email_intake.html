@@ -29,6 +29,7 @@
                 <td>
                     <div style="margin-bottom: 5px;"><strong>{{ table_row["date_for_interns"] }}</strong></div>
                     <a target="_blank" href="mailto:{{ student_emails }}?subject={{ table_row["subject"] }}&body={{ table_row["body"] }}" class="btn btn-primary btn-sm">Email</a>
+                    <a target="_blank" href="mailto:{{ all_student_emails }}?subject={{ table_row["subject"] }}&body={{ table_row["body"] }}" class="btn btn-success btn-sm" style="margin-left:5px;">Email All</a>
                     <a href="/edit_email_template/{{ table_row['id'] }}" class="btn btn-secondary btn-sm">Edit</a>
                     {% if table_row["week_number"] == '1 - First week' %}
                         <a href="/edit_email_template/{{ table_row['id'] }}" class="btn btn-warning btn-sm">Edit Date</a>

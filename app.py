@@ -489,7 +489,14 @@ def email_intake(intake_id):
 
     conn.close()
 
-    return render_template('email_intake.html', intake=intake, intake_id=intake_id, student_emails=student_emails_combined, table_rows=email_schedule)
+    return render_template(
+        'email_intake.html', 
+        intake=intake, 
+        intake_id=intake_id, 
+        student_emails=student_emails_combined, 
+        all_student_emails=all_student_emails,
+        table_rows=email_schedule
+        )
 
 @app.route('/edit_email_template/<int:email_id>', methods=['GET', 'POST'])
 def edit_email_template(email_id):
@@ -1944,14 +1951,13 @@ def edit_intake(intake_id):
         # Handle form submission and update the intake record in your database
         new_name = request.form.get('name')
         new_status = request.form.get('status')
-
-        # Perform the database update logic here
-        # Update the intake record with the new_name and new_status
+        new_start_date = request.form.get('intake_start_date')
         cursor = conn.cursor()
-
-        # Update the intake record in the database
-        cursor.execute('UPDATE Intakes SET name = ?, status = ? WHERE id = ?', (new_name, new_status, intake_id))
+        cursor.execute('UPDATE Intakes SET name = ?, status = ?, intake_start_date = ? WHERE id = ?', (new_name, new_status, new_start_date, intake_id))
         conn.commit()
+        conn.close()
+        # Redirect to previous page after saving changes
+        return redirect(url_for('intakes_index'))
 
 
 
@@ -2287,7 +2293,10 @@ def project_job_description(project_id):
         return redirect(url_for('projects_index'))
 
     # If it's a GET request, fetch the project data and word count settings
-    cursor.execute('SELECT * FROM Projects WHERE id = ?', (project_id,))
+    cursor.execute('''SELECT about_organisation, position_title, position_description, skill_requirements
+                        FROM Projects
+                        WHERE id = ?''',
+                    (project_id,))
     project_data = cursor.fetchone()
 
     cursor.execute('SELECT * FROM Job_Description_Word_Count')
@@ -2299,6 +2308,7 @@ def project_job_description(project_id):
         'project_job_description.html',
         project=project_data,
         wordcount=wordcount_data,
+        project_id=project_id
     )
 
 if __name__ == '__main__':

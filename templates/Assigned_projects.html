@@ -457,22 +457,24 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
           header.insertAdjacentElement("afterend", resultsDiv);
         }
       }
-
+      const hours_per_week_volunteer = 6;
+      const hours_per_week_science = 8;
+      const hours_per_week_engit = 24;
       const accepted_hours_per_week =
-        projectAcceptedCounts["volunteer"] * 2 +
-        projectAcceptedCounts["engit"] * 24 +
-        projectAcceptedCounts["science"] * 8;
+        projectAcceptedCounts["volunteer"] * hours_per_week_volunteer +
+        projectAcceptedCounts["engit"] * hours_per_week_engit +
+        projectAcceptedCounts["science"] * hours_per_week_science;
 
       const offered_hours_per_week =
-        projectOfferedCounts["volunteer"] * 2 +
-        projectOfferedCounts["engit"] * 24 +
-        projectOfferedCounts["science"] * 8 +
+        projectOfferedCounts["volunteer"] * hours_per_week_volunteer +
+        projectOfferedCounts["engit"] * hours_per_week_engit +
+        projectOfferedCounts["science"] * hours_per_week_science +
         accepted_hours_per_week;
 
       const hours_per_week =
-        columnCounts["volunteer"] * 2 +
-        columnCounts["engit"] * 24 +
-        columnCounts["science"] * 8;
+        columnCounts["volunteer"] * hours_per_week_volunteer +
+        columnCounts["engit"] * hours_per_week_engit +
+        columnCounts["science"] * hours_per_week_science;
 
       const essentialFields = ["female", "male"];
       const extraFields = targetClasses.filter(

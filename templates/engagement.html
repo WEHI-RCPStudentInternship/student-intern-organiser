@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Engagement{% endblock %}
+{% block page_title %}Engagement{% endblock %}
+
+{% block top_links_menu %}
+<a href="#" id="startEntryBtn">Add Entry</a>
+{% endblock %}
+
+{% block styles %}
+<style>
+  /* layout */
+  .eng-wrap { width: 90%; margin: 0 auto; }
+  .eng-card { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 18px; }
+
+  /* section titles */
+  .eng-h2 { font-size: 20px; font-weight: 600; margin: 0 0 12px; }
+
+  /* field row */
+  .eng-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .eng-row > * { margin-right: 8px; }
+
+  /* tab buttons for engagement type */
+  .type-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .type-tab {
+    background: #e9f5e8;
+    border: 1px solid #49A942;
+    color: #2e7d32;
+    padding: 6px 10px;
+    border-radius: 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .type-tab.active { background: #49A942; color: #fff; }
+
+  /* participant chips */
+  .chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+  .chip {
+    display: flex; justify-content: space-between; align-items: center;
+    border: 1px solid #ddd; border-radius: 20px; padding: 6px 10px; cursor: pointer; background: #fafafa;
+  }
+  .chip.active { border-color: #49A942; background: #e9f5e8; }
+  .chip .freq { font-size: 12px; opacity: .7; margin-left: 8px; }
+  .chip input { display: none; }
+
+  /* controls */
+  .eng-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .eng-btn {
+    background: #49A942; color: #fff; border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer;
+  }
+  .eng-btn.secondary { background: #e0e0e0; color: #333; }
+  .eng-select { padding: 6px; }
+  .right { margin-left: auto; }
+
+  /* footer actions */
+  .eng-actions { display: flex; gap: 12px; justify-content: flex-end; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="eng-wrap">
+
+  <!-- DATA ENTRY CARD -->
+  <form class="eng-card" id="engForm" method="POST" action="/engagement/save">
+    <h2 class="eng-h2">Meeting data entry</h2>
+
+    <!-- Engagement Type -->
+    <div style="margin-bottom:12px;">
+      <div style="font-weight:600; margin-bottom:6px;">Engagement type:</div>
+      <div class="type-tabs" id="typeTabs">
+        {% for t in engagement_types %}
+          <div class="type-tab" data-value="{{ t }}">{{ t }}</div>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="engagement_type" id="engagement_type" value="{{ engagement_types[0] if engagement_types }}">
+    </div>
+
+    <!-- PARTICIPANTS CARD (own white box) -->
+    <div class="eng-card" style="margin: 8px 0;">
+      <div class="eng-row eng-controls">
+        <div style="font-weight:600;">Participants:</div>
+        <label><input type="checkbox" id="selectAll"> select all</label>
+
+        <div class="right">
+          <label for="sortBy" style="margin-right:6px;">Sort:</label>
+          <select id="sortBy" class="eng-select">
+            <option value="frequency">Frequency (high → low)</option>
+            <option value="name">Name (A → Z)</option>
+          </select>
+          <button type="button" id="sortBtn" class="eng-btn secondary">Sort</button>
+        </div>
+      </div>
+
+      <div id="chipGrid" class="chip-grid">
+        {% for p in participants %}
+          <label class="chip" data-name="{{ p[1]|lower }}" data-frequency="{{ p[8] }}" for="p{{ p[0] }}">
+            <span>
+              <input type="checkbox" name="participant_ids" value="{{ p[0] }}" id="p{{ p[0] }}">
+              {{ p[1] }}
+              <span class="freq">• {{ p[8]   }}</span>
+            </span>
+            <span class="tick">✓</span>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="eng-actions">
+      <button type="button" class="eng-btn secondary" id="finishBtn">Next</button>
+    </div>
+
+  </form>
+
+</div>
+
+{% endblock %}
+
+{% block jQuery_scripts %}
+(function(){
+
+  // --- Engagement type tabs ---
+  const tabs = document.querySelectorAll('.type-tab');
+  const typeInput = document.getElementById('engagement_type');
+  function setActiveTab(el){
+    tabs.forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    typeInput.value = el.dataset.value;
+  }
+  if (tabs.length) setActiveTab(tabs[0]);
+  tabs.forEach(t => t.addEventListener('click', () => setActiveTab(t)));
+
+  // --- Participant chips toggle via label click ---
+  const chipGrid = document.getElementById('chipGrid');
+  chipGrid.addEventListener('click', (e) => {
+    const label = e.target.closest('.chip');
+    if(!label) return;
+    const cb = label.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+    label.classList.toggle('active', cb.checked);
+  });
+
+  // initialize active state if server pre-checks some
+  chipGrid.querySelectorAll('.chip').forEach(label => {
+    const cb = label.querySelector('input');
+    label.classList.toggle('active', cb.checked);
+  });
+
+  // --- Select all ---
+  const selectAll = document.getElementById('selectAll');
+  selectAll.addEventListener('change', () => {
+    const all = chipGrid.querySelectorAll('input[type="checkbox"]');
+    all.forEach(cb => {
+      cb.checked = selectAll.checked;
+      cb.closest('.chip').classList.toggle('active', cb.checked);
+    });
+  });
+
+  // --- Sorting ---
+  const sortBtn = document.getElementById('sortBtn');
+  const sortBy = document.getElementById('sortBy');
+  sortBtn.addEventListener('click', () => {
+    const chips = Array.from(chipGrid.children);
+    const mode = sortBy.value;
+    chips.sort((a,b) => {
+      if(mode === 'frequency') {
+        return parseInt(b.dataset.frequency) - parseInt(a.dataset.frequency);
+      } else {
+        return a.dataset.name.localeCompare(b.dataset.name);
+      }
+    });
+    chips.forEach(c => chipGrid.appendChild(c));
+  });
+
+  // --- Optional: Shortcuts for the secondary row button ---
+  document.getElementById('startEntryBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: document.getElementById('engForm').offsetTop - 20, behavior: 'smooth' });
+  });
+
+  // --- Finish meeting just submits for now (you can change behaviour) ---
+  document.getElementById('finishBtn').addEventListener('click', () => {
+    document.getElementById('engForm').submit();
+  });
+
+})();
+{% endblock %}

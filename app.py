@@ -7,7 +7,7 @@ from collections import Counter
 from datetime import datetime, timedelta
 from urllib.parse import unquote
 
-from flask import (Flask, jsonify, redirect, render_template, request, Response,
+from flask import (Flask, abort, flash, jsonify, redirect, render_template, request, Response,
                    send_file, url_for)
 
 import import_csv_from_redcap
@@ -2233,6 +2233,59 @@ def update_project_status():
     conn.close()
 
     return jsonify({'status': 'success', 'message': 'Project statuses updated.'})
+
+
+@app.route("/engagement", methods=["GET"])
+def engagement_page():
+    
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    cursor = conn.cursor()
+
+    # Retrieve student data from the database
+    cursor.execute('SELECT * FROM Statuses')
+    statuses = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM Projects')
+    projects = cursor.fetchall()
+
+    cursor.execute('SELECT name FROM Intakes where status  = "current"')
+    intake_current = cursor.fetchall()[0][0]
+
+    status_of_students_current = [10,11,12,13]
+    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
+    query = '''
+        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
+        FROM Students
+        WHERE intake = ? AND status IN ({})
+    '''.format(','.join(['?'] * len(current_statuses_list)))
+
+
+    # Execute the query with the statuses list
+    cursor.execute(query, [intake_current] + current_statuses_list)
+    students = cursor.fetchall()
+    conn.close()
+    print(students)
+    
+    # fetch from DB in your real app
+    engagement_types = ["Project meeting","Daily stand-up (Lunch)","Daily stand-up (Afternoon)","Email","Other"]
+    return render_template(
+        "engagement.html",
+        participants=students,
+        engagement_types=engagement_types
+    )
+    
+
+@app.route("/engagement/save", methods=["POST"])
+def engagement_save():
+    engagement_type = request.form.get("engagement_type")
+    participant_ids = request.form.getlist("participant_ids")  # list[str]
+    # TODO: write to your DB and update frequencies
+    flash("Engagement saved.")
+    return redirect(url_for("engagement_page"))
+
+
+
 
 @app.route('/project_job_description/<int:project_id>', methods=['GET', 'POST'])
 def project_job_description(project_id):

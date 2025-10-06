@@ -42,8 +42,9 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
     >
       <option value="total">Total</option>
       <option value="assigned">Assigned</option>
-      <option value="offered">Offered</option>
-      <option value="accepted">Accepted</option>
+  <option value="offered">Offered</option>
+  <option value="accepted">Accepted</option>
+  <option value="offered_accepted">Offered & Accepted</option>
     </select>
 
     <canvas id="summaryChart"></canvas>
@@ -297,6 +298,7 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
     assigned: [],
     offered: [],
     accepted: [],
+    offered_accepted: [],
   };
   function createOrUpdateDiv(selector, count_type, totalCounts) {
     let div = document.querySelector(selector);
@@ -455,22 +457,24 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
           header.insertAdjacentElement("afterend", resultsDiv);
         }
       }
-
+      const hours_per_week_volunteer = 6;
+      const hours_per_week_science = 8;
+      const hours_per_week_engit = 24;
       const accepted_hours_per_week =
-        projectAcceptedCounts["volunteer"] * 2 +
-        projectAcceptedCounts["engit"] * 24 +
-        projectAcceptedCounts["science"] * 8;
+        projectAcceptedCounts["volunteer"] * hours_per_week_volunteer +
+        projectAcceptedCounts["engit"] * hours_per_week_engit +
+        projectAcceptedCounts["science"] * hours_per_week_science;
 
       const offered_hours_per_week =
-        projectOfferedCounts["volunteer"] * 2 +
-        projectOfferedCounts["engit"] * 24 +
-        projectOfferedCounts["science"] * 8 +
+        projectOfferedCounts["volunteer"] * hours_per_week_volunteer +
+        projectOfferedCounts["engit"] * hours_per_week_engit +
+        projectOfferedCounts["science"] * hours_per_week_science +
         accepted_hours_per_week;
 
       const hours_per_week =
-        columnCounts["volunteer"] * 2 +
-        columnCounts["engit"] * 24 +
-        columnCounts["science"] * 8;
+        columnCounts["volunteer"] * hours_per_week_volunteer +
+        columnCounts["engit"] * hours_per_week_engit +
+        columnCounts["science"] * hours_per_week_science;
 
       const essentialFields = ["female", "male"];
       const extraFields = targetClasses.filter(
@@ -531,10 +535,11 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
     );
 
     // Update chart datasets dynamically
-    dataSets.total = fields.map((field) => totalCounts[field] || 0);
-    dataSets.assigned = fields.map((field) => totalAssignedCounts[field] || 0);
-    dataSets.offered = fields.map((field) => totalOfferedCounts[field] || 0);
-    dataSets.accepted = fields.map((field) => totalAcceptedCounts[field] || 0);
+  dataSets.total = fields.map((field) => totalCounts[field] || 0);
+  dataSets.assigned = fields.map((field) => totalAssignedCounts[field] || 0);
+  dataSets.offered = fields.map((field) => totalOfferedCounts[field] || 0);
+  dataSets.accepted = fields.map((field) => totalAcceptedCounts[field] || 0);
+  dataSets.offered_accepted = fields.map((field) => (totalOfferedCounts[field] || 0) + (totalAcceptedCounts[field] || 0));
 
     // Refresh chart if already created
     if (summaryChart) {

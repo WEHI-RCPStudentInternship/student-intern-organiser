@@ -46,13 +46,13 @@ def filter_students(status_of_students_to_filter,title,context = None):
         query = '''
             SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
             FROM Students
-            WHERE intake = ? AND status IN ({}) AND project != 'Unassigned' ORDER BY status ASC
+            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
         '''.format(','.join(['?'] * len(current_statuses_list)))
     elif context == "waiting_list":
         query = '''
             SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile
             FROM Students
-            WHERE intake = ? AND status IN ({}) AND pre_internship_summary_recommendation_internal != '06 - TS - Recommend no sign up except under specific circumstances. ' AND project = 'Unassigned' ORDER BY status ASC
+            WHERE intake = ? AND status IN ({}) AND project = 'Unassigned' ORDER BY status ASC
         '''.format(','.join(['?'] * len(current_statuses_list)))
     elif context == "missed_out":
         query = '''
@@ -427,16 +427,14 @@ def email_intake(intake_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Intakes WHERE id = ?',(intake_id,))
+    
     intake = cursor.fetchall()[0]
-
     intake_name = intake[1]
-    intake_science_start_date = intake[3]
-    intake_engit_start_date = intake[4]
+    intake_start_date = intake[5]
 
     # Retrieve student data from the database
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
-
 
     status_of_students_to_filter = [10,11,12,13] # from quick review to Interviewed by non-RCP supervisor
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
@@ -452,28 +450,142 @@ def email_intake(intake_id):
     # Execute the query with the statuses list
     cursor.execute(query, [intake_name] + current_statuses_list )
     students = cursor.fetchall()
-    student_emails = {'science':[],'engit':[]}
+    
+    # Collect all student emails in one list (no separation by course)
+    all_student_emails = []
     for student in students:
         email = student[2]
-        course = student[3]
-        if course == 'Science':
-            student_emails['science'].append(email)
-        if course == 'Engineering and IT':
-            student_emails['engit'].append(email)
+        if email:  # Only add if email exists
+            all_student_emails.append(email)
+
+    # Join all emails into one comma-separated string
+    student_emails_combined = ",".join(all_student_emails)
+
+    # Get the intake start date and calculate Monday of that week
+    intake_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
+
+    # Find the Monday of the week containing the start date
+    days_since_monday = intake_start_date_object.weekday()  # Monday is 0, Sunday is 6
+    start_monday = intake_start_date_object - timedelta(days=days_since_monday)
+
+    # Get email schedule from database and calculate dates dynamically - ordered by week progression
+    cursor.execute('SELECT id, intake_id, week_number, week_offset_days, subject, body FROM EmailSchedule WHERE intake_id = ? ORDER BY week_offset_days ASC', (intake_id,))
+    table_rows = cursor.fetchall()
+    
+    # Convert to dict format for template with calculated dates
+    email_schedule = []
+    for row in table_rows:
+        week_offset_days = row[3] if row[3] is not None else 0  # Get week_offset_days column
+        calculated_date = start_monday + timedelta(days=week_offset_days)
+        
+        email_schedule.append({
+            'id': row[0],           # id
+            'intake_id': row[1],    # intake_id
+            'week_number': row[2],  # week_number
+            'date_for_interns': calculated_date.strftime('%Y-%m-%d'),
+            'subject': row[4] if row[4] is not None else f'Week {row[2]} email',  # subject
+            'body': row[5] if row[5] is not None else f'Email content for {row[2]}'  # body
+        })
+
+    conn.close()
+
+    return render_template(
+        'email_intake.html', 
+        intake=intake, 
+        intake_id=intake_id, 
+        student_emails=student_emails_combined, 
+        all_student_emails=all_student_emails,
+        table_rows=email_schedule
+        )
+
+@app.route('/edit_email_template/<int:email_id>', methods=['GET', 'POST'])
+def edit_email_template(email_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        # Handle form submission to update email template
+        subject = request.form.get('subject')
+        body = request.form.get('body')
+        new_intake_start_date = request.form.get('intake_start_date')
 
 
+        # Get current email data to check which week this is
+        cursor.execute('SELECT id, intake_id, week_number, week_offset_days FROM EmailSchedule WHERE id = ?', (email_id,))
+        email_data = cursor.fetchone()
+        intake_id = email_data[1]
+        
+        # Update the email template
+        cursor.execute('''UPDATE EmailSchedule 
+                         SET subject = ?, body = ?, last_modified = CURRENT_DATE
+                         WHERE id = ?''', (subject, body, email_id))
+        
+        # If intake start date is provided and this is week 1, update the intake start date and adjust all week dates
+        if new_intake_start_date and email_data[2] == '1 - First week':
+            # Update intake start date
+            cursor.execute('''UPDATE Intakes 
+                             SET intake_start_date = ?
+                             WHERE id = ?''', (new_intake_start_date, intake_id))
 
-    science_student_emails = ",".join(x for x in student_emails['science'])
-    engit_student_emails = ",".join(x for x in student_emails['engit'])
+            # Get all email schedule rows for this intake
+            cursor.execute('SELECT id, week_offset_days FROM EmailSchedule WHERE intake_id = ?', (intake_id,))
+            all_weeks = cursor.fetchall()
 
-    science_start_date_object = datetime.strptime(intake_science_start_date, '%Y-%m-%d').date()
-    engit_start_date_object = datetime.strptime(intake_engit_start_date, '%Y-%m-%d').date()
+            # Calculate new start_monday from new_intake_start_date
+            new_start_date_object = datetime.strptime(new_intake_start_date, '%Y-%m-%d').date()
+            days_since_monday = new_start_date_object.weekday()
+            new_start_monday = new_start_date_object - timedelta(days=days_since_monday)
 
-    table_rows = create_email_intake_table_rows(science_start_date_object,engit_start_date_object)
+            # Update all week dates in EmailSchedule
+            for week_row in all_weeks:
+                week_id = week_row[0]
+                week_offset_days = week_row[1] if week_row[1] is not None else 0
+                new_week_date = new_start_monday + timedelta(days=week_offset_days)
+                # Optionally, store the calculated date in a new column if needed, or just recalculate for display
+                # If you want to store, add a column to EmailSchedule, e.g. 'scheduled_date', and update here
+                # Example: cursor.execute('UPDATE EmailSchedule SET scheduled_date = ? WHERE id = ?', (new_week_date.strftime('%Y-%m-%d'), week_id))
+                # For now, just recalculate for display
+        
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('email_intake', intake_id=intake_id))
+    
+    # GET request - show the edit form
+    cursor.execute('SELECT id, intake_id, week_number, week_offset_days, subject, body FROM EmailSchedule WHERE id = ?', (email_id,))
+    email_data = cursor.fetchone()
+    
+    if not email_data:
+        conn.close()
+        return "Email template not found", 404
+    
+    # Get intake start date to calculate the display date
+    cursor.execute('SELECT intake_start_date FROM Intakes WHERE id = ?', (email_data[1],))
+    intake_start_date = cursor.fetchone()[0]
+    conn.close()
+    
+    # Calculate the date dynamically
+    intern_start_date_object = datetime.strptime(intake_start_date, '%Y-%m-%d').date()
+    days_since_monday = intern_start_date_object.weekday()
+    start_monday = intern_start_date_object - timedelta(days=days_since_monday)
+    week_offset_days = email_data[3] if email_data[3] is not None else 0
+    calculated_date = start_monday + timedelta(days=week_offset_days)
+    
+    # Check if this is the first week (allow editing intake start date)
+    is_first_week = email_data[2] == '1 - First week'
 
-    print(table_rows)
-
-    return render_template('email_intake.html', intake=intake, science_student_emails=science_student_emails, engit_student_emails=engit_student_emails, table_rows= table_rows)
+    email_template = {
+        'id': email_data[0],           # id
+        'intake_id': email_data[1],    # intake_id
+        'week_number': email_data[2],  # week_number
+        'date_for_interns': calculated_date.strftime('%Y-%m-%d'),  # calculated date
+        'intake_start_date': intake_start_date,  # original intake start date
+        'is_first_week': is_first_week,  # whether this is first week
+        'subject': email_data[4] if email_data[4] is not None else f'Week {email_data[2]} email',  # subject
+        'body': email_data[5] if email_data[5] is not None else f'Email content for {email_data[2]}'  # body
+    }
+    
+    return render_template('edit_email_template.html', email_template=email_template)
 
 @app.route('/links/', methods=['GET'])
 def links():
@@ -820,7 +932,6 @@ def download_key_attributes():
             # Retrieve student data from the database
             # Write the student data to the CSV file
             csv_writer.writerow(student)
-
 
 
     return send_file(csv_path, as_attachment=True)
@@ -1370,6 +1481,10 @@ def index():
     title_of_page = "All Students"
     return render_template('index.html', students=students,statuses=statuses,title_of_page=title_of_page,projects=projects)
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204  # Return empty response with "No Content" status
+
 # Route to serve the file from a different directory
 @app.route('/view_docs/<path:filename>')
 def view_docs(filename):
@@ -1836,14 +1951,13 @@ def edit_intake(intake_id):
         # Handle form submission and update the intake record in your database
         new_name = request.form.get('name')
         new_status = request.form.get('status')
-
-        # Perform the database update logic here
-        # Update the intake record with the new_name and new_status
+        new_start_date = request.form.get('intake_start_date')
         cursor = conn.cursor()
-
-        # Update the intake record in the database
-        cursor.execute('UPDATE Intakes SET name = ?, status = ? WHERE id = ?', (new_name, new_status, intake_id))
+        cursor.execute('UPDATE Intakes SET name = ?, status = ?, intake_start_date = ? WHERE id = ?', (new_name, new_status, new_start_date, intake_id))
         conn.commit()
+        conn.close()
+        # Redirect to previous page after saving changes
+        return redirect(url_for('intakes_index'))
 
 
 
@@ -1860,13 +1974,29 @@ def add_intake():
     if request.method == 'POST':
         new_name = request.form.get('name')
         new_status = request.form.get('status')
+        intake_date = request.form.get('intake_start_date')
 
         # Connect to the database
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Insert the new intake record into the database
-        cursor.execute('INSERT INTO Intakes (name, status) VALUES (?, ?)', (new_name, new_status))
+        # Insert the new intake record into the database using intake_start_date
+        cursor.execute('INSERT INTO Intakes (name, status, intake_start_date) VALUES (?, ?, ?)', 
+                      (new_name, new_status, intake_date))
+        
+        # Get the newly created intake ID
+        intake_id = cursor.lastrowid
+        
+        # Create default email schedule for this intake
+        cursor.execute('''INSERT INTO EmailSchedule (intake_id, week_number, week_offset_days, subject, body) VALUES 
+                         (?, '0 - 1 week before', -7, '1 week before WEHI internship', 'Hi All, This is your email to start your internship preparation...'),
+                         (?, '1 - First week', 0, 'First week of WEHI internship', 'Hi All, Welcome to your first week of internship...'),
+                         (?, '2 - Second week', 7, 'Second week of WEHI internship', 'Hi All, This is your second week of internship...'),
+                         (?, '4 - Fourth week', 21, 'Fourth week of WEHI internship', 'Hi All, This is your email to start week 4 of your internship...'),
+                         (?, '10 - Tenth week', 63, 'Tenth week of WEHI internship', 'Hi All, This is your email to start week 10 of your internship...'),
+                         (?, '13 - End of internship', 84, 'End of WEHI internship', 'Hi All, I would like to thank you all for being a part of this intake...')''',
+                      (intake_id, intake_id, intake_id, intake_id, intake_id, intake_id))
+        
         conn.commit()
 
         # Close the database connection
@@ -1876,6 +2006,46 @@ def add_intake():
 
     # If it's a GET request, render the add_intake.html template
     return render_template('add_intake.html')
+
+
+@app.route('/add_weekly_email/<int:intake_id>', methods=['GET', 'POST'])
+def add_weekly_email(intake_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Get intake information
+    cursor.execute('SELECT id, name, intake_start_date FROM Intakes WHERE id = ?', (intake_id,))
+    intake = cursor.fetchone()
+    
+    if not intake:
+        return redirect(url_for('intakes_index'))
+    
+    if request.method == 'POST':
+        week_number = request.form.get('week_number')
+        week_description = request.form.get('week_description')
+        subject = request.form.get('subject')
+        body = request.form.get('body')
+        
+        # Calculate week_offset_days based on week number
+        # Week 0 = -7 days (1 week before), Week 1 = 0 days (start week), Week 2 = 7 days, etc.
+        week_offset_days = (int(week_number) - 1) * 7
+        
+        # Create formatted week number string
+        week_number_formatted = f"{week_number} - {week_description}"
+        
+        # Insert the new weekly email into the database
+        cursor.execute('''INSERT INTO EmailSchedule (intake_id, week_number, week_offset_days, subject, body, last_modified) 
+                         VALUES (?, ?, ?, ?, ?, CURRENT_DATE)''', 
+                      (intake_id, week_number_formatted, week_offset_days, subject, body))
+        
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('email_intake', intake_id=intake_id))
+    
+    # GET request - show the form
+    conn.close()
+    return render_template('add_weekly_email.html', intake_id=intake_id, intake_name=intake[1])
 
 
 @app.route('/projects')
@@ -2030,7 +2200,7 @@ def edit_project(project_id):
 
     return render_template('edit_project.html', project=project_data)
 
-def create_email_intake_table_rows(science_start_date_object,engit_start_date_object):
+def create_email_intake_table_rows(intake_start_date_object):
 
     body_before = """Hi All, %0D%0A%0D%0AWelcome to the RCP Student Internship Program at WEHI. We are excited to have you join our team and provide you with valuable learning opportunities throughout your internship. %0D%0A%0D%0APlease read through the onboarding document https://doi.org/10.6084/m9.figshare.23280815 as this will help you ease your way into WEHI. %0D%0A%0D%0AI will be adding your student email to the WEHI system so you can gain access to our Sharepoint. This is temporary as you will be given a WEHI email address via Workday. %0D%0A%0D%0AWorkday is the Human Resources software tool at WEHI. You will receive an email from Workday and will need to fill in all the forms before you start. You may not receive the Workday email before your start date. This is OK, you will just need to wait and use your student email for the time being. Please also note that there is a Workday FAQ you can find in the FAQ below.%0D%0A%0D%0AHere are a few things you can do before you start: %0D%0A%0D%0A- You can read about the top 5 mistakes that students make https://wehi-researchcomputing.github.io/top-5-mistakes%0D%0A%0D%0A- You can also have a look at the FAQ online https://wehi-researchcomputing.github.io/faq%0D%0A%0D%0A- You can learn how to handle a complex and ambiguous project https://wehi-researchcomputing.github.io/complex-projects %0D%0A%0D%0A- You can review your project and look at the available documentation https://wehi-researchcomputing.github.io/project-wikis%0D%0A%0D%0AIf you have any questions or need further clarification regarding the internship program or the onboarding document, please feel free to reach out to me after you have looked through these documents. We are here to assist you and provide any necessary support. %0D%0A%0D%0AWe are looking forward to working with you and wish you a rewarding and successful internship experience."""
 
@@ -2042,12 +2212,12 @@ def create_email_intake_table_rows(science_start_date_object,engit_start_date_ob
     body_end="""Hi All,%0D%0A%0D%0AI would like to thank you all for being a part of this intake at WEHI, and for all your efforts. I hope that you were able to benefit from this internship.%0D%0A%0D%0ATo help us improve, please provide anonymous feedback on the student internship https://forms.office.com/r/XLTukQ9stB %0D%0A%0D%0AWe hope you will keep in touch with your teammates and supervisors. One way of doing this is to reach out via LinkedIn.%0D%0A%0D%0AAnother way to continue sharing your work from the internship. With the permission of your supervisor, consider uploading your presentation to a platform like Figshare or Zenodo. By doing so, you can make your findings and insights accessible to a wider audience.%0D%0A%0D%0AWhen sharing your work on Figshare or a similar platform, remember to acknowledge your team mates as a co-author or contributor. Including them as an author ensures that credit is appropriately attributed to all individuals involved in the project.%0D%0A%0D%0AI hope the experience of this internship helps you in your future career and gives you more understanding of what you want out of a work environment. """
 
     table_rows = [
-            { "week_number": "0 - 1 week before", "science": science_start_date_object - timedelta(days=7), "engit": engit_start_date_object - timedelta(days=7), "subject": "1 week before WEHI internship", "body":body_before},
-            { "week_number": "1 - First week", "science": science_start_date_object, "engit": engit_start_date_object, "subject": "First week of WEHI internship", "body":body_first},
-            { "week_number": "2 - Second week", "science": science_start_date_object + timedelta(days=7), "engit": engit_start_date_object + timedelta(days=7), "subject": "Second week of WEHI internship", "body":body_second},
-            { "week_number": "3 - Fourth week", "science": science_start_date_object + timedelta(days=21), "engit": engit_start_date_object + timedelta(days=21), "subject": "Fourth week of WEHI internship", "body":body_fourth},
-            { "week_number": "4 - Tenth week", "science": science_start_date_object + timedelta(days=63), "engit": engit_start_date_object + timedelta(days=63), "subject": "Tenth week of WEHI internship", "body":body_tenth},
-            { "week_number": "5 - End of internship", "science": science_start_date_object + timedelta(days=91), "engit": engit_start_date_object + timedelta(days=91), "subject": "End of WEHI internship", "body":body_end}
+            { "week_number": "0 - 1 week before",  "date": intake_start_date_object - timedelta(days=7), "subject": "1 week before WEHI internship", "body":body_before},
+            { "week_number": "1 - First week", "date": intake_start_date_object - timedelta(days=7), "subject": "First week of WEHI internship", "body":body_first},
+            { "week_number": "2 - Second week", "date": intake_start_date_object + timedelta(days=7), "subject": "Second week of WEHI internship", "body":body_second},
+            { "week_number": "3 - Fourth week", "date": intake_start_date_object + timedelta(days=21), "subject": "Fourth week of WEHI internship", "body":body_fourth},
+            { "week_number": "4 - Tenth week", "date": intake_start_date_object + timedelta(days=63), "subject": "Tenth week of WEHI internship", "body":body_tenth},
+            { "week_number": "5 - End of internship", "date": intake_start_date_object + timedelta(days=91), "subject": "End of WEHI internship", "body":body_end}
            ]
 
 
@@ -2070,7 +2240,96 @@ def update_project_status():
 
     return jsonify({'status': 'success', 'message': 'Project statuses updated.'})
 
+@app.route('/clean_pronouns', methods=['GET'])
+def clean_pronouns():
 
+    # Connect to the database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute('UPDATE students SET pronouns = "she/her" WHERE pronouns in ("She/Her","She/her","she","She")')
+    conn.commit()
+
+    cursor.execute('UPDATE students SET pronouns = "he/him" WHERE pronouns in ("He/him","He/Him","he","He","Mr")')
+    conn.commit()
+
+    # Close the database connection
+    conn.close()
+
+    return redirect(url_for('index'))
+
+
+@app.route('/project_job_description/<int:project_id>', methods=['GET', 'POST'])
+def project_job_description(project_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        # Handle form submission and update all the Project Job Description fields
+        about_organisation = request.form.get('about_organisation')
+        position_title = request.form.get('position_title')
+        position_description = request.form.get('position_description')
+        skill_requirements = request.form.get('skill_requirements')
+        about_org_word_min = int(request.form.get('about_org_word_min', 1))
+        about_org_word_max = int(request.form.get('about_org_word_max', 70))
+        position_desc_word_min = int(request.form.get('position_desc_word_min', 400))
+        position_desc_word_max = int(request.form.get('position_desc_word_max', 500))
+        skills_word_min = int(request.form.get('skills_word_min', 50))
+        skills_word_max = int(request.form.get('skills_word_max', 70))
+
+        try:
+            # Update the project record for the current project
+            cursor.execute('''UPDATE Projects 
+                            SET skill_requirements = ?,
+                                about_organisation = ?,
+                                position_title = ?,
+                                position_description = ?
+                            WHERE id = ?''',
+                            (skill_requirements, about_organisation, position_title, position_description, project_id))
+
+            
+            # Update global word limits for ALL projects in one go
+            cursor.execute('''UPDATE Job_Description_Word_Count
+                            SET about_org_word_min = ?,
+                                about_org_word_max = ?,
+                                position_desc_word_min = ?,
+                                position_desc_word_max = ?,
+                                skills_word_min = ?,
+                                skills_word_max = ?''',
+                            (about_org_word_min, about_org_word_max,
+                            position_desc_word_min, position_desc_word_max,
+                            skills_word_min, skills_word_max))
+
+            conn.commit()
+            print("DEBUG: Database commit successful")
+
+        except Exception as e:
+            print(f"DEBUG: Database error: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
+        
+        return redirect(url_for('projects_index'))
+
+    # If it's a GET request, fetch the project data and word count settings
+    cursor.execute('''SELECT about_organisation, position_title, position_description, skill_requirements
+                        FROM Projects
+                        WHERE id = ?''',
+                    (project_id,))
+    project_data = cursor.fetchone()
+
+    cursor.execute('SELECT * FROM Job_Description_Word_Count')
+    wordcount_data = cursor.fetchone()
+
+    conn.close()
+
+    return render_template(
+        'project_job_description.html',
+        project=project_data,
+        wordcount=wordcount_data,
+        project_id=project_id
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
+

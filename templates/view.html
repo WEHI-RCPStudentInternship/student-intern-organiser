@@ -14,24 +14,7 @@
 
 
 {% block content %}
-<style>
-    table {
-        width: 50%;
-        border: #ddd;
-        padding-top:20px;
-        padding-bottom: 20px;
-    }
-
-    th, td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-</style>
+<div class="view-page">
         <h2>Upload Application</h2>
         <form action="{{ url_for('upload_application', intern_id=student[0], full_name=student[1]) }}" method="POST" enctype="multipart/form-data">
             <input type="file" name="file" accept=".pdf" required>
@@ -276,5 +259,5 @@
 
 
 
-
+</div>
 {% endblock %}

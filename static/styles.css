@@ -85,3 +85,303 @@ Kanban boards styles
   margin-bottom: 4px;
   font-size: 14px;
 }
+
+/* ========================================
+   FORM AND TABLE STYLING
+   ======================================== */
+
+/* Page containers */
+.edit-email-template-page, .form-page, .table-page {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #49A942;
+    outline: none;
+    box-shadow: 0 0 5px rgba(73, 169, 66, 0.3);
+}
+
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.form-control[disabled] {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Help text */
+.form-text, .text-muted {
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Button styling */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+}
+
+.btn:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background-color: #49A942;
+    color: white;
+    border: 1px solid #49A942;
+}
+
+.btn-primary:hover {
+    background-color: #3d8b36;
+    border-color: #3d8b36;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: 1px solid #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+    border-color: #545b62;
+    color: white;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+/* Textarea specific styling */
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+/* Simple table styling - only cells have borders */
+td, th {
+    border: 1px solid #333;
+    padding: 10px;
+}
+
+/* Ensure header row has top border */
+thead th:first-child,
+tr:first-child th,
+tr:first-child td {
+    border-top: 1px solid #333;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Override DataTables default styling to prevent double borders */
+.dataTables_wrapper table {
+    border: none !important;
+}
+
+.dataTables_wrapper table.dataTable {
+    border: none !important;
+}
+
+.dataTables_wrapper table.dataTable thead th,
+.dataTables_wrapper table.dataTable thead td {
+    border: 1px solid #333 !important;
+}
+
+.dataTables_wrapper table.dataTable tbody td {
+    border: 1px solid #333 !important;
+}
+
+/* Additional targeting for DataTables first row */
+.dataTables_wrapper table.dataTable thead tr:first-child th,
+.dataTables_wrapper table.dataTable thead tr:first-child td {
+    border-top: 1px solid #333 !important;
+}
+
+/* Ensure borders are visible on all table cells */
+#emailScheduleTable td, #emailScheduleTable th,
+#intakesTable td, #intakesTable th,
+.styled-table td, .styled-table th {
+    border: 1px solid #333;
+    padding: 10px;
+}
+
+/* Center the email schedule table */
+#emailScheduleTable {
+    margin: auto;
+}
+
+/* Specific styling for view.html student details page */
+.view-page table {
+    width: 50%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.view-page th {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+.view-page td {
+    text-align: left;
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+/* Card styling for content sections */
+.content-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.content-card h1,
+.content-card h2,
+.content-card h3 {
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #49A942;
+    padding-bottom: 10px;
+}
+
+/* Alert/notification styling */
+.alert {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* Utility classes */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 10px; }
+.mb-2 { margin-bottom: 20px; }
+.mb-3 { margin-bottom: 30px; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 10px; }
+.mt-2 { margin-top: 20px; }
+.mt-3 { margin-top: 30px; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: 10px; }
+.p-2 { padding: 20px; }
+.p-3 { padding: 30px; }
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .edit-email-template-page, .form-page, .table-page {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .styled-table {
+        font-size: 14px;
+    }
+    
+    .styled-table th,
+    .styled-table td {
+        padding: 8px 10px;
+    }
+}

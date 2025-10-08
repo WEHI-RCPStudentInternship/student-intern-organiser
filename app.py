@@ -2330,6 +2330,59 @@ def project_job_description(project_id):
         project_id=project_id
     )
 
+def insert_eng_interns_into_db(conn, data):
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO students (
+            full_name, email, mobile, 
+            course, course_major, intake, status
+        )           
+        VALUES (?, ?, ?, ?, ?, ?, ? )
+    ''', data)
+    conn.commit()
+    last_intern_id = cursor.lastrowid
+    return last_intern_id
+
+@app.route('/add_eng_interns', methods=['GET', 'POST'])
+def add_eng_interns():
+    if request.method == 'POST':
+        # Get data from textarea
+        data = request.form['student_data']
+        conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+        cursor = conn.cursor()
+        cursor.execute('Select name from intakes where status = "new";')
+        rows = cursor.fetchall()
+        intake = rows[0][0]
+
+ 
+        # Split data into lines and prepare for database insertion
+        students_data = []
+        lines = data.strip().split('\n')
+        print(data)
+        for line in lines:
+            parts = line.split('|')
+            print(parts)
+            student_tuple = (
+                parts[0].strip(),  # full_name
+                parts[2].strip(),  # email
+                parts[3].strip(),  # mobile
+                "Engineering and IT",      # hardcoded course
+                parts[1].strip(),  # course_major
+                intake,  # intake
+                "01 Received application"  # status
+            )
+            students_data.append(student_tuple)
+
+            print(student_tuple)
+            # Insert each student into the database
+            insert_eng_interns_into_db(conn, student_tuple)
+
+        conn.close()
+        return redirect(url_for('new_applications'))
+
+    return render_template('add_eng_interns.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 

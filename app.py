@@ -775,12 +775,16 @@ def pre_int_st_evaluation(intern_id):
 
     # Split the pronoun into multiple parts using the '/' delimiter
     #he/him/his or she/her or they/them/their
-    pronoun_parts = pronoun.split('/')
+    try:
+        pronoun_parts = pronoun.split('/')
 
-    # Assign pronoun1, pronoun2, and pronoun3 based on the pronoun_parts
-    pronoun1 = pronoun_parts[0].strip()
-    pronoun2 = pronoun_parts[1].strip() if len(pronoun_parts) > 1 else ""
-
+        # Assign pronoun1, pronoun2, and pronoun3 based on the pronoun_parts
+        pronoun1 = pronoun_parts[0].strip()
+        pronoun2 = pronoun_parts[1].strip() if len(pronoun_parts) > 1 else ""
+    except:
+        pronoun1 = ""
+        pronoun2 = ""
+        print("error in pronoun splitting")
 
     # Find matching PDF files
     attachments_dir = 'student_intern_data/attachments'

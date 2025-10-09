@@ -84,7 +84,7 @@
                 <th>Pronunciation</th>
                 <th>Pronouns</th>
                 <th>University Email</th>
-                <th>WEHI Email</th>
+                <th>Key Skill</th>
                 <th>Mobile</th>
                 <th>Project</th>
                 <th>Intake</th>
@@ -109,9 +109,9 @@
                     <td></td>
                 {% endif %}
                 {% if student[11] and student[11] != '' %}
-                    <td><a href="mailto:{{ student[11] }}">{{ student[11] }}</a></td>
+                    <td>{{ student[11] }}</td>
                 {% else %}
-                    <td>No WEHI Email</td>
+                    <td>No skill</td>
                 {% endif %}
                 <th>{{ student[12] }}</th>
                 <td>{{ student[4] }}</td>

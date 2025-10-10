@@ -55,9 +55,10 @@
     </div>
 
     <div class="footer">
-      <button class="ghost" type="submit" formaction="{{ url_for('save_draft') }}">
-    Save & add more participants
+      <button class="ghost" type="submit" formaction="{{ url_for('save_draft') }}" style="margin-right:10px;">
+    Add more participants
   </button>
+  
   <button class="primary" type="submit" formaction="{{ url_for('finish_meeting') }}">
     Finish meeting
   </button>

@@ -81,6 +81,7 @@
         <div style="font-weight:600;">Participants:</div>
         <label><input type="checkbox" id="selectAll"> select all</label>
 
+
         <div class="right">
           <label for="sortBy" style="margin-right:6px;">Sort:</label>
           <select id="sortBy" class="eng-select">
@@ -93,11 +94,11 @@
 
       <div id="chipGrid" class="chip-grid">
         {% for p in participants %}
-          <label class="chip" data-name="{{ p[1]|lower }}" data-frequency="{{ p[8] }}" for="p{{ p[0] }}">
+          <label class="chip" data-name="{{ p[1]|lower }}" data-frequency="{{ p[2] }}" for="p{{ p[0] }}">
             <span>
-              <input type="checkbox" name="participant_ids" value="{{ p[0] }}" id="p{{ p[0] }}">
+              <input type="checkbox" name="selected_ids" value="{{ p[0] }}" id="p{{ p[0] }}">
               {{ p[1] }}
-              <span class="freq">• {{ p[8]   }}</span>
+              <span class="freq">• {{ p[2] }} </span>
             </span>
             <span class="tick">✓</span>
           </label>
@@ -107,7 +108,7 @@
 
     <!-- ACTIONS -->
     <div class="eng-actions">
-      <button type="button" class="eng-btn secondary" id="finishBtn">Next</button>
+      <button type="submit" formaction="/engagement/meeting_entry" class="eng-btn secondary">Next</button>
     </div>
 
   </form>

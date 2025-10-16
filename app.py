@@ -7,12 +7,13 @@ from collections import Counter
 from datetime import datetime, timedelta
 from urllib.parse import unquote
 
-from flask import (Flask, jsonify, redirect, render_template, request, Response,
-                   send_file, url_for)
+from flask import (Flask, abort, flash, jsonify, redirect, render_template, request, Response,
+                   send_file, url_for, session)
 
 import import_csv_from_redcap
 
 app = Flask(__name__)
+app.secret_key = "super_secret_key_123"
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
@@ -2233,6 +2234,164 @@ def update_project_status():
     conn.close()
 
     return jsonify({'status': 'success', 'message': 'Project statuses updated.'})
+
+
+@app.route("/engagement", methods=["GET"])
+def engagement_page():
+    # Connect to the SQLite database
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    c = conn.cursor()
+
+    # Show only students not moved into meeting_entry yet
+    c.execute("""
+        SELECT intern_id, full_name, TOTAL_QUESTIONS_ASKED
+        FROM Students
+        ORDER BY full_name
+    """)
+    students = c.fetchall()
+    conn.close()
+    
+    # hide those already selected for this meeting (stored in session)
+    selected_ids = set(session.get("meeting_ids", [])) # who’s currently in the meeting
+    not_selected_studs = [s for s in students if s[0] not in selected_ids]
+
+    engagement_types = ["Project meeting","Daily stand-up (Lunch)","Daily stand-up (Afternoon)","Email","Other"]
+   
+    return render_template(
+        "engagement.html",
+        participants=not_selected_studs,
+        engagement_types=engagement_types,
+        preselected_ids=selected_ids
+    )
+    
+
+@app.route('/engagement/save_draft', methods=['POST'])
+def save_draft():
+    # Collect absolute totals coming from the UI
+    posted_totals = {}
+    kept_ids = set()
+    increments = {}
+    for k, v in request.form.items():
+        if k.startswith("count_"):
+            try:
+                sid = int(k.split("_", 1)[1])
+                kept_ids.add(sid) # card still on screen
+                total = max(0, int(v or 0))
+                posted_totals[sid] = total
+            except ValueError:
+                pass
+
+    # Also include newly added participants
+    newly_selected = [int(x) for x in request.form.getlist('selected_ids')]
+    kept_ids.update(newly_selected)
+
+    if posted_totals:
+        conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+        c = conn.cursor()
+        c.executemany(
+            "UPDATE Students SET TOTAL_QUESTIONS_ASKED = ? WHERE intern_id = ?",
+            [(total, sid) for sid, total in posted_totals.items()]
+        )
+        conn.commit()
+        conn.close()
+
+    # keep session selection trimmed to what’s still on screen + newly added
+    from flask import session, redirect, url_for
+    session["meeting_ids"] = list(sorted(kept_ids))
+
+    # (optional) baselines not needed if using absolute totals
+    session.pop("meeting_baselines", None)
+
+    return redirect(url_for('engagement_page'))
+
+
+@app.route('/engagement/meeting_entry', methods=["POST"])
+def meeting_entry():
+    engagement_type = request.form.get("engagement_type") 
+    
+    selected_ids = [int(x) for x in request.form.getlist('selected_ids')]
+    if not selected_ids:
+        # If nothing selected, just send back to engagement list
+        return redirect(url_for("engagement_page"))
+    
+    # Merge into session selection
+    current = set(session.get("meeting_ids", []))
+    current.update(selected_ids)
+    session["meeting_ids"] = list(current)
+
+    # Build UI data from ALL selected so far (session)
+    all_selected = list(current)
+    q_marks = ','.join(['?'] * len(all_selected))
+
+    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    c = conn.cursor()
+    c.execute(f"""
+        SELECT intern_id, full_name, COALESCE(TOTAL_QUESTIONS_ASKED,0)
+        FROM Students
+        WHERE intern_id IN ({q_marks})
+        ORDER BY full_name
+    """, all_selected)
+    rows = c.fetchall()
+
+    
+    selected = [{"id": rid, "name": name} for rid, name, _ in rows]
+    draft_counts = {rid: int(total) for rid, _, total in rows} # total questions asked so far
+
+    # Remaining participants (not yet selected)
+    c.execute("SELECT intern_id, full_name FROM Students ORDER BY full_name")
+    remaining_rows = c.fetchall()
+    remaining = [{"id": rid, "name": name} for rid, name in remaining_rows if rid not in current]
+
+    conn.close()
+
+    return render_template(
+        "meeting_entry.html",
+        engagement_type=engagement_type,
+        selected=selected,
+        remaining=remaining,
+        counts=draft_counts
+    )
+
+@app.route('/engagement/finish', methods=["POST"])
+def finish_meeting():
+    # 1) Gather absolute totals from the form
+    posted_totals = {}  # {intern_id: absolute_total}
+    for k, v in request.form.items():
+        if k.startswith("count_"):
+            try:
+                sid = int(k.split("_", 1)[1])
+                total = max(0, int(v or 0))
+                posted_totals[sid] = total
+            except ValueError:
+                pass
+
+    # 2) Persist to DB (overwrite totals for only those still on screen)
+    if posted_totals:
+        conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+        c = conn.cursor()
+        c.executemany(
+            "UPDATE Students SET TOTAL_QUESTIONS_ASKED = ? WHERE intern_id = ?",
+            [(total, sid) for sid, total in posted_totals.items()]
+        )
+        conn.commit()
+        conn.close()
+
+    # 3) Reset the meeting (clear selection & any per-meeting state)
+    session.pop("meeting_ids", None)
+    session.pop("meeting_baselines", None)
+    session.pop("engagement_type", None)
+
+    flash("Meeting finished. Counts saved and selection reset.")
+    return redirect(url_for('engagement_page'))
+
+@app.route("/engagement/save", methods=["POST"])
+def engagement_save():
+    engagement_type = request.form.get("engagement_type")
+    participant_ids = request.form.getlist("participant_ids")  
+    # TODO: write to your DB and update frequencies
+    flash("Engagement saved.")
+    return redirect(url_for("engagement_page"))
+
 
 @app.route('/project_job_description/<int:project_id>', methods=['GET', 'POST'])
 def project_job_description(project_id):

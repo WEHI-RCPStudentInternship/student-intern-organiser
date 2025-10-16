@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Meeting Entry{% endblock %}
+{% block page_title %}Meeting Data Entry{% endblock %}
+
+{% block styles %}
+<style>
+  .wrap { width: 90%; margin: 0 auto; }
+  .card { border:1px solid #e3e3e3; border-radius:12px; padding:12px; background:#f9fbf9; }
+  .cards { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
+  .card header { display:flex; justify-content:space-between; align-items:center; }
+  .name { font-weight:600; }
+  .xbtn { background:transparent; border:none; font-size:18px; cursor:pointer; }
+  .counter { display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .counter button { border:1px solid #49A942; background:#e9f5e8; padding:6px 10px; border-radius:10px; cursor:pointer; }
+  .count { min-width:40px; text-align:center; font-weight:700; }
+  .toolbar { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .toolbar .right { margin-left:auto; display:flex; gap:8px; }
+  .ghost { border:1px solid #cbd5cb; background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; }
+  .primary { background:#49A942; color:#fff; border:none; padding:10px 16px; border-radius:12px; cursor:pointer; }
+  select { height:40px; padding:6px 8px; border-radius:8px; border:1px solid #ccc; }
+  .footer { display:flex; justify-content:flex-end; margin-top:16px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <form id="meetingForm" method="POST" action="{{ url_for('meeting_entry') }}">
+    <h2>Meeting Data Entry</h2>
+    <input type="hidden" name="engagement_type" value="{{ engagement_type }}">
+
+    <div class="toolbar">
+      <div><strong>Type:</strong> {{ engagement_type }}</div>
+      <div class="right">
+        <button type="button" class="ghost" id="removeAllBtn">Remove all</button>
+      </div>
+    </div>
+
+    <div class="cards" id="cards">
+      {% for p in selected %}
+      <div class="card" data-id="{{ p.id }}">
+        <header>
+          <div class="name">{{ p.name }}</div>
+          <button type="button" class="xbtn" data-action="remove" aria-label="Remove">×</button>
+        </header>
+
+        <div class="counter">
+          <button type="button" data-action="dec">−1</button>
+          <span class="count" data-role="count">[{{ counts.get(p.id, 0) }}]</span>
+          <button type="button" data-action="inc">+1</button>
+        </div>
+        <input type="hidden" name="count_{{ p.id }}" value="{{ counts.get(p.id, 0) }}" data-role="input">
+
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="footer">
+      <button class="ghost" type="submit" formaction="{{ url_for('save_draft') }}" style="margin-right:10px;">
+    Add more participants
+  </button>
+  
+  <button class="primary" type="submit" formaction="{{ url_for('finish_meeting') }}">
+    Finish meeting
+  </button>
+    </div>
+  </form>
+</div>
+
+<script>
+(function () {
+  const cards = document.getElementById('cards');
+
+  // helper: set visible number + hidden input value
+  function setCount(card, val) {
+    if (!card) return;
+    if (val < 0) val = 0;                 // no negatives
+    card.querySelector('[data-role="count"]').textContent = val;
+    card.querySelector('[data-role="input"]').value = val;
+  }
+
+  // event delegation for all cards
+  cards.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const card = e.target.closest('.card');
+    if (!card) return;
+
+    const current = parseInt(card.querySelector('[data-role="input"]').value || '0', 10);
+
+    if (btn.dataset.action === 'inc') setCount(card, current + 1);
+    if (btn.dataset.action === 'dec') setCount(card, current - 1);
+    if (btn.dataset.action === 'remove') card.remove();
+  });
+
+  // remove all participants
+  const removeAllBtn = document.getElementById('removeAllBtn');
+  if (removeAllBtn) {
+    removeAllBtn.addEventListener('click', () => { cards.innerHTML = ""; });
+  }
+})();
+</script>
+{% endblock %}

@@ -10,7 +10,7 @@
 
 {% block content %}
 <div class="project-job-description-page">
-    <h1>Project Job Description - {{ project[1] }}</h1>
+    <h1>Project Job Description - {{ project[0] }}</h1>
     
     <form method="POST" action="{{url_for('project_job_description', project_id=project_id)}}">
         <h2>Position Details</h2>
@@ -28,7 +28,7 @@
                 word maximum) 
                 <a href="#" onclick="window.open('https://feit-vocational-placement.app.unimelb.edu.au/index.php?r=request/createInternship&id=0m', '_blank')" title="External link">Link*</a>
             </label>
-            <textarea class="form-control" id="about_organisation" name="about_organisation" rows="5" placeholder="Describe the organization...">{{ project[0] if project[0] else '' }}</textarea>
+            <textarea class="form-control" id="about_organisation" name="about_organisation" rows="5" placeholder="Describe the organization...">{{ project[1] if project[1] else '' }}</textarea>
             <small class="form-text text-muted">
                 Word count: <span id="org_word_count">0</span> 
                 (Min: <span id="org_min_display">{{ wordcount[0] if wordcount[0] else 1 }}</span>, 
@@ -39,7 +39,7 @@
         
         <div class="form-group">
             <label for="position_title">Position Title</label>
-            <input type="text" class="form-control" id="position_title" name="position_title" placeholder="Enter the position title..." value="{{ project[1] if project[1] else '' }}">
+            <input type="text" class="form-control" id="position_title" name="position_title" placeholder="Enter the position title..." value="{{ project[2] if project[2] else '' }}">
         </div>
 
         <div class="form-group">
@@ -54,7 +54,7 @@
                        min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
                 word maximum) 
             </label>
-            <textarea class="form-control" id="position_description" name="position_description" rows="5" placeholder="Describe the position duties and responsibilities...">{{ project[2] if project[2] else '' }}</textarea>
+            <textarea class="form-control" id="position_description" name="position_description" rows="5" placeholder="Describe the position duties and responsibilities...">{{ project[3] if project[3] else '' }}</textarea>
             <small class="form-text text-muted">
                 Word count: <span id="position_word_count">0</span> 
                 (Min: <span id="position_min_display">{{ wordcount[2] if wordcount[2] else 400 }}</span>, 
@@ -75,7 +75,7 @@
                        min="1" style="width: 60px; display: inline-block; padding: 2px;"> 
                 word maximum) 
             </label>
-            <textarea class="form-control" id="skill_requirements" name="skill_requirements" rows="5" placeholder="List the key skills students will develop...">{{ project[3] if project[3] else '' }}</textarea>
+            <textarea class="form-control" id="skill_requirements" name="skill_requirements" rows="5" placeholder="List the key skills students will develop...">{{ project[4] if project[4] else '' }}</textarea>
             <small class="form-text text-muted">
                 Word count: <span id="skill_word_count">0</span> 
                 (Min: <span id="skills_min_display">{{ wordcount[4] if wordcount[4] else 50 }}</span>, 

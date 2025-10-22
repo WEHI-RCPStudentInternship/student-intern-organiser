@@ -2366,10 +2366,12 @@ def add_eng_interns():
         for line in lines:
             parts = line.split('|')
             print(parts)
+            email = parts[2].strip().split(' ')[0]
+            mobile = "" # Not using mobile anymore
             student_tuple = (
                 parts[0].strip(),  # full_name
-                parts[2].strip(),  # email
-                parts[3].strip(),  # mobile
+                email,
+                mobile,
                 "Engineering and IT",      # hardcoded course
                 parts[1].strip(),  # course_major
                 intake,  # intake

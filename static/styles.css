@@ -62,7 +62,7 @@ Kanban boards styles
     color: black !important;
 }
 
-.translator a, .interesting a {
+.translator a, .sysadmin a, .interesting a {
     color: white !important;
 }
 

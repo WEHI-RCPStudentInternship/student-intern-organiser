@@ -1,22 +1,18 @@
 {% extends 'base.html' %} {% block title %} Project Students Allocation {%
 endblock %} {% block page_title %}Projects Students Allocation{% endblock %} {%
-block content %} {% macro studentKanbanCard(classes,student) -%}
 
+block content %} {% macro studentKanbanCard(classes,student) -%}
 <div
   class="{{ classes }}"
   data-student-id="{{ student[0] }}"
   draggable="true"
   ondragstart="drag(event)"
 >
-  {{ student[1] }} ({{ student[7][:3] }})<br />{{ student[8] }}<br />{{
-  student[6].split(' - ')[1] }} <br />
-  {{ student[3] }} <br />
+  <a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}" > {{ student[1] }} ({{ student[7][:3] }})</a><br />
+  {{ student[8] }}<br />
+  {{ student[6].split(' - ')[1] }} ({{ student[3] }}) <br />
   {{ student[4] }} <br />
-  {{ student[5] }} <br /><a
-    target="_blank"
-    href="/pre_int_st_evaluation/{{ student[0] }}"
-    >View</a
-  >
+  {{ student[5] }} <br />
 </div>
 {%- endmacro %}
 
@@ -510,7 +506,7 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
               cursor: pointer;
               font-size: 16px;
               padding: 4px 10px;">
-              Other fields ▼
+              Fields+ ▼
             </button>
           </div>
         `;
@@ -559,7 +555,7 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
       const isHidden = extraDiv.style.display === "none";
 
       extraDiv.style.display = isHidden ? "block" : "none";
-      btn.textContent = isHidden ? "Hide fields ▲" : "Other fields ▼";
+      btn.textContent = isHidden ? "Hide fields ▲" : "Fields+ ▼";
     }
   });
   // To call it again, simply reuse the function

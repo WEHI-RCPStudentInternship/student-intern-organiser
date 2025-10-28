@@ -9,7 +9,7 @@ Kanban boards styles
 }
 
 .kanban-column {
-  flex: 0 0 150px; /* Set a fixed width for each project column */
+  width: 200px; /* Set a fixed width for each project column */
   background-color: lightgray;
   padding: 5px;
   padding-top: 5px;
@@ -58,10 +58,14 @@ Kanban boards styles
     border: 5px solid black !important;
 }
 
-.accepted a, .offered a, .interesting a {
-    color: white !important;
-
+.experienced a, .not-accepted a {
+    color: black !important;
 }
+
+.translator a, .interesting a {
+    color: white !important;
+}
+
 .counts {
     float: left;
     margin-left: 10px;
@@ -78,12 +82,14 @@ Kanban boards styles
 }
 
 .kanban-card {
+  height: 200px;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 4px;
   margin-bottom: 4px;
   font-size: 14px;
+  overflow: hidden;
 }
 
 /* ========================================

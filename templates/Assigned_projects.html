@@ -13,6 +13,14 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   {{ student[6].split(' - ')[1] }} ({{ student[3] }}) <br />
   {{ student[4] }} <br />
   {{ student[5] }} <br />
+
+  <div class="logos">
+    <span style="margin-right: 2px;"> <img src="/static/hourglass.png" alt="waiting" style="width: 25px; height: 25px;"> </span>
+    <span style="margin-right: 2px;"> <img src="/static/green_tick.png" alt="accepted" style="width: 25px; height: 25px;"> </span>
+    <span style="margin-right: 2px"> <img src="/static/r_logo.png" alt="R Logo" style="width: 25px; height: 25px;"> </span>
+    <span style="margin-right: 2px"> <img src="/static/python_logo.png" alt="Python Logo" style="width: 25px; height: 25px;"> </span>
+    <span style="margin-right: 2px"> <img src="/static/leadership.png" alt="leadership" style="width: 25px; height: 25px;"> </span>
+  </div>
 </div>
 {%- endmacro %}
 

@@ -17,23 +17,12 @@ Kanban boards styles
   flex-direction: column;
 }
 
-.accepted {
-    background-image: url('/static/tick.png');
-    background-position: right bottom;
-    background-repeat: no-repeat;
-}
-
 .partially-accepted {
     background-color: #70A3CC !important;
     color: white !important;
 }
 
 
-.offered {
-    background-image: url('/static/wait.png');
-    background-position: right bottom;
-    background-repeat: no-repeat;
-}
 .translator {
     background-color: #037bdb !important;
     color: white !important;
@@ -57,12 +46,16 @@ Kanban boards styles
 .female {
     border: 5px solid black !important;
 }
+.not-accepted  {
+    background-color: #cb7f07 !important;
+    color: white;
+}
 
-.experienced a, .not-accepted a {
+.experienced a  {
     color: black !important;
 }
 
-.translator a, .sysadmin a, .interesting a {
+.translator a,.not-accepted a, .sysadmin a, .interesting a {
     color: white !important;
 }
 

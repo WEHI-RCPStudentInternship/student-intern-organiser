@@ -109,9 +109,9 @@
                     <td></td>
                 {% endif %}
                 {% if student[11] and student[11] != '' %}
-                    <td>{{ student[11] }}</td>
+                    <td>{{ student[11] }} ({{ student[13] }})</td>
                 {% else %}
-                    <td>No skill</td>
+                    <td>No skill ({{ student[13] }})</td>
                 {% endif %}
                 <th>{{ student[12] }}</th>
                 <td>{{ student[4] }}</td>

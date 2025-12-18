@@ -4,6 +4,7 @@ CREATE TABLE Students (
         full_name TEXT,
         pronouns TEXT,
         status TEXT,
+        status_id INTEGER,
         email TEXT,
         mobile TEXT,
         course TEXT,
@@ -20,7 +21,7 @@ CREATE TABLE Students (
         end_date DATE,
         hours_per_week INTEGER,
         intake TEXT,
-        intake_id INTEGER,  -- new field for intake association
+        intake_id INTEGER,
         supervisor_email TEXT,
         wehi_email TEXT,
         summary_tech_skills TEXT,

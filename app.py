@@ -42,34 +42,39 @@ def filter_students(status_of_students_to_filter,title,context = None):
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
+    status_id_list = [row[0] for row in statuses if row[0] in status_of_students_to_filter]
     if context == "interview":
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, s.pre_internship_summary_recommendation_internal, s.show_key_skill, s.mobile
+            FROM Students s
+            LEFT JOIN Statuses st ON s.status_id = st.id
+            WHERE s.intake = ? AND s.status_id IN ({}) ORDER BY st.name ASC
+        '''.format(','.join(['?'] * len(status_id_list)))
     elif context == "waiting_list":
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, s.pre_internship_summary_recommendation_internal, s.show_key_skill, s.mobile
+            FROM Students s
+            LEFT JOIN Statuses st ON s.status_id = st.id
+            WHERE s.intake = ? AND s.status_id IN ({}) ORDER BY st.name ASC
+        '''.format(','.join(['?'] * len(status_id_list)))
     elif context == "missed_out":
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) AND pre_internship_summary_recommendation_internal = '06 - TS - Recommend no sign up except under specific circumstances. ' ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, s.pre_internship_summary_recommendation_internal, s.show_key_skill, s.mobile
+            FROM Students s
+            LEFT JOIN Statuses st ON s.status_id = st.id
+            WHERE s.intake = ? AND s.status_id IN ({}) AND s.pre_internship_summary_recommendation_internal = '06 - TS - Recommend no sign up except under specific circumstances. ' ORDER BY st.name ASC
+        '''.format(','.join(['?'] * len(status_id_list)))
     else:
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
-        '''.format(','.join(['?'] * len(current_statuses_list)))
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, s.pre_internship_summary_recommendation_internal, s.show_key_skill, s.mobile
+            FROM Students s
+            LEFT JOIN Statuses st ON s.status_id = st.id
+            WHERE s.intake = ? AND s.status_id IN ({}) ORDER BY st.name ASC
+        '''.format(','.join(['?'] * len(status_id_list)))
  
 
     # Execute the query with the statuses list
-    cursor.execute(query, [intake_current] + current_statuses_list)
+    cursor.execute(query, [intake_current] + status_id_list)
     students = cursor.fetchall()
 
 
@@ -109,19 +114,19 @@ def current_student():
 
     # Define current student status IDs
     status_of_students_current = [10, 11, 12, 13]
-    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
 
     # Retrieve current students with specific status
-    placeholder = ','.join(['?'] * len(current_statuses_list))
+    placeholder = ','.join(['?'] * len(status_of_students_current))
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile, github_username
-        FROM Students
-        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
-    '''.format(','.join(['?'] * len(current_statuses_list)))
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, s.pre_internship_summary_recommendation_internal, s.show_key_skill, s.mobile, s.github_username
+        FROM Students s
+        LEFT JOIN Statuses st ON s.status_id = st.id
+        WHERE s.intake = ? AND s.status_id IN ({}) ORDER BY st.name ASC
+    '''.format(','.join(['?'] * len(status_of_students_current)))
 
 
     # Execute the query with the statuses list
-    cursor.execute(query, [intake_current] + current_statuses_list)
+    cursor.execute(query, [intake_current] + status_of_students_current)
     students = cursor.fetchall()
 
     # Close the database connection
@@ -608,7 +613,7 @@ def assigned_projects(intake_type=None):
             cursor.execute('SELECT name FROM Intakes where status  = "'+intake_type+'"')
             intake_current = cursor.fetchall()[0][0]
 
-            cursor.execute('SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects FROM Students WHERE intake = ?',(intake_current,))
+            cursor.execute('SELECT s.intern_id, s.full_name, s.project, s.pronouns, st.name, s.cover_letter_projects FROM Students s LEFT JOIN Statuses st ON s.status_id = st.id WHERE s.intake = ?',(intake_current,))
             students = cursor.fetchall()
 
             cursor.execute('SELECT * FROM Statuses')
@@ -908,7 +913,7 @@ def download_key_attributes():
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
-    cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal, intake, course FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
+    cursor.execute('SELECT s.full_name, s.pronunciation, s.project, st.name, s.mobile, s.email, s.start_date, s.end_date, s.hours_per_week, s.pronouns, s.pre_internship_summary_recommendation_internal, s.intake, s.course FROM Students s LEFT JOIN Statuses st ON s.status_id = st.id WHERE s.intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
 
     students = cursor.fetchall()
 
@@ -1470,7 +1475,7 @@ def index():
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile FROM Students')
+    cursor.execute('SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, s.pre_internship_summary_recommendation_internal, s.show_key_skill, s.mobile FROM Students s LEFT JOIN Statuses st ON s.status_id = st.id')
     students = cursor.fetchall()
 
     cursor.execute('SELECT * FROM Projects')
@@ -1597,30 +1602,31 @@ def change_status():
 
     data = request.get_json()
     student_ids = data.get('student_ids', [])
-    new_status = data.get('new_status', '')
+    new_status_id = data.get('new_status_id', '')
 
-    # Convert student IDs to integers
+    # Convert student IDs and status_id to integers
     student_ids = [int(id) for id in student_ids]
+    new_status_id = int(new_status_id)
 
     # Call the change_student_status function
-    change_student_status(student_ids, new_status)
+    change_student_status(student_ids, new_status_id)
 
     # Redirect back to the index page
     return redirect('/')
 
-def change_student_status(student_ids, new_status):
+def change_student_status(student_ids, new_status_id):
     conn = sqlite3.connect('student_intern_data/student_intern_data.db')
     cursor = conn.cursor()
 
     # Prepare the SQL query
     query = '''
         UPDATE Students
-        SET status = ?
+        SET status_id = ?
         WHERE intern_id IN ({})
     '''.format(','.join(['?'] * len(student_ids)))
 
     # Execute the query
-    cursor.execute(query, [new_status] + student_ids)
+    cursor.execute(query, [new_status_id] + student_ids)
 
     # Commit the changes and close the connection
     conn.commit()
@@ -1878,7 +1884,7 @@ def intakes_index():
     cursor.execute('SELECT * FROM Intakes')
     intakes = cursor.fetchall()
 
-    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status FROM Students')
+    cursor.execute('SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, st.name FROM Students s LEFT JOIN Statuses st ON s.status_id = st.id')
     students = cursor.fetchall()
 
     # Close the database connection

@@ -56,7 +56,7 @@ CREATE TABLE Students_copy (
         projects_recommended TEXT,
         -- NEW: Foreign key constraints
         FOREIGN KEY (project_id) REFERENCES Projects(id),
-        FOREIGN KEY (pre_internship_summary_recommendation_internal_id) REFERENCES Statuses(id)
+        FOREIGN KEY (pre_internship_summary_recommendation_internal_id) REFERENCES Internal_eval_levels(id)
         );
 
 -- insert existing data from original to new database
@@ -167,8 +167,17 @@ SELECT intern_id,
         projects_recommended
 FROM Students;
 
--- add corresponding value to new field
+-- add corresponding value to new fields
 UPDATE students_copy
 SET project_id = 
         (SELECT projects.id FROM projects
         WHERE projects.name = students_copy.project);
+
+UPDATE students_copy
+SET pre_internship_summary_recommendation_internal_id =
+        (SELECT Internal_eval_levels.id FROM Internal_eval_levels
+        WHERE SUBSTR(
+                students_copy.pre_internship_summary_recommendation_internal, 
+                INSTR(students_copy.pre_internship_summary_recommendation_internal, '-') + 2
+                ) 
+        = Internal_eval_levels.name);

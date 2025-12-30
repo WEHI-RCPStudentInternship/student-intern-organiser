@@ -1473,7 +1473,7 @@ def index():
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-   
+    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns, pre_internship_summary_recommendation_internal, show_key_skill, mobile FROM Students')
     students = cursor.fetchall()
 
     cursor.execute('SELECT * FROM Projects')

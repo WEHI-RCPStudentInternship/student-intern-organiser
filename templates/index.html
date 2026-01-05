@@ -252,7 +252,6 @@
             $('#changeStatusBtn').on('click', function() {
                 var status_id = $('#statusDropdown').val();
                 var student_ids = [];
-                var status_name = $('#statusDropdown option:selected').text();
 
                 var selectedRows = $('.studentCheckbox:checked').each(function() {
                     text = table.row($(this).closest('tr')).data();
@@ -262,7 +261,7 @@
 
                 data = {
                     student_ids: student_ids,
-                    new_status: status_name
+                    new_status_id: status_id
                 };
 
                 url = '/change_status';

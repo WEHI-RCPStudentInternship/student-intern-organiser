@@ -2,7 +2,7 @@ import sqlite3
 import csv
 
 # Connect to the SQLite database
-conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+conn = sqlite3.connect('student_intern.db')
 cursor = conn.cursor()
 
 # Create the Internal_eval_levels table if it doesn't exist

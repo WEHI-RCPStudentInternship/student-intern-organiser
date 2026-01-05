@@ -1691,7 +1691,7 @@ def change_status():
     # Redirect back to the index page
     return redirect('/')
 
-def change_student_status(student_ids, new_status):
+def change_student_status(student_ids, new_status_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 

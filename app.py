@@ -9,6 +9,7 @@ from urllib.parse import unquote
 
 from flask import (Flask, jsonify, redirect, render_template, request, Response,
                    send_file, url_for)
+import traceback
 
 import import_csv_from_redcap
 
@@ -97,7 +98,7 @@ def filter_students(status_of_students_to_filter,title,context = None):
         LEFT JOIN Projects p ON s.project_id = p.id
         LEFT JOIN Intakes  i ON s.intake_id  = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
-        WHERE s.intake_id = ?
+        WHERE s.intake = ?
           AND s.status_id IN ({status_placeholders})
     """
 
@@ -159,7 +160,7 @@ def current_student():
         FROM Students s
         LEFT JOIN Statuses st ON s.status_id = st.id
         LEFT JOIN Intakes i ON s.intake_id = i.id
-        WHERE s.intake_id = ? AND s.status_id IN ({}) ORDER BY st.name ASC
+        WHERE s.intake = ? AND s.status_id IN ({}) ORDER BY st.name ASC
     '''.format(','.join(['?'] * len(status_of_students_current)))
 
 
@@ -205,7 +206,7 @@ def download_empty_emails():
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
-        WHERE s.intake_id = ?
+        WHERE s.intake = ?
         AND s.status_id IN ({placeholder})
         AND (s.wehi_email IS NULL OR s.wehi_email NOT LIKE '%@wehi.edu.au%')
         ORDER BY st.name ASC
@@ -329,7 +330,7 @@ def add_to_github():
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
-        WHERE s.intake_id = ?
+        WHERE s.intake = ?
             AND s.status_id IN ({})
         ORDER BY st.name ASC
     '''.format(','.join(['?'] * len(status_id_list)))
@@ -390,7 +391,7 @@ def quick_review():
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
-        WHERE s.intake_id = ?
+        WHERE s.intake = ?
           AND s.status_id IN ({})
         ORDER BY st.name ASC
     '''.format(','.join(['?'] * len(status_id_list)))
@@ -1859,24 +1860,27 @@ def change_student_project(student_ids, new_project):
 
 
 def calculate_breakdown_of_students(students):
-    ratings = [student[42] for student in students]
+    # rating in index 5
+    ratings = [student[5] for student in students]
 
-    # Calculate the value breakdown using Counter
     breakdown_ratings = dict(Counter(ratings))
-    total_students = len(ratings)
+    total_students = len(students)
 
-
-    courses = [student[6] for student in students]
-
-    # Calculate the value breakdown using Counter
+    # course in index 4
+    courses = [student[4] for student in students]
     breakdown_courses = dict(Counter(courses))
 
-
+    # status in index 3
     statuses = [student[3] for student in students]
     breakdown_statuses = dict(Counter(statuses))
-    print(breakdown_statuses)
 
-    return [breakdown_ratings,breakdown_courses,total_students,breakdown_statuses]
+    return [
+        breakdown_ratings,
+        breakdown_courses,
+        total_students,
+        breakdown_statuses
+    ]
+
 
 #pronouns breakdown
 def calculate_breakdown_of_pronouns(students):
@@ -1909,106 +1913,110 @@ def calculate_breakdown_of_pronouns(students):
 
 @app.route('/dashboard/<string:dashboard_type>',methods=['GET'])
 def dashboard(dashboard_type):
-    print(dashboard_type)
-    # Connect to the SQLite database
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+    try:
+        print(dashboard_type)
+        # Connect to the SQLite database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
 
-    # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Statuses')
-    statuses = cursor.fetchall()
-    if dashboard_type == "new_all":
-        status_of_students_current_and_past = [1,2,3,4,5,6,7,8,9,10,11,12]
-    if dashboard_type == "finished":
-        status_of_students_current_and_past = [14]
-    if dashboard_type == "current":
-        status_of_students_current_and_past = [13]
-    if dashboard_type == "new_signed_and_offered":
-        status_of_students_current_and_past = [7,8,9,10,11,12]
-    if dashboard_type == "new_signed_and_accepted":
-        status_of_students_current_and_past = [8,9,10,11,12]
-    if dashboard_type == "new_signed":
-        status_of_students_current_and_past = [9,10,11,12]
-    if dashboard_type == "all":
-        status_of_students_current_and_past = [8,9, 10, 11, 12, 13, 14]
-    # FIXED: Get status IDs instead of names
-    status_id_list = [row[0] for row in statuses if row[0] in status_of_students_current_and_past]
+        # Retrieve student data from the database
+        cursor.execute('SELECT * FROM Statuses')
+        statuses = cursor.fetchall()
+        if dashboard_type == "new_all":
+            status_of_students_current_and_past = [1,2,3,4,5,6,7,8,9,10,11,12]
+        if dashboard_type == "finished":
+            status_of_students_current_and_past = [14]
+        if dashboard_type == "current":
+            status_of_students_current_and_past = [13]
+        if dashboard_type == "new_signed_and_offered":
+            status_of_students_current_and_past = [7,8,9,10,11,12]
+        if dashboard_type == "new_signed_and_accepted":
+            status_of_students_current_and_past = [8,9,10,11,12]
+        if dashboard_type == "new_signed":
+            status_of_students_current_and_past = [9,10,11,12]
+        if dashboard_type == "all":
+            status_of_students_current_and_past = [8,9, 10, 11, 12, 13, 14]
+        # FIXED: Get status IDs instead of names
+        status_id_list = [row[0] for row in statuses if row[0] in status_of_students_current_and_past]
 
-    # Retrieve student data from the database
-    # Prepare the SQL query with placeholders for the statuses filter and pronouns
-    query = '''
-        SELECT s.intern_id, s.full_name, s.pronouns, st.name AS status, s.course, 
-               s.post_internship_summary_rating_internal, s.intake_id
-        FROM Students s
-        LEFT JOIN Statuses st ON s.status_id = st.id
-        WHERE s.status_id IN ({}) AND s.pronouns IS NOT NULL
-    '''.format(','.join(['?'] * len(status_id_list)))
-
-
-    # Execute the query with the statuses list
-    cursor.execute(query, status_id_list)
-
-    # Retrieve student data from the database
-    students = cursor.fetchall()
-    total_students_current_and_past = len(students)
-
-    # Close the database connection
-    conn.close()
-
-    result = calculate_breakdown_of_students(students)
-
-    breakdown_ratings = result[0]
-    breakdown_courses = result[1]
-    total_students = result[2]
-    breakdown_statuses = result[3]
-
-    pronoun_data, pronoun_percentage, total_students = calculate_breakdown_of_pronouns(students)
-
-    return render_template('dashboard.html', students=students, breakdown_ratings=breakdown_ratings,
-                        breakdown_courses=breakdown_courses,
-                        total_students=total_students, pronoun_data=pronoun_data,
-                        pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses,total_students_current_and_past = total_students_current_and_past,
-                        dashboard_type = dashboard_type)
+        # Retrieve student data from the database
+        # Prepare the SQL query with placeholders for the statuses filter and pronouns
+        query = '''
+            SELECT s.intern_id, s.full_name, s.pronouns, st.name AS status, s.course, 
+                s.post_internship_summary_rating_internal, s.intake_id
+            FROM Students s
+            LEFT JOIN Statuses st ON s.status_id = st.id
+            WHERE s.status_id IN ({}) AND s.pronouns IS NOT NULL
+        '''.format(','.join(['?'] * len(status_id_list)))
 
 
-@app.route('/dashboard/<string:dashboard_type>/chart_data', methods=['GET'])
-def dashboard_chart_data(dashboard_type):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    # FIXED: First get the status_id for '14 Finished'
-    cursor.execute("SELECT id FROM Statuses WHERE name = '14 Finished'")
-    finished_status_id = cursor.fetchone()[0]
+        # Execute the query with the statuses list
+        cursor.execute(query, status_id_list)
 
-    # Retrieve students by intake and calculate hours per week
-    cursor.execute('''
-        SELECT intakes.name AS intake_name,
-               SUM(CASE 
-                       WHEN Students.course = 'Engineering and IT' THEN 300
-                       WHEN Students.course = 'Engineering' THEN 300
-                       WHEN Students.course = 'Science Full Year' THEN 200
-                       WHEN Students.course = 'Science' THEN 100
-                       WHEN Students.course = 'Volunter' THEN 100
-                       ELSE 100
-                   END) AS total_hours,
-               COUNT(*) AS student_count
-        FROM Students
-        JOIN Intakes ON Students.intake_id = Intakes.id
-        WHERE Students.status_id = ? AND Intakes.status = 'finished'
-        GROUP BY Students.intake_id, intakes.name
-        ORDER BY Intakes.id ASC
-    ''', (finished_status_id,))
+        # Retrieve student data from the database
+        students = cursor.fetchall()
+        total_students_current_and_past = len(students)
+
+        # Close the database connection
+        conn.close()
+
+        result = calculate_breakdown_of_students(students)
+
+        breakdown_ratings = result[0]
+        breakdown_courses = result[1]
+        total_students = result[2]
+        breakdown_statuses = result[3]
+
+        pronoun_data, pronoun_percentage, total_students = calculate_breakdown_of_pronouns(students)
+
+        return render_template('dashboard.html', students=students, breakdown_ratings=breakdown_ratings,
+                            breakdown_courses=breakdown_courses,
+                            total_students=total_students, pronoun_data=pronoun_data,
+                            pronoun_percentage=pronoun_percentage,breakdown_statuses=breakdown_statuses,total_students_current_and_past = total_students_current_and_past,
+                            dashboard_type = dashboard_type)
+    except Exception:
+        traceback.print_exc()   
+        raise
+
+    @app.route('/dashboard/<string:dashboard_type>/chart_data', methods=['GET'])
+    def dashboard_chart_data(dashboard_type):
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        # FIXED: First get the status_id for '14 Finished'
+        cursor.execute("SELECT id FROM Statuses WHERE name = '14 Finished'")
+        finished_status_id = cursor.fetchone()[0]
+
+        # Retrieve students by intake and calculate hours per week
+        cursor.execute('''
+            SELECT intakes.name AS intake_name,
+                SUM(CASE 
+                        WHEN Students.course = 'Engineering and IT' THEN 300
+                        WHEN Students.course = 'Engineering' THEN 300
+                        WHEN Students.course = 'Science Full Year' THEN 200
+                        WHEN Students.course = 'Science' THEN 100
+                        WHEN Students.course = 'Volunter' THEN 100
+                        ELSE 100
+                    END) AS total_hours,
+                COUNT(*) AS student_count
+            FROM Students
+            JOIN Intakes ON Students.intake_id = Intakes.id
+            WHERE Students.status_id = ? AND Intakes.status = 'finished'
+            GROUP BY Students.intake_id, intakes.name
+            ORDER BY Intakes.id ASC
+        ''', (finished_status_id,))
+        
+        data = cursor.fetchall()
+        conn.close()
+
+        # Format the response
+        chart_data = {
+            "intakes": [row[0] for row in data], 
+            "total_hours": [row[1] for row in data],
+            "student_count": [row[2] for row in data]
+        }
+
+        return jsonify(chart_data)
     
-    data = cursor.fetchall()
-    conn.close()
-
-    # Format the response
-    chart_data = {
-        "intakes": [row[0] for row in data], 
-        "total_hours": [row[1] for row in data],
-        "student_count": [row[2] for row in data]
-    }
-
-    return jsonify(chart_data)
 
 
 
@@ -2099,7 +2107,14 @@ def students_by_intake(intake_name):
 @app.route('/finished_students_by_intake/<path:intake_name>')
 def finished_students_by_intake(intake_name):
     intake_name = unquote(intake_name)
-    conn = sqlite3.connect('student_intern_data/student_intern_data.db')
+    import os
+
+    db_path = 'student_intern_data/student_intern_data.db'
+    print("CWD =", os.getcwd())
+    print("DB ABS =", os.path.abspath(db_path))
+
+    conn = sqlite3.connect(db_path)
+
     cursor = conn.cursor()
 
     # Resolve intake_name to intake_id

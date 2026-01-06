@@ -1829,17 +1829,23 @@ def change_project():
 
     data = request.get_json()
     student_ids = data.get('student_ids', [])
-    new_project = data.get('new_project', '')
+    project_id = data.get('project_id')
 
     # Convert student IDs to integers
     student_ids = [int(id) for id in student_ids]
     new_project = int(new_project)
 
-    # Call the change_student_project function
-    change_student_project(student_ids, new_project)
+    # Convert project_id to int (and basic validation)
+    if project_id is None:
+        return ("Missing project_id", 400)
 
-    # Redirect back to the index page
+    project_id = int(project_id)
+
+    # Call the function with project_id
+    change_student_project(student_ids, project_id)
+
     return redirect('/')
+
 
 
 @app.route('/change_status', methods=['POST'])
@@ -1953,7 +1959,7 @@ def change_course_update(student_ids, new_course):
     conn.close()
 
 
-def change_student_project(student_ids, new_project):
+def change_student_project(student_ids, project_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -1965,7 +1971,7 @@ def change_student_project(student_ids, new_project):
     '''.format(','.join(['?'] * len(student_ids)))
 
     # Execute the query
-    cursor.execute(query, [new_project] + student_ids)
+    cursor.execute(query, [project_id] + student_ids)
 
     # Commit the changes and close the connection
     conn.commit()
@@ -2148,7 +2154,7 @@ def intakes_index():
             s.full_name,
             s.email,
             s.pronunciation,
-            COALESCE(p.name, 'X') AS project,
+            p.name AS project,
             i.name AS intake,
             s.course,
             st.name AS status

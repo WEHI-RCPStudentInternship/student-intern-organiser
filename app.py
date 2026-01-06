@@ -156,10 +156,11 @@ def current_student():
     # Retrieve current students with specific status
     placeholder = ','.join(['?'] * len(status_of_students_current))
     query = '''
-        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, i.name AS intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile, s.github_username
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake, s.course, st.name, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile, s.github_username
         FROM Students s
         LEFT JOIN Statuses st ON s.status_id = st.id
         LEFT JOIN Intakes i ON s.intake_id = i.id
+        LEFT JOIN Projects p ON s.project_id = p.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
         WHERE s.intake_id = ? AND s.status_id IN ({}) ORDER BY st.id ASC
     '''.format(','.join(['?'] * len(status_of_students_current)))
@@ -201,10 +202,11 @@ def download_empty_emails():
     placeholder = ','.join(['?'] * len(status_id_list))
     query = f'''
         SELECT
-            s.intern_id, s.full_name, s.email, s.pronunciation,s.project, i.name AS intake, s.course,
+            s.intern_id, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake, s.course,
             st.name AS status, s.post_internship_summary_rating_internal,s.pronouns, 
             CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.wehi_email, s.mobile, s.github_username
         FROM Students s 
+        LEFT JOIN Projects ON s.project_id = p.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
@@ -326,13 +328,14 @@ def add_to_github():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, i.name AS intake, 
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake, 
         s.course, st.name AS status, s.post_internship_summary_rating_internal, s.pronouns,
         CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
         s.wehi_email, s.mobile, s.github_username
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
+        LEFT JOIN Projects p ON s.project_id = p.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
         WHERE s.intake_id = ?
             AND s.status_id IN ({})
@@ -389,13 +392,14 @@ def quick_review():
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
         SELECT
-            s.intern_id,s.full_name, s.full_name, s.email, s.pronunciation, s.project, i.name AS intake,
+            s.intern_id,s.full_name, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake,
             s.course,st.name AS status, s.post_internship_summary_rating_internal, s.pronouns,
             CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
             s.show_key_skill, s.mobile
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
+        LEFT JOIN Projects p ON s.project_id = p.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
         WHERE s.intake_id = ?
         AND s.status_id IN ({})
@@ -451,12 +455,13 @@ def email_ack():
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
         SELECT
-            s.intern_id, s.full_name, s.email, s.pronunciation, s.project, i.name AS intake,  s.course,
+            s.intern_id, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake,  s.course,
             st.name AS status, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
             s.pronouns, s.pre_internship_summary_recommendation_internal, s.show_key_skill, s.mobile
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
+        LEFT JOIN Projects p on s.project_id = p.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
         WHERE s.intake_id = ?
         AND s.status_id IN ({})
@@ -684,7 +689,11 @@ def assigned_projects(intake_type=None):
             cursor.execute('SELECT id FROM Intakes where status  = "'+intake_type+'"')
             intake_current = cursor.fetchall()[0][0]
 
-            cursor.execute('SELECT s.intern_id, s.full_name, s.project, s.pronouns, st.name, s.cover_letter_projects FROM Students s LEFT JOIN Statuses st ON s.status_id = st.id WHERE s.intake_id = ?',(intake_current,))
+            cursor.execute('''SELECT s.intern_id, s.full_name, p.name, s.pronouns, st.name, s.cover_letter_projects 
+                            FROM Students s 
+                            LEFT JOIN Statuses st ON s.status_id = st.id 
+                            LEFT JOIN Projects p ON s.project_id = p.id
+                            WHERE s.intake_id = ?''',(intake_current,))
             students = cursor.fetchall()
 
             cursor.execute('SELECT * FROM Statuses')
@@ -707,7 +716,7 @@ def assigned_projects(intake_type=None):
                     s.course,
                     s.show_key_skill
                 FROM Students s
-                LEFT JOIN Project p ON s.project_id = p.id
+                LEFT JOIN Projects p ON s.project_id = p.id
                 LEFT JOIN Statuses st ON s.status_id = st.id
                 LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
                 WHERE s.intake_id = ?
@@ -873,7 +882,7 @@ def pre_int_st_evaluation(intern_id):
                 s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
                 FROM Students s 
                 LEFT JOIN Statuses st ON s.status_id = st.id
-                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Intakes i ON s.intake_id = i.id
                 LEFT JOIN Projects p ON s.project_id = p.id
                 LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
                 WHERE s.intern_id = ?''', (intern_id,))
@@ -932,7 +941,7 @@ def student_evaluation(intern_id):
                 s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
                 FROM Students s 
                 LEFT JOIN Statuses st ON s.status_id = st.id
-                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Intakes i ON s.intake_id = i.id
                 LEFT JOIN Projects p ON s.project_id = p.id
                 LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
                 ''')
@@ -1139,7 +1148,7 @@ def get_student_by_id(intern_id):
                 s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
                 FROM Students s 
                 LEFT JOIN Statuses st ON s.status_id = st.id
-                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Intakes i ON s.intake_id = i.id
                 LEFT JOIN Projects p ON s.project_id = p.id
                 LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
                 WHERE s.intern_id = ?''', (intern_id,))
@@ -1509,11 +1518,12 @@ def index_new_intake_unavailable():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, i.name AS intake, 
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake, 
         s.course, st.name AS status, s.post_internship_summary_rating_internal, s.wehi_email, s.mobile
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
+        LEFT JOIN Projects p on s.project_id = p.id
         WHERE s.intake_id = ? AND s.status_id IN ({})
     '''.format(','.join(['?'] * len(status_id_list)))
 
@@ -1549,13 +1559,14 @@ def index_new_intake():
 
     # FIXED: Added Statuses JOIN and changed s.status to st.name
     query = '''
-        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, i.name AS intake, 
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake, 
         s.course, st.name AS status, s.post_internship_summary_rating_internal, s.pronouns,
         CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''),
         s.show_key_skill, s.mobile
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
+        LEFT JOIN Projects p ON s.project_id = p.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
         WHERE s.intake_id = ? AND s.status_id IN ({})
     '''.format(','.join(['?'] * len(status_id_list)))
@@ -1640,7 +1651,7 @@ def index_current():
         CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''),
         s.show_key_skill, s.mobile, s.github_username
         FROM Students s
-        LEFT JOIN Project p ON s.project_id = p.id
+        LEFT JOIN Projects p ON s.project_id = p.id
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
@@ -1738,7 +1749,7 @@ def student(intern_id):
                 s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
                 FROM Students s 
                 LEFT JOIN Statuses st ON s.status_id = st.id
-                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Intakes i ON s.intake_id = i.id
                 LEFT JOIN Projects p ON s.project_id = p.id
                 LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
                 WHERE s.intern_id = ?''', (intern_id,))
@@ -1822,6 +1833,7 @@ def change_project():
 
     # Convert student IDs to integers
     student_ids = [int(id) for id in student_ids]
+    new_project = int(new_project)
 
     # Call the change_student_project function
     change_student_project(student_ids, new_project)
@@ -1847,7 +1859,7 @@ def change_status():
     # Redirect back to the index page
     return redirect('/')
 
-def change_student_status(student_ids, new_status):
+def change_student_status(student_ids, new_status_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -2238,7 +2250,7 @@ def finished_students_by_intake(intake_name):
         FROM Students s
         LEFT JOIN Intakes i ON s.intake_id = i.id
         LEFT JOIN Statuses st ON s.status_id = st.id
-        LEFT JOIN Project p ON s.project_id = p.id
+        LEFT JOIN Projects p ON s.project_id = p.id
         LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
         WHERE s.intake_id = ? AND s.status_id = ?
     '''

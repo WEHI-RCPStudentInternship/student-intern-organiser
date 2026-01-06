@@ -47,27 +47,31 @@ def filter_students(status_of_students_to_filter,title,context = None):
     # Prepare the SQL query with a placeholder for the statuses filter
     if context == "interview":
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile 
+            FROM Students s 
+            LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id 
+            WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
         '''.format(','.join(['?'] * len(current_statuses_list)))
     elif context == "waiting_list":
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile 
+            FROM Students s 
+            LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id 
+            WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
         '''.format(','.join(['?'] * len(current_statuses_list)))
     elif context == "missed_out":
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) AND pre_internship_summary_recommendation_internal = '06 - TS - Recommend no sign up except under specific circumstances. ' ORDER BY status ASC
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile 
+            FROM Students s 
+            LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id 
+            WHERE s.intake = ? AND s.status IN ({}) AND s.pre_internship_internal_eval_level_id = 8 ORDER BY s.status ASC
         '''.format(','.join(['?'] * len(current_statuses_list)))
     else:
         query = '''
-            SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-            FROM Students
-            WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+            SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile 
+            FROM Students s 
+            LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id 
+            WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
         '''.format(','.join(['?'] * len(current_statuses_list)))
  
 
@@ -117,9 +121,10 @@ def current_student():
     # Retrieve current students with specific status
     placeholder = ','.join(['?'] * len(current_statuses_list))
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile, github_username
-        FROM Students
-        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile, s.github_username 
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id")
+        WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -160,9 +165,10 @@ def download_empty_emails():
     # Retrieve current students with specific status
     placeholder = ','.join(['?'] * len(current_statuses_list))
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
-        FROM Students
-        WHERE intake = ? AND status IN ({}) AND (wehi_email IS NULL OR wehi_email NOT LIKE '%@wehi.edu.au%') ORDER BY status ASC
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.wehi_email, s.mobile, s.github_username
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status IN ({}) AND (s.wehi_email IS NULL OR s.wehi_email NOT LIKE '%@wehi.edu.au%') ORDER BY s.status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -280,9 +286,10 @@ def add_to_github():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, wehi_email, mobile, github_username
-        FROM Students
-        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.wehi_email, s.mobile, s.github_username
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -334,9 +341,10 @@ def quick_review():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-        FROM Students
-        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -387,9 +395,10 @@ def email_ack():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-        FROM Students
-        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -623,9 +632,10 @@ def assigned_projects(intake_type=None):
             # Retrieve student data from the database
             # Prepare the SQL query with a placeholder for the statuses filter
             query = '''
-                SELECT intern_id, full_name, project, pronouns, status, cover_letter_projects,pre_internship_summary_recommendation_internal, course, show_key_skill
-                FROM Students
-                WHERE intake = ? AND status IN ({}) ORDER BY status desc, pre_internship_summary_recommendation_internal asc
+                SELECT s.intern_id, s.full_name, s.project, s.pronouns, s.status, s.cover_letter_projects, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.course, s.show_key_skill
+                FROM Students s 
+                LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+                WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status desc, s.pre_internship_internal_eval_level_id asc
             '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -701,7 +711,7 @@ def submit_student_evaluation():
     why_applied = request.form.get('why_applied')
     projects_recommended = request.form.get('projects_recommended')
     Overall_External = request.form.get('Overall_External')
-    Overall_Internal = request.form.get('Overall_Internal')
+    Overall_Internal = int(request.form.get('Overall_Internal'))
     learn_quickly_technical = request.form.get('learn_quickly_technical')
     learn_domain_concepts = request.form.get('learn_domain_concepts')
     Enthusiastic = request.form.get('Enthusiastic')
@@ -733,7 +743,7 @@ def submit_student_evaluation():
             pronunciation = ?,
             cover_letter_projects = ?,
             pre_internship_summary_recommendation_external = ?,
-            pre_internship_summary_recommendation_internal = ?,
+            pre_internship_internal_eval_level_id = ?,
             pre_internship_technical_rating = ?,
             pre_internship_learning_quickly = ?,
             pre_internship_enthusiasm = ?,
@@ -753,7 +763,7 @@ def submit_student_evaluation():
             projects_recommended = ?
 
         WHERE intern_id = ?
-    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, remote_internship, code_of_conduct, facilitator_follower, listener_or_talker, thinker_brainstormer, why_applied, show_key_skill, projects_recommended, student_id))
+    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal_id,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, remote_internship, code_of_conduct, facilitator_follower, listener_or_talker, thinker_brainstormer, why_applied, show_key_skill, projects_recommended, student_id))
 
     # Commit the changes and close the database connection
     conn.commit()
@@ -769,7 +779,27 @@ def pre_int_st_evaluation(intern_id):
     cursor = conn.cursor()
 
     # Retrieve the student's details from the database
-    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (intern_id,))
+    # query everything
+    cursor.execute('''SELECT s.intern_id, s.full_name, s.pronouns, st.name, s.email, s.mobile, s.course, s.course_major, 
+                s.link_to_application_doc, s.read_student_handbook, s.read_student_projects, s.cover_letter_projects, 
+                s.cover_letter_concept, s.cover_letter_technical, s.pronunciation, p.name, s.start_date, s.end_date, 
+                s.hours_per_week, i.name, s.supervisor_email, s.wehi_email, s.summary_tech_skills, s.summary_experience, 
+                s.summary_interest_in_projects, s.pre_internship_summary_recommendation_external, 
+                CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
+                s.pre_internship_technical_rating, s.pre_internship_social_rating, s.pre_internship_learning_quickly, 
+                s.pre_internship_enthusiasm, s.pre_internship_experience, s.pre_internship_communication, 
+                s.pre_internship_adaptable, s.pre_internship_problem_solver, s.post_internship_comments, 
+                s.post_internship_adaptability, s.post_internship_learn_technical, s.post_internship_learn_conceptual, 
+                s.post_internship_collaborative, s.post_internship_ambiguity, s.post_internship_complexity, 
+                s.post_internship_summary_rating_internal, s.post_internship_summary_rating_external, s.github_username, 
+                s.extra_notes, s.remote_internship, s.code_of_conduct, s.facilitator_follower, s.listener_or_talker, 
+                s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
+                FROM Students s 
+                LEFT JOIN Statuses st ON s.status_id = st.id
+                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Projects p ON s.project_id = p.id
+                LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+                WHERE s.intern_id = ?''', (intern_id,))
     student = cursor.fetchone()
 
     # Close the database connection
@@ -808,7 +838,27 @@ def student_evaluation(intern_id):
     cursor = conn.cursor()
 
     # Retrieve the feedback data from the Students table
-    cursor.execute('SELECT * FROM Students')
+    # query everything
+    cursor.execute('''SELECT s.intern_id, s.full_name, s.pronouns, st.name, s.email, s.mobile, s.course, s.course_major, 
+                s.link_to_application_doc, s.read_student_handbook, s.read_student_projects, s.cover_letter_projects, 
+                s.cover_letter_concept, s.cover_letter_technical, s.pronunciation, p.name, s.start_date, s.end_date, 
+                s.hours_per_week, i.name, s.supervisor_email, s.wehi_email, s.summary_tech_skills, s.summary_experience, 
+                s.summary_interest_in_projects, s.pre_internship_summary_recommendation_external, 
+                CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
+                s.pre_internship_technical_rating, s.pre_internship_social_rating, s.pre_internship_learning_quickly, 
+                s.pre_internship_enthusiasm, s.pre_internship_experience, s.pre_internship_communication, 
+                s.pre_internship_adaptable, s.pre_internship_problem_solver, s.post_internship_comments, 
+                s.post_internship_adaptability, s.post_internship_learn_technical, s.post_internship_learn_conceptual, 
+                s.post_internship_collaborative, s.post_internship_ambiguity, s.post_internship_complexity, 
+                s.post_internship_summary_rating_internal, s.post_internship_summary_rating_external, s.github_username, 
+                s.extra_notes, s.remote_internship, s.code_of_conduct, s.facilitator_follower, s.listener_or_talker, 
+                s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
+                FROM Students s 
+                LEFT JOIN Statuses st ON s.status_id = st.id
+                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Projects p ON s.project_id = p.id
+                LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+                ''')
     st_eval = cursor.fetchall()
 
     # Close the database connection
@@ -911,7 +961,13 @@ def download_key_attributes():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    cursor.execute('SELECT full_name, pronunciation, project, status, mobile, email, start_date, end_date, hours_per_week, pronouns, pre_internship_summary_recommendation_internal, intake, course FROM Students WHERE intern_id IN ({})'.format(','.join('?' for _ in student_ids)), student_ids)
+    cursor.execute('''SELECT s.full_name, s.pronunciation, s.project, s.status, s.mobile, s.email, s.start_date, s.end_date, 
+                    s.hours_per_week, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
+                    s.intake, s.course 
+                    FROM Students s 
+                    LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id 
+                    WHERE s.intern_id IN ({})
+                    '''.format(','.join('?' for _ in student_ids)), student_ids)
 
     students = cursor.fetchall()
 
@@ -987,7 +1043,27 @@ def get_projects():
 def get_student_by_id(intern_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (intern_id,))
+    # query everything
+    cursor.execute('''SELECT s.intern_id, s.full_name, s.pronouns, st.name, s.email, s.mobile, s.course, s.course_major, 
+                s.link_to_application_doc, s.read_student_handbook, s.read_student_projects, s.cover_letter_projects, 
+                s.cover_letter_concept, s.cover_letter_technical, s.pronunciation, p.name, s.start_date, s.end_date, 
+                s.hours_per_week, i.name, s.supervisor_email, s.wehi_email, s.summary_tech_skills, s.summary_experience, 
+                s.summary_interest_in_projects, s.pre_internship_summary_recommendation_external, 
+                CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
+                s.pre_internship_technical_rating, s.pre_internship_social_rating, s.pre_internship_learning_quickly, 
+                s.pre_internship_enthusiasm, s.pre_internship_experience, s.pre_internship_communication, 
+                s.pre_internship_adaptable, s.pre_internship_problem_solver, s.post_internship_comments, 
+                s.post_internship_adaptability, s.post_internship_learn_technical, s.post_internship_learn_conceptual, 
+                s.post_internship_collaborative, s.post_internship_ambiguity, s.post_internship_complexity, 
+                s.post_internship_summary_rating_internal, s.post_internship_summary_rating_external, s.github_username, 
+                s.extra_notes, s.remote_internship, s.code_of_conduct, s.facilitator_follower, s.listener_or_talker, 
+                s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
+                FROM Students s 
+                LEFT JOIN Statuses st ON s.status_id = st.id
+                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Projects p ON s.project_id = p.id
+                LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+                WHERE s.intern_id = ?''', (intern_id,))
     student = cursor.fetchone()
     conn.close()
     return student
@@ -1376,9 +1452,10 @@ def index_new_intake():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-        FROM Students
-        WHERE intake = ? AND status IN ({})
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -1414,9 +1491,10 @@ def index_outstanding():
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-        FROM Students
-        WHERE intake = ? AND status IN ({}) ORDER BY status ASC
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status IN ({}) ORDER BY s.status ASC
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -1451,9 +1529,10 @@ def index_current():
     status_of_students_current = [10,11,12,13]
     current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_current]
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile, github_username
-        FROM Students
-        WHERE intake = ? AND status IN ({})
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile, s.github_username
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status IN ({})
     '''.format(','.join(['?'] * len(current_statuses_list)))
 
 
@@ -1473,7 +1552,9 @@ def index():
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-    cursor.execute('SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns, pre_internship_summary_recommendation_internal, show_key_skill, mobile FROM Students')
+    cursor.execute('''SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile 
+                    FROM Students s 
+                    LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id''')
     students = cursor.fetchall()
 
     cursor.execute('SELECT * FROM Projects')
@@ -1506,7 +1587,27 @@ def student(intern_id):
     cursor = conn.cursor()
 
     # Retrieve student data from the database
-    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (intern_id,))
+    # query everything
+    cursor.execute('''SELECT s.intern_id, s.full_name, s.pronouns, st.name, s.email, s.mobile, s.course, s.course_major, 
+                s.link_to_application_doc, s.read_student_handbook, s.read_student_projects, s.cover_letter_projects, 
+                s.cover_letter_concept, s.cover_letter_technical, s.pronunciation, p.name, s.start_date, s.end_date, 
+                s.hours_per_week, i.name, s.supervisor_email, s.wehi_email, s.summary_tech_skills, s.summary_experience, 
+                s.summary_interest_in_projects, s.pre_internship_summary_recommendation_external, 
+                CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
+                s.pre_internship_technical_rating, s.pre_internship_social_rating, s.pre_internship_learning_quickly, 
+                s.pre_internship_enthusiasm, s.pre_internship_experience, s.pre_internship_communication, 
+                s.pre_internship_adaptable, s.pre_internship_problem_solver, s.post_internship_comments, 
+                s.post_internship_adaptability, s.post_internship_learn_technical, s.post_internship_learn_conceptual, 
+                s.post_internship_collaborative, s.post_internship_ambiguity, s.post_internship_complexity, 
+                s.post_internship_summary_rating_internal, s.post_internship_summary_rating_external, s.github_username, 
+                s.extra_notes, s.remote_internship, s.code_of_conduct, s.facilitator_follower, s.listener_or_talker, 
+                s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
+                FROM Students s 
+                LEFT JOIN Statuses st ON s.status_id = st.id
+                LEFT JOIN Intakes i ON s.intakes_id = i.id
+                LEFT JOIN Projects p ON s.project_id = p.id
+                LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+                WHERE s.intern_id = ?''', (intern_id,))
     student = cursor.fetchone()
 
     # Close the database connection
@@ -1893,8 +1994,7 @@ def intakes_index():
         s.status
     FROM Students s
     LEFT JOIN Projects p ON s.project_id = p.id
-""")
-    cursor.execute(query)
+    """)
     students = cursor.fetchall()
 
     # Close the database connection
@@ -1911,9 +2011,10 @@ def students_by_intake(intake_name):
     cursor = conn.cursor()
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, status, post_internship_summary_rating_internal, pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile, github_username
-        FROM Students
-        WHERE intake = ?
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile, s.github_username
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ?
     '''
     cursor.execute(query, (intake_name,))
     students = cursor.fetchall()
@@ -1938,13 +2039,14 @@ def finished_students_by_intake(intake_name):
     cursor = conn.cursor()
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
-        status, post_internship_summary_rating_internal, 
-        pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile, github_username
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, s.course,
+        s.status, s.post_internship_summary_rating_internal, 
+        s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile, s.github_username
         
         
-        FROM Students
-        WHERE intake = ? AND status = "14 Finished"
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.intake = ? AND s.status = "14 Finished"
     '''
     cursor.execute(query, (intake_name,))
     students = cursor.fetchall()
@@ -2085,11 +2187,12 @@ def project_students(id):
 
     # Get students associated with this project
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, course, 
-        status, post_internship_summary_rating_internal, pronouns,
-        pre_internship_summary_recommendation_internal, show_key_skill, mobile
-        FROM Students
-        WHERE project = (SELECT name FROM Projects WHERE id = ?)
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, 
+        s.course, s.status, s.post_internship_summary_rating_internal, s.pronouns, 
+        CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.project = (SELECT name FROM Projects WHERE id = ?)
     '''
     cursor.execute(query, (id,))
     students = cursor.fetchall()
@@ -2117,11 +2220,12 @@ def project_finished_students(id):
     name = name[0] if name else "Unknown Project"
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, 
-        course, status, post_internship_summary_rating_internal, 
-        pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-        FROM Students
-        WHERE project = (SELECT name FROM Projects WHERE id = ?) AND status = "14 Finished"
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, 
+        s.course, s.status, s.post_internship_summary_rating_internal, 
+        s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.project = (SELECT name FROM Projects WHERE id = ?) AND s.status = "14 Finished"
     '''
     cursor.execute(query, (id,))
     students = cursor.fetchall()
@@ -2149,11 +2253,12 @@ def project_current_students(id):
     name = name[0] if name else "Unknown Project"
 
     query = '''
-        SELECT intern_id, full_name, email, pronunciation, project, intake, 
-        course, status, post_internship_summary_rating_internal, 
-        pronouns,pre_internship_summary_recommendation_internal, show_key_skill, mobile
-        FROM Students
-        WHERE project = (SELECT name FROM Projects WHERE id = ?) AND status = "13 Internship started"
+        SELECT s.intern_id, s.full_name, s.email, s.pronunciation, s.project, s.intake, 
+        s.course, s.status, s.post_internship_summary_rating_internal, 
+        s.pronouns, CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), s.show_key_skill, s.mobile
+        FROM Students s 
+        LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+        WHERE s.project = (SELECT name FROM Projects WHERE id = ?) AND s.status = "13 Internship started"
     '''
     cursor.execute(query, (id,))
     students = cursor.fetchall()

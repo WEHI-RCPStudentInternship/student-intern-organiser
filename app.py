@@ -2,6 +2,7 @@ import csv
 import os
 import shutil
 import sqlite3
+import traceback
 import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
@@ -1827,24 +1828,21 @@ def change_post_internship_rating():
 @app.route('/change_project', methods=['POST'])
 def change_project():
 
-    data = request.get_json()
+    data = request.get_json() or {}
     student_ids = data.get('student_ids', [])
     project_id = data.get('project_id')
 
-    # Convert student IDs to integers
-    student_ids = [int(id) for id in student_ids]
-    new_project = int(new_project)
-
-    # Convert project_id to int (and basic validation)
     if project_id is None:
         return ("Missing project_id", 400)
 
+    # Convert IDs to integers
+    student_ids = [int(sid) for sid in student_ids]
     project_id = int(project_id)
 
-    # Call the function with project_id
     change_student_project(student_ids, project_id)
 
-    return redirect('/')
+    return ("OK", 200)
+
 
 
 

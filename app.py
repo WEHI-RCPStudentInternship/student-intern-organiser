@@ -2,6 +2,7 @@ import csv
 import os
 import shutil
 import sqlite3
+import traceback
 import zipfile
 from collections import Counter
 from datetime import datetime, timedelta
@@ -1827,19 +1828,22 @@ def change_post_internship_rating():
 @app.route('/change_project', methods=['POST'])
 def change_project():
 
-    data = request.get_json()
+    data = request.get_json() or {}
     student_ids = data.get('student_ids', [])
-    new_project = data.get('new_project', '')
+    project_id = data.get('project_id')
 
-    # Convert student IDs to integers
-    student_ids = [int(id) for id in student_ids]
-    new_project = int(new_project)
+    if project_id is None:
+        return ("Missing project_id", 400)
 
-    # Call the change_student_project function
-    change_student_project(student_ids, new_project)
+    # Convert IDs to integers
+    student_ids = [int(sid) for sid in student_ids]
+    project_id = int(project_id)
 
-    # Redirect back to the index page
-    return redirect('/')
+    change_student_project(student_ids, project_id)
+
+    return ("OK", 200)
+
+
 
 
 @app.route('/change_status', methods=['POST'])
@@ -1953,7 +1957,7 @@ def change_course_update(student_ids, new_course):
     conn.close()
 
 
-def change_student_project(student_ids, new_project):
+def change_student_project(student_ids, project_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -1965,7 +1969,7 @@ def change_student_project(student_ids, new_project):
     '''.format(','.join(['?'] * len(student_ids)))
 
     # Execute the query
-    cursor.execute(query, [new_project] + student_ids)
+    cursor.execute(query, [project_id] + student_ids)
 
     # Commit the changes and close the connection
     conn.commit()
@@ -2148,7 +2152,7 @@ def intakes_index():
             s.full_name,
             s.email,
             s.pronunciation,
-            COALESCE(p.name, 'X') AS project,
+            p.name AS project,
             i.name AS intake,
             s.course,
             st.name AS status

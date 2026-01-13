@@ -287,19 +287,19 @@
 
             // Change project button action
             $('#changeProjectBtn').on('click', function() {
-              var project_id = $('#projectDropdown').val();
-              var student_ids = [];
+                var project_id = $('#projectDropdown').val();
+                var student_ids = [];
 
-              $('.studentCheckbox:checked').each(function() {
+                $('.studentCheckbox:checked').each(function() {
                 let text = table.row($(this).closest('tr')).data();
                 let id = String(text[1]).replace(/<\/?[^>]+(>|$)/g, '');
                 student_ids.push(id);
-              });
+                });
 
-              const data = {
-                student_ids: student_ids,
-                project_id: project_id
-              };
+                data = {
+                    student_ids: student_ids,
+                    new_project_id: project_id
+                };
 
               fetch('/change_project', {
                 method: 'POST',

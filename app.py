@@ -38,7 +38,7 @@ def fetch_students_with_project_name(cursor, where_sql="", params=(), order_sql=
             s.full_name,
             s.email,
             s.pronunciation,
-            COALESCE(p.name, 'X') AS project,   -- ✅ 输出仍叫 project（给前端显示用）
+            p.name AS project,
             s.intake,
             s.course,
             s.status,
@@ -73,7 +73,7 @@ def filter_students(status_of_students_to_filter,title,context = None):
     cursor.execute('SELECT * FROM Statuses')
     statuses = cursor.fetchall()
 
-    current_statuses_list = [row[1] for row in statuses if row[0] in status_of_students_to_filter]
+    current_statuses_list = [row[0] for row in statuses if row[0] in status_of_students_to_filter]
 
     # Retrieve student data from the database
     # Prepare the SQL query with a placeholder for the statuses filter
@@ -86,7 +86,7 @@ def filter_students(status_of_students_to_filter,title,context = None):
             s.full_name,
             s.email,
             s.pronunciation,
-            COALESCE(p.name, 'X') AS project,
+            p.name AS project,
             i.name AS intake,
             s.course,
             st.name AS status,
@@ -108,7 +108,7 @@ def filter_students(status_of_students_to_filter,title,context = None):
 
     if context == "missed_out":
         base_query += """
-          AND s.pre_internship_internal_eval_id = 8
+          AND s.pre_internship_internal_eval_level_id = 8
         """
 
     base_query += " ORDER BY st.name ASC"
@@ -393,7 +393,7 @@ def quick_review():
     # Prepare the SQL query with a placeholder for the statuses filter
     query = '''
         SELECT
-            s.intern_id,s.full_name, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake,
+            s.intern_id, s.full_name, s.email, s.pronunciation, p.name, i.name AS intake,
             s.course,st.name AS status, s.post_internship_summary_rating_internal, s.pronouns,
             CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
             s.show_key_skill, s.mobile
@@ -713,7 +713,8 @@ def assigned_projects(intake_type=None):
                     s.pronouns,
                     st.name AS status,
                     s.cover_letter_projects,
-                    CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''),
+                    s.pre_internship_internal_eval_level_id,
+                    COALESCE(lvl.name, ''),
                     s.course,
                     s.show_key_skill
                 FROM Students s
@@ -850,7 +851,7 @@ def submit_student_evaluation():
             projects_recommended = ?
 
         WHERE intern_id = ?
-    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal_id,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, remote_internship, code_of_conduct, facilitator_follower, listener_or_talker, thinker_brainstormer, why_applied, show_key_skill, projects_recommended, student_id))
+    ''', (status,pronunciation, cover_letter_projects, Overall_External, Overall_Internal,learn_quickly_technical, learn_domain_concepts, Enthusiastic, Experience, Communication, Adaptability,  summary_tech_skills, extra_notes, summary_experience, remote_internship, code_of_conduct, facilitator_follower, listener_or_talker, thinker_brainstormer, why_applied, show_key_skill, projects_recommended, student_id))
 
     # Commit the changes and close the database connection
     conn.commit()
@@ -1684,7 +1685,7 @@ def index():
             s.full_name,
             s.email,
             s.pronunciation,
-            COALESCE(p.name, 'X') AS project,
+            p.name AS project,
             i.name AS intake,
             s.course,
             st.name AS status,
@@ -1830,20 +1831,20 @@ def change_project():
 
     data = request.get_json() or {}
     student_ids = data.get('student_ids', [])
-    project_id = data.get('project_id')
+    new_project_id = data.get('new_project_id')
 
-    if project_id is None:
+    if new_project_id is None:
         return ("Missing project_id", 400)
 
     # Convert IDs to integers
     student_ids = [int(sid) for sid in student_ids]
-    project_id = int(project_id)
+    new_project_id = int(new_project_id)
 
-    change_student_project(student_ids, project_id)
+    # Call the change_student_project function
+    change_student_project(student_ids, new_project_id)
 
-    return ("OK", 200)
-
-
+    # Redirect back to the index page
+    return redirect('/')
 
 
 @app.route('/change_status', methods=['POST'])

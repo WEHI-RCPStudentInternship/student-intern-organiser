@@ -243,43 +243,8 @@
                   });
             });
 
-            // Change project button action
-            $('#changeProjectBtn').on('click', function() {
-                var project_id = $('#projectDropdown').val();
-                var student_ids = [];
-                var project_name = $('#projectDropdown option:selected').text();
-
-                var selectedRows = $('.studentCheckbox:checked').each(function() {
-                    text = table.row($(this).closest('tr')).data();
-                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
-                    student_ids.push(id);
-                });
-
-                data = {
-                    student_ids: student_ids,
-                    new_project: project_name
-                };
-
-                url = '/change_project';
-                // Send the POST request
-                fetch(url, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(data)
-                })
-                  .then(response => {
-                    if (response.ok) {
-                      console.log('Project changed successfully');
-                    } else {
-                      console.error('An error occurred:', response.statusText);
-                    }
-                  })
-                  .catch(error => {
-                    console.error('An error occurred:', error);
-                  });
-            });
+            
+            
 
 
             // Change post_internship_rating button action

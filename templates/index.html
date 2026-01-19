@@ -110,7 +110,7 @@
                 {% endif %}
                 
                 
-                
+
                 <td>N/A</td>
 
                 <th>{{ student[12] }}</th>
@@ -289,39 +289,34 @@
             $('#changeProjectBtn').on('click', function() {
                 var project_id = $('#projectDropdown').val();
                 var student_ids = [];
-                var project_name = $('#projectDropdown option:selected').text();
 
-                var selectedRows = $('.studentCheckbox:checked').each(function() {
-                    text = table.row($(this).closest('tr')).data();
-                    var id = text[1].replace(/<\/?[^>]+(>|$)/g, '')
-                    student_ids.push(id);
+                $('.studentCheckbox:checked').each(function() {
+                let text = table.row($(this).closest('tr')).data();
+                let id = String(text[1]).replace(/<\/?[^>]+(>|$)/g, '');
+                student_ids.push(id);
                 });
 
                 data = {
                     student_ids: student_ids,
-                    new_project: project_name
+                    new_project_id: project_id
                 };
 
-                url = '/change_project';
-                // Send the POST request
-                fetch(url, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(data)
-                })
-                  .then(response => {
-                    if (response.ok) {
-                      console.log('Project changed successfully');
-                    } else {
-                      console.error('An error occurred:', response.statusText);
-                    }
-                  })
-                  .catch(error => {
-                    console.error('An error occurred:', error);
-                  });
+              fetch('/change_project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+              })
+              .then(response => {
+                if (response.ok) {
+                  console.log('Project changed successfully');
+                  location.reload(); // Reload the page
+                } else {
+                  console.error('An error occurred:', response.statusText);
+                }
+              })
+              .catch(error => console.error('An error occurred:', error));
             });
+
 
             // Change phone button action
             $('#change_phone').on('click', function() {

@@ -1093,16 +1093,16 @@ def download_key_attributes():
 def get_statuses():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute('SELECT name FROM Statuses')
-    statuses = [row[0] for row in cursor.fetchall()]
+    cursor.execute('SELECT id, name FROM Statuses')
+    statuses = cursor.fetchall()
     conn.close()
     return statuses
 
 def get_intakes():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute('SELECT name FROM Intakes')
-    intakes = [row[0] for row in cursor.fetchall()]
+    cursor.execute('SELECT id, name FROM Intakes')
+    intakes = cursor.fetchall()
     conn.close()
     return intakes
 
@@ -1171,17 +1171,33 @@ def edit_student(intern_id):
     if request.method == 'POST':
         # Handle form submission and update the student record in the database
         print(request.form)
+        
+        # Convert status name to status_id
+        status_name = request.form['status']
+        intake_name = request.form['intake']
+        
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute('SELECT id FROM Statuses WHERE name = ?', (status_name,))
+        status_id_result = cursor.fetchone()
+        status_id = status_id_result[0] if status_id_result else None
+        
+        cursor.execute('SELECT id FROM Intakes WHERE name = ?', (intake_name,))
+        intake_id_result = cursor.fetchone()
+        intake_id = intake_id_result[0] if intake_id_result else None
+        conn.close()
+        
         data = {
             'full_name': request.form['full_name'],
             'pronouns': request.form['pronouns'],
-            'status_id': request.form['status'],
+            'status_id': status_id,
             'email': request.form['email'],
             'wehi_email': request.form['wehi_email'],
             'mobile': request.form['mobile'],
             'course': request.form['course'],
             'course_major': request.form['course_major'],
             'github_username': request.form['github_username'],
-            'intake_id': request.form['intake'],
+            'intake_id': intake_id,
             'project': request.form['project'],
             'start_date': request.form['start_date'],
             'end_date': request.form['end_date'],

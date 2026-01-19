@@ -1161,8 +1161,8 @@ def get_student_by_id(intern_id):
 def update_student(intern_id, data):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute('UPDATE Students SET github_username = ?, full_name = ?, pronouns = ?, status_id = ?, email = ?, wehi_email = ?, mobile = ?, course = ?, course_major = ?, intake_id = ?, project = ?, start_date = ?, end_date = ?, hours_per_week = ?, cover_letter_projects = ?, pronunciation = ?, post_internship_summary_rating_internal = ? WHERE intern_id = ?',
-                   (data['github_username'], data['full_name'], data['pronouns'], data['status_id'], data['email'], data['wehi_email'], data['mobile'], data['course'], data['course_major'], data['intake_id'], data['project'], data['start_date'], data['end_date'], data['hours_per_week'], data['cover_letter_projects'],data['pronunciation'],data['post_internship_summary_rating_internal'], intern_id))
+    cursor.execute('UPDATE Students SET github_username = ?, full_name = ?, pronouns = ?, status_id = ?, email = ?, wehi_email = ?, mobile = ?, course = ?, course_major = ?, intake_id = ?, project_id = ?, start_date = ?, end_date = ?, hours_per_week = ?, cover_letter_projects = ?, pronunciation = ?, post_internship_summary_rating_internal = ? WHERE intern_id = ?',
+                   (data['github_username'], data['full_name'], data['pronouns'], data['status_id'], data['email'], data['wehi_email'], data['mobile'], data['course'], data['course_major'], data['intake_id'], data['project_id'], data['start_date'], data['end_date'], data['hours_per_week'], data['cover_letter_projects'],data['pronunciation'],data['post_internship_summary_rating_internal'], intern_id))
     conn.commit()
     conn.close()
 
@@ -1175,6 +1175,7 @@ def edit_student(intern_id):
         # Convert status name to status_id
         status_name = request.form['status']
         intake_name = request.form['intake']
+        project_name = request.form['project']
         
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -1185,6 +1186,10 @@ def edit_student(intern_id):
         cursor.execute('SELECT id FROM Intakes WHERE name = ?', (intake_name,))
         intake_id_result = cursor.fetchone()
         intake_id = intake_id_result[0] if intake_id_result else None
+        
+        cursor.execute('SELECT id FROM Projects WHERE name = ?', (project_name,))
+        project_id_result = cursor.fetchone()
+        project_id = project_id_result[0] if project_id_result else None
         conn.close()
         
         data = {
@@ -1198,7 +1203,7 @@ def edit_student(intern_id):
             'course_major': request.form['course_major'],
             'github_username': request.form['github_username'],
             'intake_id': intake_id,
-            'project': request.form['project'],
+            'project_id': project_id,
             'start_date': request.form['start_date'],
             'end_date': request.form['end_date'],
             'hours_per_week': request.form['hours_per_week'],

@@ -999,7 +999,27 @@ def feedback(intern_id):
     cursor = conn.cursor()
 
     # Retrieve the student's details from the database
-    cursor.execute('SELECT * FROM Students WHERE intern_id = ?', (intern_id,))
+    # query everything
+    cursor.execute('''SELECT s.intern_id, s.full_name, s.pronouns, st.name, s.email, s.mobile, s.course, s.course_major, 
+                s.link_to_application_doc, s.read_student_handbook, s.read_student_projects, s.cover_letter_projects, 
+                s.cover_letter_concept, s.cover_letter_technical, s.pronunciation, p.name, s.start_date, s.end_date, 
+                s.hours_per_week, i.name, s.supervisor_email, s.wehi_email, s.summary_tech_skills, s.summary_experience, 
+                s.summary_interest_in_projects, s.pre_internship_summary_recommendation_external, 
+                CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
+                s.pre_internship_technical_rating, s.pre_internship_social_rating, s.pre_internship_learning_quickly, 
+                s.pre_internship_enthusiasm, s.pre_internship_experience, s.pre_internship_communication, 
+                s.pre_internship_adaptable, s.pre_internship_problem_solver, s.post_internship_comments, 
+                s.post_internship_adaptability, s.post_internship_learn_technical, s.post_internship_learn_conceptual, 
+                s.post_internship_collaborative, s.post_internship_ambiguity, s.post_internship_complexity, 
+                s.post_internship_summary_rating_internal, s.post_internship_summary_rating_external, s.github_username, 
+                s.extra_notes, s.remote_internship, s.code_of_conduct, s.facilitator_follower, s.listener_or_talker, 
+                s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
+                FROM Students s 
+                LEFT JOIN Statuses st ON s.status_id = st.id
+                LEFT JOIN Intakes i ON s.intake_id = i.id
+                LEFT JOIN Projects p ON s.project_id = p.id
+                LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+                WHERE s.intern_id = ?''', (intern_id,))
     student = cursor.fetchone()
 
     # Close the database connection
@@ -1027,7 +1047,27 @@ def feedback_table(intern_id):
     cursor = conn.cursor()
 
     # Retrieve the feedback data from the Students table
-    cursor.execute('SELECT * FROM Students')
+    # query everything
+    cursor.execute('''SELECT s.intern_id, s.full_name, s.pronouns, st.name, s.email, s.mobile, s.course, s.course_major, 
+                s.link_to_application_doc, s.read_student_handbook, s.read_student_projects, s.cover_letter_projects, 
+                s.cover_letter_concept, s.cover_letter_technical, s.pronunciation, p.name, s.start_date, s.end_date, 
+                s.hours_per_week, i.name, s.supervisor_email, s.wehi_email, s.summary_tech_skills, s.summary_experience, 
+                s.summary_interest_in_projects, s.pre_internship_summary_recommendation_external, 
+                CAST(COALESCE(s.pre_internship_internal_eval_level_id, '') AS TEXT) || ' - ' || COALESCE(lvl.name, ''), 
+                s.pre_internship_technical_rating, s.pre_internship_social_rating, s.pre_internship_learning_quickly, 
+                s.pre_internship_enthusiasm, s.pre_internship_experience, s.pre_internship_communication, 
+                s.pre_internship_adaptable, s.pre_internship_problem_solver, s.post_internship_comments, 
+                s.post_internship_adaptability, s.post_internship_learn_technical, s.post_internship_learn_conceptual, 
+                s.post_internship_collaborative, s.post_internship_ambiguity, s.post_internship_complexity, 
+                s.post_internship_summary_rating_internal, s.post_internship_summary_rating_external, s.github_username, 
+                s.extra_notes, s.remote_internship, s.code_of_conduct, s.facilitator_follower, s.listener_or_talker, 
+                s.thinker_brainstormer, s.why_applied, s.projects_recommended, s.redcap_id, s.show_key_skill 
+                FROM Students s 
+                LEFT JOIN Statuses st ON s.status_id = st.id
+                LEFT JOIN Intakes i ON s.intake_id = i.id
+                LEFT JOIN Projects p ON s.project_id = p.id
+                LEFT JOIN internal_eval_levels lvl ON s.pre_internship_internal_eval_level_id = lvl.id
+                ''')
     students = cursor.fetchall()
 
     # Close the database connection

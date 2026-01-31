@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Statuses Index{% endblock %}
+
+{% block page_title %}Statuses{% endblock %}
+
+{% block top_links_menu %}
+<a href="/add_status">Add Status</a>
+{% endblock %}
+
+{% block content %}
+<h1>Statuses Table</h1>
+<p><strong>Note:</strong> Status IDs are used throughout the application in hardcoded filters. Changing IDs will break existing functionality.</p>
+
+<table id="statusesTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for status in statuses %}
+        <tr>
+            <td>{{ status[0] }}</td>
+            <td>{{ status[1] }}</td>
+            <td>
+                <a href="/edit_status/{{ status[0] }}">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#statusesTable').DataTable({
+            "lengthMenu": [10, 25, 50, 100]
+        });
+    });
+</script>
+{% endblock %}

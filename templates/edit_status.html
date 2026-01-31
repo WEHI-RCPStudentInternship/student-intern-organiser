@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Status{% endblock %}
+
+{% block page_title %}Edit Status{% endblock %}
+
+{% block top_links_menu %}
+    <!-- Your top links menu goes here if needed -->
+{% endblock %}
+
+{% block content %}
+    <h1>Edit Status</h1>
+    <div class="alert alert-warning" role="alert">
+        ⚠️ <strong>Warning:</strong> This status is used by existing student records. ID {{ status[0] }} is referenced in filters throughout the application.
+    </div>
+    <form method="POST" action="/edit_status/{{ status[0] }}">
+        <div class="form-group">
+            <label for="status_id">Status ID (Read-only):</label>
+            <input type="text" class="form-control" id="status_id" value="{{ status[0] }}" readonly disabled>
+        </div>
+        <div class="form-group">
+            <label for="name">Status Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ status[1] }}" required>
+            <small class="form-text text-muted">Format: ## Description, e.g., '01 Received application'</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+{% endblock %}

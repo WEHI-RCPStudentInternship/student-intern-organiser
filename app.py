@@ -2230,6 +2230,65 @@ def intakes_index():
     return render_template('intakes.html', intakes=intakes, students=students)
 
 
+@app.route('/statuses')
+def statuses_index():
+    # Connect to database and retrieve all status records
+    # Note: Status IDs are referenced throughout the application:
+    #   - IDs 10-13: "Current" students (quick review to interviewed)
+    #   - IDs 1-6: Early-stage applicants
+    #   - IDs 15-21: Finished/unavailable students
+    # Changing IDs will break hardcoded filters in multiple routes
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT id, name FROM Statuses ORDER BY id')
+    statuses = cursor.fetchall()
+    
+    conn.close()
+    return render_template('statuses.html', statuses=statuses)
+
+
+@app.route('/add_status', methods=['GET', 'POST'])
+def add_status():
+    if request.method == 'POST':
+        new_name = request.form.get('name')
+
+        # Connect to the database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Insert the new status record into the database
+        cursor.execute('INSERT INTO Statuses (name) VALUES (?)', (new_name,))
+        
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('statuses_index'))
+
+    # If it's a GET request, render the add_status.html template
+    return render_template('add_status.html')
+
+
+@app.route('/edit_status/<int:status_id>', methods=['GET', 'POST'])
+def edit_status(status_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        # Handle form submission and update the status record
+        new_name = request.form.get('name')
+        cursor.execute('UPDATE Statuses SET name = ? WHERE id = ?', (new_name, status_id))
+        conn.commit()
+        conn.close()
+        # Redirect to statuses index after saving changes
+        return redirect(url_for('statuses_index'))
+
+    # If it's a GET request, render the edit_status.html template
+    cursor.execute('SELECT * FROM Statuses WHERE id = ?', (status_id,))
+    status_data = cursor.fetchone()
+    conn.close()
+
+    return render_template('edit_status.html', status=status_data)
 
 
 @app.route('/students_by_intake/<path:intake_name>')  # Use <path:> to allow slashes in the parameter
@@ -2341,7 +2400,6 @@ def finished_students_by_intake(intake_name):
 def edit_intake(intake_id):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-
     if request.method == 'POST':
         # Handle form submission and update the intake record in your database
         new_name = request.form.get('name')

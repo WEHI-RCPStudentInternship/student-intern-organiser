@@ -164,7 +164,7 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
       </h3>
     </div>
     {% for student in students %} 
-    {% if project[1] == student[2] %} 
+    {% if project[0] == student[2] %} 
         {% if student[6] == 8 %} 
             {% set classes = 'male other not-accepted kanban-card' %} 
         {% elif student[6] == 3 %} 

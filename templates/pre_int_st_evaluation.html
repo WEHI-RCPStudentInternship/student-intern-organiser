@@ -231,10 +231,10 @@ If you would like to decline this offer, please reply to this email if you would
 
         <select name="status" required>
             {% for status in statuses %}
-                {% if status == student[3] %}
-                    <option value="{{ status }}" selected>{{ status }}</option>
+                {% if status[1] == student[3] %}
+                    <option value="{{ status[0] }}" selected>{{ status[1] }}</option>
                 {% else %}
-                    <option value="{{ status }}">{{ status }}</option>
+                    <option value="{{ status[0] }}">{{ status[1] }}</option>
                 {% endif %}
             {% endfor %}
         </select>
@@ -439,18 +439,18 @@ If you would like to decline this offer, please reply to this email if you would
         <label for="Overall_Internal" class= "normal"> Overall Internal </label>
         <select name="Overall_Internal" id="Overall_Internal">
             {% if student[26] %}
-                <option value="{{ student[26] }}"selected>{{ student[26] }}</option>
+                <option value="{{ student[26][0] }}"selected>{{ student[26] }}</option>
             {% else %}
                 <option value="" selected disabled>Select your Evaluation</option>
             {% endif %}
-            <option value="1"> 01 - F Translator - Recommend sign up even without a project.</option>
-            <option value="2"> 02 - F Sysadmin - Recommend sign up even without a project.</option>
-            <option value="3"> 03 - F ETS/Fast Learner - Recommend sign up even without a project.</option>
-            <option value="4"> 04 - F Technical Skills - Recommend sign up for a specific project.</option>
-            <option value="5"> 05 - Translator- Recommend sign up even without a project.</option>
-            <option value="6"> 06 - Sysadmin - Recommend sign up even without a project.</option>
-            <option value="7"> 07 - ETS/Fast Learner - Recommend sign up for a specific project.</option>
-            <option value="8"> 08 - TS - Recommend no sign up except under specific circumstances.</option>
+            <option value="1"> 1 F Translator - Recommend sign up even without a project.</option>
+            <option value="2"> 2 F Sysadmin - Recommend sign up even without a project.</option>
+            <option value="3"> 3 F ETS/Fast Learner - Recommend sign up even without a project.</option>
+            <option value="4"> 4 F Technical Skills - Recommend sign up for a specific project.</option>
+            <option value="5"> 5 Translator- Recommend sign up even without a project.</option>
+            <option value="6"> 6 Sysadmin - Recommend sign up even without a project.</option>
+            <option value="7"> 7 ETS/Fast Learner - Recommend sign up for a specific project.</option>
+            <option value="8"> 8 TS - Recommend no sign up except under specific circumstances.</option>
         </select>
 
         <label for="Overall_External" class= "normal">Overall External:</label>

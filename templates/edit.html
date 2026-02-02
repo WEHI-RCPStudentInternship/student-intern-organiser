@@ -48,10 +48,6 @@
                 <td><input type="email" name="email" value="{{ student[4] }}" required></td>
             </tr>
             <tr>
-                <td>wehi_email</td>
-                <td><input type="email" name="wehi_email" value="{{ student[21] }}" required></td>
-            </tr>
-            <tr>
                 <td>mobile</td>
                 <td><input type="tel" name="mobile" value="{{ student[5] }}" required></td>
             </tr>
@@ -62,10 +58,6 @@
             <tr>
                 <td>course_major</td>
                 <td><input type="text" name="course_major" value="{{ student[7] }}" required></td>
-            </tr>
-            <tr>
-                <td>github_username</td>
-                <td><input type="text" name="github_username" value="{{ student[44] }}" ></td>
             </tr>
             <tr>
                 <td>cover_letter_projects</td>
@@ -121,18 +113,18 @@
             <tr>
                 <td>intake</td>
                 <td>
-                    <select name="intake" required>
+                    <select name="intake_id" required>
                         {% for intake in intakes %}
-                            {% if intake[1] == student[19] %}
-                                <option value="{{ intake[1] }}" selected>{{ intake[1] }}</option>
+                            {% if intake[0] == student[19] %}
+                                <option value="{{ intake[0] }}" selected>{{ intake[1] }}</option>
                             {% else %}
-                                <option value="{{ intake[1] }}">{{ intake[1] }}</option>
+                                <option value="{{ intake[0] }}">{{ intake[1] }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
                 </td>
             </tr>
-        </table>
+                    </table>
         <button type="submit">Update</button>
     </form>
 {% endblock %}

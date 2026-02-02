@@ -1028,7 +1028,7 @@ def feedback(intern_id):
     # Close the database connection
     conn.close()
     # Retrieve the pronoun from the database
-    pronoun = str(student[3] or "")
+    pronoun = str(student[2] or "")
 
     # Split the pronoun into multiple parts using the '/' delimiter
     pronoun_parts = pronoun.split('/')

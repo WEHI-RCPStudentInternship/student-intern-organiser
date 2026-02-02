@@ -13,7 +13,7 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   </a><br />
 
   {{ (student[10] or '') }}<br />
-  {{ (student[8] or '').split(' - ')[0] }} ({{ student[3] }})
+  {{ (student[8] or '').split(' - ')[0] }} ({{ student[3] }}) <br/>
   {{ student[4] }} <br />
   {{ student[5] }} <br />
 </div>

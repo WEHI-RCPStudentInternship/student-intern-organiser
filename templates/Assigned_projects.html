@@ -9,10 +9,10 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   ondragstart="drag(event)"
 >
   <a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">
-  {{ student[1] }} ({{ (student[3] or '')[:3] }})
+  {{ student[1] }} ({{ (student[9] or '')[:3] }})
   </a><br />
 
-  {{ (student[9] or '') }}<br />
+  {{ (student[10] or '') }}<br />
   {{ (student[8] or '').split(' - ')[0] }} ({{ student[3] }})
   {{ student[4] }} <br />
   {{ student[5] }} <br />

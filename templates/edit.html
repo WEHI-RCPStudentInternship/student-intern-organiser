@@ -121,18 +121,18 @@
             <tr>
                 <td>intake</td>
                 <td>
-                    <select name="intake" required>
+                    <select name="intake_id" required>
                         {% for intake in intakes %}
-                            {% if intake[1] == student[19] %}
-                                <option value="{{ intake[1] }}" selected>{{ intake[1] }}</option>
+                            {% if intake[0] == student[19] %}
+                                <option value="{{ intake[0] }}" selected>{{ intake[1] }}</option>
                             {% else %}
-                                <option value="{{ intake[1] }}">{{ intake[1] }}</option>
+                                <option value="{{ intake[0] }}">{{ intake[1] }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
                 </td>
             </tr>
-        </table>
+                    </table>
         <button type="submit">Update</button>
     </form>
 {% endblock %}

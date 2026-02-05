@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Pre-internship internal evaluation{% endblock %}
+
+{% block page_title %}Pre-internship internal evaluation{% endblock %}
+
+{% block top_links_menu %}
+<a href="/add_pre_int_internal_eval_level">Add internal evaluation level</a>
+{% endblock %}
+
+{% block content %}
+<h1>Pre-internship internal evaluation level table</h1>
+<p><strong>Note:</strong> Evaluation level IDs are used throughout the application in hardcoded filters. Changing IDs will break existing functionality.</p>
+
+<table id="levelsTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for level in levels %}
+        <tr>
+            <td>{{ level[0] }}</td>
+            <td>{{ level[1] }}</td>
+            <td>
+                <a href="/edit_pre_int_internal_eval_level/{{ level[0] }}">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#levelsTable').DataTable({
+            "lengthMenu": [10, 25, 50, 100]
+        });
+    });
+</script>
+{% endblock %}

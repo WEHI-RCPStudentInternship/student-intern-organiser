@@ -2388,6 +2388,61 @@ def add_eng_interns():
 
     return render_template('add_eng_interns.html')
 
+@app.route('/pre_int_internal_eval_level')
+def pre_int_internal_eval_level():
+    # Connect to database and retrieve all pre-internship internal evaluation records
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT id, name FROM Internal_eval_levels ORDER BY id')
+    levels = cursor.fetchall()
+    
+    conn.close()
+    return render_template('internal_eval_level.html', levels=levels)
+
+
+@app.route('/add_pre_int_internal_eval_level', methods=['GET', 'POST'])
+def add_pre_int_internal_eval_level():
+    if request.method == 'POST':
+        new_level = request.form.get('name')
+
+        # Connect to the database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+
+        # Insert the new level description into the database
+        cursor.execute('INSERT INTO Internal_eval_levels (name) VALUES (?)', (new_level,))
+        
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for('pre_int_internal_eval_level'))
+
+    # If it's a GET request, render the add_internal_eval_level.html template
+    return render_template('add_internal_eval_level.html')
+
+
+@app.route('/edit_pre_int_internal_eval_level/<int:level_id>', methods=['GET', 'POST'])
+def edit_pre_int_internal_eval_level(level_id):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        # Handle form submission and update the level description
+        new_level = request.form.get('name')
+        cursor.execute('UPDATE Internal_eval_levels SET name = ? WHERE id = ?', (new_level, level_id))
+        conn.commit()
+        conn.close()
+        # Redirect to internal evaluation table after saving changes
+        return redirect(url_for('pre_int_internal_eval_level'))
+
+    # If it's a GET request, render the edit_status.html template
+    cursor.execute('SELECT * FROM Internal_eval_levels WHERE id = ?', (level_id,))
+    level = cursor.fetchone()
+    conn.close()
+
+    return render_template('edit_internal_eval_level.html', level=level)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

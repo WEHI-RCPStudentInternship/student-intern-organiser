@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Pre-internship Internal Evaluation Level{% endblock %}
+
+{% block page_title %}Add Pre-internship Internal Evaluation Level{% endblock %}
+
+{% block top_links_menu %}
+    <!-- Your top links menu goes here if needed -->
+{% endblock %}
+
+{% block content %}
+    <h1>Add pre-internship internal evaluation level</h1>
+    <form method="POST" action="/add_pre_int_internal_eval_level">
+        <div class="form-group">
+            <label for="name">Evaluation Level Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+            <small class="form-text text-muted">Format: Name - Description, e.g., ' F Translator - Recommend sign up even without a project.'</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Add evaluation level</button>
+    </form>
+{% endblock %}

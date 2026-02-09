@@ -2398,7 +2398,7 @@ def pre_int_internal_eval_level():
     levels = cursor.fetchall()
     
     conn.close()
-    return render_template('internal_eval_level.html', levels=levels)
+    return render_template('internal_eval_level_index.html', levels=levels)
 
 
 @app.route('/add_pre_int_internal_eval_level', methods=['GET', 'POST'])

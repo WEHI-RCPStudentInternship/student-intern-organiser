@@ -8,9 +8,12 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
   draggable="true"
   ondragstart="drag(event)"
 >
-  <a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}" > {{ student[1] }} ({{ student[8][:3] }})</a><br />
-  {{ student[9] }}<br />
-  {{ student[7].split(' - ')[0] }} ({{ student[3] }}) <br />
+  <a target="_blank" href="/pre_int_st_evaluation/{{ student[0] }}">
+  {{ student[1] }} ({{ (student[9] or '')[:3] }})
+  </a><br />
+
+  {{ (student[10] or '') }}<br />
+  {{ (student[8] or '').split(' - ')[0] }} ({{ student[3] }}) <br/>
   {{ student[4] }} <br />
   {{ student[5] }} <br />
 </div>
@@ -116,10 +119,17 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
 <div class="counts kanban-total-accepted-counts"></div>
 
 <div class="kanban-container">
+  {#
+  <div style="background:#fff3cd; padding:10px; margin:10px 0; border:1px solid #ffeeba;">
+    DEBUG<br>
+    first project = {{ projects[0] }} <br>
+    first student = {{ students[0] }}
+  </div>
+  #}
   {% for project in projects %}
   <div
     class="kanban-column"
-    data-project-id="{{ project[1] }}"
+    data-project-id="{{ project[0] }}"
     data-status="{{ project[2] }}"
     ondrop="drop(event)"
     ondragover="allowDrop(event)"
@@ -154,7 +164,7 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
         <input
           type="checkbox"
           class="project-checkbox"
-          data-project-id="{{ project[1] }}"
+          data-project-id="{{ project[0] }}"
           style="transform: scale(1.5); margin: 0"
         />
         <span>Status: {{ project[2] }}</span>
@@ -164,22 +174,22 @@ block content %} {% macro studentKanbanCard(classes,student) -%}
       </h3>
     </div>
     {% for student in students %} 
-    {% if project[1] == student[2] %} 
-        {% if student[6] == 8 %} 
+      {% if student[2] == project[0] %}
+        {% if student[7] == 8 %} 
             {% set classes = 'male other not-accepted kanban-card' %} 
-        {% elif student[6] == 3 %} 
+        {% elif student[7] == 3 %} 
             {% set classes = 'experienced kanban-card female' %} 
-        {% elif student[6] == 7 %} 
+        {% elif student[7] == 7 %} 
             {% set classes = 'experienced kanban-card male' %}
-        {% elif student[6] == 2 %} 
+        {% elif student[7] == 2 %} 
             {% set classes = 'sysadmin kanban-card female' %} 
-        {% elif student[6] == 6 %} 
+        {% elif student[7] == 6 %} 
             {% set classes = 'sysadmin kanban-card male' %} 
-        {% elif student[6] == 1 %} 
+        {% elif student[7] == 1 %} 
             {% set classes = 'translator kanban-card female' %} 
-        {% elif student[6] == 5 %} 
+        {% elif student[7] == 5 %} 
             {% set classes = 'translator kanban-card male' %} 
-        {% elif student[6] == 4 %} 
+        {% elif student[7] == 4 %} 
             {% set classes = 'other not-accepted female kanban-card' %} 
         {% else %} 
             {% set classes = 'other kanban-card' %} 

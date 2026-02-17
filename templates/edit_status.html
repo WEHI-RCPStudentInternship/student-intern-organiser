@@ -5,14 +5,11 @@
 {% block page_title %}Edit Status{% endblock %}
 
 {% block top_links_menu %}
-    <!-- Your top links menu goes here if needed -->
+
 {% endblock %}
 
 {% block content %}
     <h1>Edit Status</h1>
-    <div class="alert alert-warning" role="alert">
-        ⚠️ <strong>Warning:</strong> This status is used by existing student records. ID {{ status[0] }} is referenced in filters throughout the application.
-    </div>
     <form method="POST" action="/edit_status/{{ status[0] }}">
         <div class="form-group">
             <label for="status_id">Status ID (Read-only):</label>

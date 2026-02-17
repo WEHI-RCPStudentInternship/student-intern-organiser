@@ -2245,7 +2245,7 @@ def statuses_index():
     statuses = cursor.fetchall()
     
     conn.close()
-    return render_template('statuses.html', statuses=statuses)
+    return render_template('statuses_index.html', statuses=statuses)
 
 
 @app.route('/add_status', methods=['GET', 'POST'])

@@ -34,10 +34,10 @@
                 <td>
                     <select name="status" required>
                         {% for status in statuses %}
-                            {% if status == student[3] %}
-                                <option value="{{ status }}" selected>{{ status }}</option>
+                            {% if status[1] == student[3] %}
+                                <option value="{{ status[1] }}" selected>{{ status[1] }}</option>
                             {% else %}
-                                <option value="{{ status }}">{{ status }}</option>
+                                <option value="{{ status[1] }}">{{ status[1] }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
@@ -46,10 +46,6 @@
             <tr>
                 <td>university_email</td>
                 <td><input type="email" name="email" value="{{ student[4] }}" required></td>
-            </tr>
-            <tr>
-                <td>wehi_email</td>
-                <td><input type="email" name="wehi_email" value="{{ student[21] }}" required></td>
             </tr>
             <tr>
                 <td>mobile</td>
@@ -62,10 +58,6 @@
             <tr>
                 <td>course_major</td>
                 <td><input type="text" name="course_major" value="{{ student[7] }}" required></td>
-            </tr>
-            <tr>
-                <td>github_username</td>
-                <td><input type="text" name="github_username" value="{{ student[44] }}" ></td>
             </tr>
             <tr>
                 <td>cover_letter_projects</td>
@@ -121,18 +113,18 @@
             <tr>
                 <td>intake</td>
                 <td>
-                    <select name="intake" required>
+                    <select name="intake_id" required>
                         {% for intake in intakes %}
-                            {% if intake == student[19] %}
-                                <option value="{{ intake }}" selected>{{ intake }}</option>
+                            {% if intake[0] == student[19] %}
+                                <option value="{{ intake[0] }}" selected>{{ intake[1] }}</option>
                             {% else %}
-                                <option value="{{ intake }}">{{ intake }}</option>
+                                <option value="{{ intake[0] }}">{{ intake[1] }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
                 </td>
             </tr>
-        </table>
+                    </table>
         <button type="submit">Update</button>
     </form>
 {% endblock %}

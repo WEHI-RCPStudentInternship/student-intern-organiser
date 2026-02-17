@@ -1,4 +1,4 @@
-CREATE TABLE sqlite_sequence(name,seq);
+---CREATE TABLE sqlite_sequence(name,seq);
 CREATE TABLE Students (
         intern_id INTEGER PRIMARY KEY AUTOINCREMENT,
         full_name TEXT,
